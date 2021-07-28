@@ -28,10 +28,41 @@ const logout = async (req, res) => {
     return isLogoutSuccess;
 };
 
+const auth = async (req, res) => {
+    const authUser = {
+        isAuth: true,
+        email: req.decodeData.sub,
+        accessToken: req.accessToken
+    };
+    res.json(utils.successTrue(responseMessage.LOGIN_SUCCESS, authUser));
+};
+
+const join = async (req, res) => {
+    const missDataToSubmit = {};
+    missDataToSubmit.email = null;
+    const joinUser = req.body;
+
+    const isEmail = await userService.findUserByEmail(joinUser.email);
+    if (!isEmail) {
+        return res
+            .status(statusCode.DB_ERROR)
+            .json(utils.successFalse(responseMessage.DB_ERROR,missDataToSubmit));
+    }
+    if (Object.keys(isEmail).length > 0) {
+        return res
+            .status(statusCode.BAD_REQUEST)
+            .json(utils.successFalse(responseMessage.EMAIL_ALREADY_EXIST,missDataToSubmit));
+    }
+    const isJoinSuccess = await userService.join({ joinUser }, res);
+    return isJoinSuccess;
+};
+
 
 module.exports = {
     login,
     reissueAccessToken,
     dashboard,
-    logout
+    logout,
+    auth,
+    join
 };

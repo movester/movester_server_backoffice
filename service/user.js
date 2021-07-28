@@ -60,17 +60,6 @@ const login = async ({ loginUser }, res) => {
             );
         return isLoginSuccess;
     }
-    if (!daoRow[0].is_email_verify) {
-        const isLoginSuccess = res
-            .status(statusCode.BAD_REQUEST)
-            .json(
-                utils.successFalse(
-                    responseMessage.EMAIL_VERIFY_NOT,
-                    missDataToSubmit
-                )
-            );
-        return isLoginSuccess;
-    }
 
     const accessToken = jwt.sign(
         { sub: loginUser.email },
@@ -80,6 +69,7 @@ const login = async ({ loginUser }, res) => {
     const refreshToken = auth.generateRefreshToken(loginUser.email);
 
     const dataToSubmit = {
+        name: daoRow[0].name,
         accessToken: accessToken,
         refreshToken: refreshToken,
         isAuth: true
@@ -128,8 +118,57 @@ const logout = async (email, res) => {
     return isLogoutSuccess;
 };
 
+const join = async ({ joinUser }, res) => {
+    const missDataToSubmit = {
+        email: null
+    };
+
+    const hashPassword = await encrypt.hashPassword(joinUser.password);
+    if (!hashPassword) {
+        const isJoinSuccess = res
+            .status(statusCode.INTERNAL_SERVER_ERROR)
+            .json(
+                utils.successFalse(
+                    responseMessage.ENCRYPT_ERROR,
+                    missDataToSubmit
+                )
+            );
+        return isJoinSuccess;
+    }
+    joinUser.password = hashPassword;
+
+    const daoRow = await userDao.join({ joinUser });
+    if (!daoRow) {
+        const isJoinSuccess = res
+            .status(statusCode.DB_ERROR)
+            .json(
+                utils.successFalse(responseMessage.DB_ERROR, missDataToSubmit)
+            );
+        return isJoinSuccess;
+    }
+
+    const dataToSubmit = {
+        email: joinUser.email
+    };
+    const isJoinSuccess = res
+        .status(statusCode.OK)
+        .json(utils.successTrue(responseMessage.JOIN_SUCCESS, dataToSubmit));
+    return isJoinSuccess;
+};
+
+const findUserByEmail = async email => {
+    const daoRow = await userDao.findUserByEmail(email);
+    if (!daoRow) {
+        return false;
+    }
+    return daoRow;
+};
+
+
 module.exports = {
     login,
     reissueAccessToken,
-    logout
+    logout,
+    join,
+    findUserByEmail
 };

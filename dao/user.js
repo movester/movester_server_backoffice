@@ -19,11 +19,49 @@ const test = async () => {
     }
 };
 
+const join = async ({ joinUser }) => {
+    try {
+        const connection = await pool.getConnection(async conn => conn);
+        try {
+            const sql = `INSERT INTO admin_user (email, password, name, create_at) VALUES ('${joinUser.email}', '${joinUser.password}', '${joinUser.name}', now())`;
+            const [row] = await connection.query(sql);
+            connection.release();
+            return row;
+        } catch (err) {
+            console.log(`Query Error > ${err}`);
+            connection.release();
+            return false;
+        }
+    } catch (err) {
+        console.log(`DB Error > ${err}`);
+        return false;
+    }
+};
+
 const login = async email => {
     try {
         const connection = await pool.getConnection(async conn => conn);
         try {
-            const sql = `SELECT user_idx, email, password, name, is_email_verify FROM user WHERE email = '${email}'`;
+            const sql = `SELECT admin_user_idx, email, password, name FROM admin_user WHERE email = '${email}'`;
+            const [row] = await connection.query(sql);
+            connection.release();
+            return row;
+        } catch (err) {
+            console.log(`Query Error > ${err}`);
+            connection.release();
+            return false;
+        }
+    } catch (err) {
+        console.log(`DB Error > ${err}`);
+        return false;
+    }
+};
+
+const findUserByEmail = async email => {
+    try {
+        const connection = await pool.getConnection(async conn => conn);
+        try {
+            const sql = `SELECT admin_user_idx, email, password, name FROM admin_user WHERE email = '${email}'`;
             const [row] = await connection.query(sql);
             connection.release();
             return row;
@@ -40,5 +78,7 @@ const login = async email => {
 
 module.exports = {
     test,
-    login
+    login,
+    join,
+    findUserByEmail
 };
