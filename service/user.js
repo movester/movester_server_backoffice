@@ -11,7 +11,7 @@ const login = async ({ loginUser }, res) => {
     const missDataToSubmit = {
         isAuth: false
     };
-    const daoRow = await userDao.login(loginUser.email);
+    const daoRow = await userDao.findUserByEmail(loginUser.email);
     if (!daoRow) {
         const isLoginSuccess = res
             .status(statusCode.DB_ERROR)
@@ -164,11 +164,45 @@ const findUserByEmail = async email => {
     return daoRow;
 };
 
+const updatePassword = async ({ updatePasswordUser }, res) => {
+    const missDataToSubmit = {
+        email: null
+    };
+
+    const hashPassword = await encrypt.hashPassword(updatePasswordUser.newPassword);
+    if (!hashPassword) {
+        const isUpdatePasswordSuccess = res
+            .status(statusCode.INTERNAL_SERVER_ERROR)
+            .json(
+                utils.successFalse(
+                    responseMessage.ENCRYPT_ERROR,
+                    missDataToSubmit
+                )
+            );
+        return isUpdatePasswordSuccess;
+    }
+
+    const daoRow = await userDao.updatePassword(updatePasswordUser.email, hashPassword);
+    if (!daoRow) {
+        const isUpdatePasswordSuccess = res
+            .status(statusCode.DB_ERROR)
+            .json(utils.successFalse(responseMessage.DB_ERROR));
+        return isUpdatePasswordSuccess;
+    }
+    const isUpdatePasswordSuccess = res
+        .status(statusCode.OK)
+        .json(utils.successTrue(responseMessage.UPDATE_PASSWORD_SUCCESS));
+    return isUpdatePasswordSuccess;
+
+ 
+};
+
 
 module.exports = {
     login,
     reissueAccessToken,
     logout,
     join,
-    findUserByEmail
+    findUserByEmail,
+    updatePassword
 };

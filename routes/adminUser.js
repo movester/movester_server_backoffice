@@ -6,7 +6,7 @@ const ValidatorError = require("../middleware/validatorError");
 const auth = require("../middleware/auth");
 
 router.get("/dashboard", auth.verifyToken, userCtrl.dashboard);
-router.post("/login", Validator.login, ValidatorError.login, userCtrl.login);
+router.post("/login", Validator.login, ValidatorError.error, userCtrl.login);
 router.post(
     "/reissueAccessToken",
     auth.verifyRefreshToken,
@@ -14,6 +14,7 @@ router.post(
 );
 router.get("/logout", auth.verifyToken, userCtrl.logout);
 router.get("/auth", auth.verifyToken, userCtrl.auth);
-router.post("/join", Validator.join, ValidatorError.join, userCtrl.join);
+router.post("/join", Validator.join, ValidatorError.error, userCtrl.join);
+router.post("/updatePassword", Validator.updatePassword, ValidatorError.error, userCtrl.updatePassword);
 
 module.exports = router;

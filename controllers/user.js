@@ -2,6 +2,7 @@ const userService = require("../service/user");
 const statusCode = require("../utils/statusCode");
 const responseMessage = require("../utils/responseMessage");
 const utils = require("../utils/utils");
+const encrypt = require("../utils/encrypt");
 
 const login = async (req, res) => {
     const loginUser = req.body;
@@ -57,6 +58,63 @@ const join = async (req, res) => {
     return isJoinSuccess;
 };
 
+const updatePassword = async (req, res) => {
+    const missDataToSubmit = {
+        email: null
+    };
+    const updatePasswordUser = req.body;
+
+    if (updatePasswordUser.newPassword !== updatePasswordUser.confirmPassword) {
+        return res
+            .status(statusCode.BAD_REQUEST)
+            .json(utils.successFalse(responseMessage.CONFIRM_PW_MISMATCH));
+    }
+
+    const adminUser = await userService.findUserByEmail(updatePasswordUser.email)
+    if (!adminUser) {
+        const isUpdatePasswordSuccess = res
+            .status(statusCode.DB_ERROR)
+            .json(
+                utils.successFalse(responseMessage.DB_ERROR, missDataToSubmit)
+            );
+        return isUpdatePasswordSuccess;
+    }
+
+    const comparePassword = adminUser[0].password;
+    const isCorrectBeforePassword = await encrypt.comparePassword(
+        updatePasswordUser.beforePassword,
+        comparePassword
+    );
+
+    if (isCorrectBeforePassword === 0) {
+        const isUpdatePasswordSuccess = res
+            .status(statusCode.INTERNAL_SERVER_ERROR)
+            .json(
+                utils.successFalse(
+                    responseMessage.ENCRYPT_ERROR,
+                    missDataToSubmit
+                )
+            );
+        return isUpdatePasswordSuccess;
+    }
+
+    if (isCorrectBeforePassword === false) {
+        const isUpdatePasswordSuccess = res
+            .status(statusCode.BAD_REQUEST)
+            .json(
+                utils.successFalse(
+                    responseMessage.PW_MISMATCH,
+                    missDataToSubmit
+                )
+            );
+        return isUpdatePasswordSuccess;
+    }
+
+    const isUpdatePasswordSuccess = await userService.updatePassword({ updatePasswordUser }, res);
+    return isUpdatePasswordSuccess;
+};
+
+
 
 module.exports = {
     login,
@@ -64,5 +122,6 @@ module.exports = {
     dashboard,
     logout,
     auth,
-    join
+    join,
+    updatePassword
 };

@@ -6,10 +6,13 @@ const responseMessage = {
     LOGIN_FAIL: "로그인 실패",
     LOGOUT_SUCCESS: "로그아웃 성공",
 
+    UPDATE_PASSWORD_SUCCESS: "비밀번호 변경 성공",
+
     EMAIL_ALREADY_EXIST: "존재하는 email 입니다.",
     EMAIL_NOT_EXIST: "존재하지 않는 유저 email 입니다.",
 
     PW_MISMATCH: "비밀번호가 일치하지 않습니다",
+    CONFIRM_PW_MISMATCH: "비밀번호 확인이 일치하지 않습니다.",
 
     TOKEN_EMPTY: "토큰이 없습니다",
     TOKEN_INVALID: "올바르지 않은 토큰입니다.",
