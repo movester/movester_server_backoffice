@@ -1,0 +1,31 @@
+const serviceCenterService = require("../service/serviceCenter");
+
+const noticeCreate = async (req, res) => {
+    const createPost = req.body;
+    const isNoticeCreateSuccess = await serviceCenterService.noticeCreate({ createPost }, res);
+    return isNoticeCreateSuccess;
+};
+
+const noticeList = async (req, res) => {
+    const isNoticeListSuccess = await serviceCenterService.noticeList(res);
+    return isNoticeListSuccess
+};
+
+const noticeDetail = async (req, res) => {
+    const isNoticeDetailSuccess = await serviceCenterService.noticeDetail(req.body.detailId, res);
+    return isNoticeDetailSuccess
+};
+
+const fileUpload = async (req, res) => {
+    const isFileUploadSuccess = await serviceCenterService.fileUpload(req, res);
+    return isFileUploadSuccess
+};
+
+
+
+module.exports = {
+    noticeCreate,
+    noticeList,
+    noticeDetail,
+    fileUpload
+};

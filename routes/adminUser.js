@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const userCtrl = require("../controllers/user");
+const userCtrl = require("../controllers/adminUser");
 const Validator = require("../middleware/validator");
 const ValidatorError = require("../middleware/validatorError");
 const auth = require("../middleware/auth");
