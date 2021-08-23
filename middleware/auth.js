@@ -7,7 +7,6 @@ const utils = require("../utils/utils");
 const verifyToken = (req, res, next) => {
     try {
         const accessToken = req.headers.authorization.split("Bearer ")[1];
-
         const decodeAccessToken = jwt.verify(
             accessToken,
             process.env.JWT_ACCESS_SECRET
@@ -44,10 +43,11 @@ const verifyRefreshToken = (req, res, next) => {
         redisClient.get(decodeRefreshToken.sub.toString(), (err, data) => {
             if (err) throw err;
 
-            if (data === null)
+            if (data === null) {
                 return res
                     .status(statusCode.BAD_REQUEST)
                     .json(utils.successFalse(responseMessage.TOKEN_EMPTY));
+            }
             if (JSON.parse(data).token != refreshToken) {
                 return res
                     .status(statusCode.BAD_REQUEST)
