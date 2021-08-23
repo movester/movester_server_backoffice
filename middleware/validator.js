@@ -31,7 +31,31 @@ const login = [
         .withMessage("비밀번호는 최소 8글자부터 최대 20글자까지 가능합니다.")
 ];
 
+const updatePassword = [
+    check("email")
+        .notEmpty()
+        .withMessage("이메일을 입력해주세요.")
+        .isLength({ min: 4, max: 50 })
+        .withMessage("이메일은 최소 10글자부터 최대 50글자까지 가능합니다."),
+    check("beforePassword")
+        .notEmpty()
+        .withMessage("비밀번호를 입력해주세요.")
+        .isLength({ min: 4, max: 20 })
+        .withMessage("비밀번호는 최소 8글자부터 최대 20글자까지 가능합니다."),
+    check("newPassword")
+        .notEmpty()
+        .withMessage("비밀번호를 입력해주세요.")
+        .isLength({ min: 4, max: 20 })
+        .withMessage("비밀번호는 최소 8글자부터 최대 20글자까지 가능합니다."),
+    check("confirmPassword")
+        .notEmpty()
+        .withMessage("비밀번호를 입력해주세요.")
+        .isLength({ min: 4, max: 20 })
+        .withMessage("비밀번호는 최소 8글자부터 최대 20글자까지 가능합니다.")
+];
+
 module.exports = {
     join,
-    login
+    login,
+    updatePassword
 };
