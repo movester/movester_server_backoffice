@@ -5,7 +5,9 @@ const Validator = require("../middleware/validator");
 const ValidatorError = require("../middleware/validatorError");
 const auth = require("../middleware/auth");
 
+// accessToken, refeshToken 재발급 과정 동작이 원활한지 테스트를 만들도록 함
 router.get("/dashboard", auth.verifyToken, userCtrl.dashboard);
+
 router.post("/login", Validator.login, ValidatorError.error, userCtrl.login);
 router.post(
     "/reissueAccessToken",

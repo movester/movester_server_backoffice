@@ -15,14 +15,14 @@ const noticeCreate = async ({ createPost }, res) => {
         return isNoticeCreateSuccess;
     }
 
-    const dataToSubmit = {
-        email: "test"
-    };
+    // TODO : res 로 전달한 dataToSubmit 값이 필요하지 않음
+    const dataToSubmit = {};
     const isNoticeCreateSuccess = res
         .status(statusCode.OK)
         .json(
             utils.successTrue(responseMessage.POST_CREATE_SUCCESS, dataToSubmit)
         );
+ 
     return isNoticeCreateSuccess;
 };
 

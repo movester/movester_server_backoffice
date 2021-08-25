@@ -28,7 +28,7 @@ const verifyToken = (req, res, next) => {
 
 const verifyRefreshToken = (req, res, next) => {
     const refreshToken = req.body.token;
-    if (refreshToken === null) {
+    if (!refreshToken) {
         return res
             .status(statusCode.BAD_REQUEST)
             .json(utils.successFalse(responseMessage.VALUE_NULL));
@@ -43,7 +43,7 @@ const verifyRefreshToken = (req, res, next) => {
         redisClient.get(decodeRefreshToken.sub.toString(), (err, data) => {
             if (err) throw err;
 
-            if (data === null) {
+            if (!data) {
                 return res
                     .status(statusCode.BAD_REQUEST)
                     .json(utils.successFalse(responseMessage.TOKEN_EMPTY));
