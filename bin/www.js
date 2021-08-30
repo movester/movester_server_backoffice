@@ -16,5 +16,6 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 // app.use(helmet());
 app.use("/", router);
+app.use('/uploads', express.static('uploads'));
 
 app.listen(port, () => console.log(`Dev Server listening on port ${port}!`));
