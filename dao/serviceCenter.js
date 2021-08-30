@@ -23,7 +23,7 @@ const noticeList = async () => {
     try {
         const connection = await pool.getConnection(async conn => conn);
         try {
-            const sql = `SELECT notice_idx, title, create_at from notice`;
+            const sql = `SELECT notice_idx, title, create_at FROM notice`;
             const [row] = await connection.query(sql);
             connection.release();
             return row;
@@ -42,7 +42,7 @@ const noticeDetail = async (postId) => {
     try {
         const connection = await pool.getConnection(async conn => conn);
         try {
-            const sql = `SELECT notice_idx, title, contents, create_at, update_at from notice where notice_idx = ${postId}`;
+            const sql = `SELECT notice_idx, title, contents, create_at, update_at FROM notice WHERE notice_idx = ${postId}`;
             const [row] = await connection.query(sql);
             connection.release();
             return row;
