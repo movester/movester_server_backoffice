@@ -76,11 +76,11 @@ const noticeUpdate = async ({ updatePost }) => {
     }
 };
 
-const noticeDelete = async (postId) => {
+const noticeDelete = async (noticeIdx) => {
     try {
         const connection = await pool.getConnection(async conn => conn);
         try {
-            const sql = `DELETE FROM notice WHERE notice_idx = ${postId}`;
+            const sql = `DELETE FROM notice WHERE notice_idx = ${noticeIdx}`;
             const [row] = await connection.query(sql);
             connection.release();
             return row;

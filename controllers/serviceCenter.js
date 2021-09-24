@@ -12,7 +12,7 @@ const noticeList = async (req, res) => {
 };
 
 const noticeDetail = async (req, res) => {
-    const isNoticeDetailSuccess = await serviceCenterService.noticeDetail(req.body.postId, res);
+    const isNoticeDetailSuccess = await serviceCenterService.noticeDetail(req.body.noticeIdx, res);
     return isNoticeDetailSuccess
 };
 
@@ -24,7 +24,7 @@ const noticeUpdate = async (req, res) => {
 };
 
 const noticeDelete = async (req, res) => {
-    const isNoticeDeleteSuccess = await serviceCenterService.noticeDelete(req.body.postId, res);
+    const isNoticeDeleteSuccess = await serviceCenterService.noticeDelete(req.body.noticeIdx, res);
     return isNoticeDeleteSuccess
 };
 
