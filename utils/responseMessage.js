@@ -10,13 +10,13 @@ const responseMessage = {
     POST_LIST_SUCCESS: "글 목록 조회 성공",
     POST_DETAIL_SUCCESS: "글 상세 조회 성공",
     POST_UPDATE_SUCCESS: "글 수정 성공",
-    POST_DELETE_SUCCESS: "글 수정 성공",
+    POST_DELETE_SUCCESS: "글 삭제 성공",
 
     POST_CREATE_FAIL: "글 등록 실패",
     POST_LIST_FAIL: "글 목록 조회 실패",
     POST_DETAIL_FAIL: "글 상세 조회 실패",
     POST_UPDATE_FAIL: "글 수정 실패",
-    POST_DELETE_FAIL: "글 수정 실패",
+    POST_DELETE_FAIL: "글 삭제 실패",
 
     FILE_UPLOAD_SUCCESS: "파일 업로드 성공",
     FILE_UPLOAD_FAIL: "파일 업로드 실패",

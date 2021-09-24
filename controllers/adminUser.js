@@ -39,29 +39,24 @@ const auth = async (req, res) => {
 };
 
 const join = async (req, res) => {
-    const missDataToSubmit = {};
-    missDataToSubmit.email = null;
     const joinUser = req.body;
 
     const isEmail = await userService.findUserByEmail(joinUser.email);
     if (!isEmail) {
         return res
             .status(statusCode.DB_ERROR)
-            .json(utils.successFalse(responseMessage.DB_ERROR,missDataToSubmit));
+            .json(utils.successFalse(responseMessage.DB_ERROR));
     }
     if (Object.keys(isEmail).length > 0) {
         return res
             .status(statusCode.BAD_REQUEST)
-            .json(utils.successFalse(responseMessage.EMAIL_ALREADY_EXIST,missDataToSubmit));
+            .json(utils.successFalse(responseMessage.EMAIL_ALREADY_EXIST));
     }
     const isJoinSuccess = await userService.join({ joinUser }, res);
     return isJoinSuccess;
 };
 
 const updatePassword = async (req, res) => {
-    const missDataToSubmit = {
-        email: null
-    };
     const updatePasswordUser = req.body;
 
     if (updatePasswordUser.newPassword !== updatePasswordUser.confirmPassword) {
@@ -75,7 +70,7 @@ const updatePassword = async (req, res) => {
         const isUpdatePasswordSuccess = res
             .status(statusCode.DB_ERROR)
             .json(
-                utils.successFalse(responseMessage.DB_ERROR, missDataToSubmit)
+                utils.successFalse(responseMessage.DB_ERROR)
             );
         return isUpdatePasswordSuccess;
     }
@@ -91,8 +86,7 @@ const updatePassword = async (req, res) => {
             .status(statusCode.INTERNAL_SERVER_ERROR)
             .json(
                 utils.successFalse(
-                    responseMessage.ENCRYPT_ERROR,
-                    missDataToSubmit
+                    responseMessage.ENCRYPT_ERROR
                 )
             );
         return isUpdatePasswordSuccess;
@@ -103,8 +97,7 @@ const updatePassword = async (req, res) => {
             .status(statusCode.BAD_REQUEST)
             .json(
                 utils.successFalse(
-                    responseMessage.PW_MISMATCH,
-                    missDataToSubmit
+                    responseMessage.PW_MISMATCH
                 )
             );
         return isUpdatePasswordSuccess;

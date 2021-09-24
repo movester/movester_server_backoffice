@@ -12,8 +12,20 @@ const noticeList = async (req, res) => {
 };
 
 const noticeDetail = async (req, res) => {
-    const isNoticeDetailSuccess = await serviceCenterService.noticeDetail(req.body.detailId, res);
+    const isNoticeDetailSuccess = await serviceCenterService.noticeDetail(req.body.postId, res);
     return isNoticeDetailSuccess
+};
+
+const noticeUpdate = async (req, res) => {
+    const updatePost = req.body;
+    console.log(updatePost)
+    const isNoticeUpdateSuccess = await serviceCenterService.noticeUpdate({ updatePost }, res);
+    return isNoticeUpdateSuccess
+};
+
+const noticeDelete = async (req, res) => {
+    const isNoticeDeleteSuccess = await serviceCenterService.noticeDelete(req.body.postId, res);
+    return isNoticeDeleteSuccess
 };
 
 const fileUpload = async (req, res) => {
@@ -27,5 +39,7 @@ module.exports = {
     noticeCreate,
     noticeList,
     noticeDetail,
+    noticeUpdate,
+    noticeDelete,
     fileUpload
 };

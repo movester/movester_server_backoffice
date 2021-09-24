@@ -8,9 +8,6 @@ const auth = require("../middleware/auth");
 const redisClient = require("../config/redis");
 
 const login = async ({ loginUser }, res) => {
-    const missDataToSubmit = {
-        isAuth: false
-    };
     const daoRow = await userDao.findUserByEmail(loginUser.email);
     if (!daoRow) {
         const isLoginSuccess = res
@@ -21,14 +18,11 @@ const login = async ({ loginUser }, res) => {
         return isLoginSuccess;
     }
     if (Object.keys(daoRow).length === 0) {
-        const isLoginSuccess = res
-            .status(statusCode.BAD_REQUEST)
-            .json(
-                utils.successFalse(
-                    responseMessage.EMAIL_NOT_EXIST,
-                    missDataToSubmit
-                )
-            );
+        const isLoginSuccess = res.status(statusCode.BAD_REQUEST).json(
+            utils.successFalse(responseMessage.EMAIL_NOT_EXIST, {
+                isAuth: false
+            })
+        );
         return isLoginSuccess;
     }
     const hashPassword = daoRow[0].password;
@@ -42,23 +36,19 @@ const login = async ({ loginUser }, res) => {
         const isLoginSuccess = res
             .status(statusCode.INTERNAL_SERVER_ERROR)
             .json(
-                utils.successFalse(
-                    responseMessage.ENCRYPT_ERROR,
-                    missDataToSubmit
-                )
+                utils.successFalse(responseMessage.ENCRYPT_ERROR, {
+                    isAuth: false
+                })
             );
         return isLoginSuccess;
     }
 
     if (isCorrectPassword === false) {
-        const isLoginSuccess = res
-            .status(statusCode.BAD_REQUEST)
-            .json(
-                utils.successFalse(
-                    responseMessage.PW_MISMATCH,
-                    missDataToSubmit
-                )
-            );
+        const isLoginSuccess = res.status(statusCode.BAD_REQUEST).json(
+            utils.successFalse(responseMessage.PW_MISMATCH, {
+                isAuth: false
+            })
+        );
         return isLoginSuccess;
     }
 
@@ -69,16 +59,18 @@ const login = async ({ loginUser }, res) => {
     );
     const refreshToken = auth.generateRefreshToken(loginUser.email);
 
-    const dataToSubmit = {
+    const resData = {
+        isAuth: true,
+        adminUserIdx: daoRow[0].admin_user_idx,
+        email: daoRow[0].email,
         name: daoRow[0].name,
         accessToken: accessToken,
-        refreshToken: refreshToken,
-        isAuth: true
+        refreshToken: refreshToken
     };
 
     const isLoginSuccess = res
         .status(statusCode.OK)
-        .json(utils.successTrue(responseMessage.LOGIN_SUCCESS, dataToSubmit));
+        .json(utils.successTrue(responseMessage.LOGIN_SUCCESS, resData));
     return isLoginSuccess;
 };
 
@@ -109,51 +101,43 @@ const reissueAccessToken = (email, res) => {
 const logout = async (email, res) => {
     await redisClient.del(email.toString());
 
-    const dataToSubmit = {
-        isAuth: false
-    };
-
     const isLogoutSuccess = res
         .status(statusCode.OK)
-        .json(utils.successTrue(responseMessage.LOGOUT_SUCCESS, dataToSubmit));
+        .json(
+            utils.successTrue(responseMessage.LOGOUT_SUCCESS, { isAuth: false })
+        );
     return isLogoutSuccess;
 };
 
 const join = async ({ joinUser }, res) => {
-    const missDataToSubmit = {
-        email: null
-    };
-
     const hashPassword = await encrypt.hashPassword(joinUser.password);
     if (!hashPassword) {
         const isJoinSuccess = res
             .status(statusCode.INTERNAL_SERVER_ERROR)
-            .json(
-                utils.successFalse(
-                    responseMessage.ENCRYPT_ERROR,
-                    missDataToSubmit
-                )
-            );
+            .json(utils.successFalse(responseMessage.ENCRYPT_ERROR));
         return isJoinSuccess;
     }
     joinUser.password = hashPassword;
 
     const daoRow = await userDao.join({ joinUser });
+
     if (!daoRow) {
         const isJoinSuccess = res
             .status(statusCode.DB_ERROR)
-            .json(
-                utils.successFalse(responseMessage.DB_ERROR, missDataToSubmit)
-            );
+            .json(utils.successFalse(responseMessage.DB_ERROR));
         return isJoinSuccess;
     }
 
-    const dataToSubmit = {
-        email: joinUser.email
+    // FIXME : adminUserIdx 값 가져와야한다.
+    const resData = {
+        adminUserIdx: null,
+        email: joinUser.email,
+        name: joinUser.name
     };
+
     const isJoinSuccess = res
         .status(statusCode.OK)
-        .json(utils.successTrue(responseMessage.JOIN_SUCCESS, dataToSubmit));
+        .json(utils.successTrue(responseMessage.JOIN_SUCCESS, resData));
     return isJoinSuccess;
 };
 
@@ -166,24 +150,20 @@ const findUserByEmail = async email => {
 };
 
 const updatePassword = async ({ updatePasswordUser }, res) => {
-    const missDataToSubmit = {
-        email: null
-    };
-
-    const hashPassword = await encrypt.hashPassword(updatePasswordUser.newPassword);
+    const hashPassword = await encrypt.hashPassword(
+        updatePasswordUser.newPassword
+    );
     if (!hashPassword) {
         const isUpdatePasswordSuccess = res
             .status(statusCode.INTERNAL_SERVER_ERROR)
-            .json(
-                utils.successFalse(
-                    responseMessage.ENCRYPT_ERROR,
-                    missDataToSubmit
-                )
-            );
+            .json(utils.successFalse(responseMessage.ENCRYPT_ERROR));
         return isUpdatePasswordSuccess;
     }
 
-    const daoRow = await userDao.updatePassword(updatePasswordUser.email, hashPassword);
+    const daoRow = await userDao.updatePassword(
+        updatePasswordUser.email,
+        hashPassword
+    );
     if (!daoRow) {
         const isUpdatePasswordSuccess = res
             .status(statusCode.DB_ERROR)
@@ -194,10 +174,7 @@ const updatePassword = async ({ updatePasswordUser }, res) => {
         .status(statusCode.OK)
         .json(utils.successTrue(responseMessage.UPDATE_PASSWORD_SUCCESS));
     return isUpdatePasswordSuccess;
-
- 
 };
-
 
 module.exports = {
     login,

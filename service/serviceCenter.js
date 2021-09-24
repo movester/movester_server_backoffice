@@ -4,7 +4,11 @@ const responseMessage = require("../utils/responseMessage");
 const utils = require("../utils/utils");
 const multerUpload = require("../utils/multer");
 
+let missDataToSubmit = {};
+let dataToSubmit = {};
+
 const noticeCreate = async ({ createPost }, res) => {
+    console.log(createPost)
     const daoRow = await serviceCenterDao.noticeCreate({ createPost });
     if (!daoRow) {
         const isNoticeCreateSuccess = res
@@ -14,15 +18,16 @@ const noticeCreate = async ({ createPost }, res) => {
             );
         return isNoticeCreateSuccess;
     }
+    const idxDaoRow = await serviceCenterDao.getCreateIdx();
+    const noticeIdx = idxDaoRow[0].idx;
 
-    // TODO : res 로 전달한 dataToSubmit 값이 필요하지 않음
-    const dataToSubmit = {};
+    dataToSubmit = { postIdx: noticeIdx };
     const isNoticeCreateSuccess = res
         .status(statusCode.OK)
         .json(
             utils.successTrue(responseMessage.POST_CREATE_SUCCESS, dataToSubmit)
         );
- 
+
     return isNoticeCreateSuccess;
 };
 
@@ -43,8 +48,8 @@ const noticeList = async res => {
     return isNoticeListSuccess;
 };
 
-const noticeDetail = async (detailId, res) => {
-    const daoRow = await serviceCenterDao.noticeDetail(detailId);
+const noticeDetail = async (postId, res) => {
+    const daoRow = await serviceCenterDao.noticeDetail(postId);
     if (!daoRow) {
         const isNoticeDetailSuccess = res
             .status(statusCode.DB_ERROR)
@@ -60,12 +65,53 @@ const noticeDetail = async (detailId, res) => {
     return isNoticeDetailSuccess;
 };
 
+const noticeUpdate = async ({ updatePost }, res) => {
+    const daoRow = await serviceCenterDao.noticeUpdate({ updatePost });
+    if (!daoRow) {
+        const isNoticeUpdateSuccess = res
+            .status(statusCode.DB_ERROR)
+            .json(
+                utils.successFalse(responseMessage.DB_ERROR, missDataToSubmit)
+            );
+        return isNoticeUpdateSuccess;
+    }
+
+    dataToSubmit = { title : updatePost.title };
+
+    const isNoticeUpdateSuccess = res
+        .status(statusCode.OK)
+        .json(
+            utils.successTrue(responseMessage.POST_UPDATE_SUCCESS, dataToSubmit)
+        );
+
+    return isNoticeUpdateSuccess;
+};
+
+const noticeDelete = async (postId, res) => {
+    const daoRow = await serviceCenterDao.noticeDelete(postId);
+    if (!daoRow) {
+        const isNoticeDeleteSuccess = res
+            .status(statusCode.DB_ERROR)
+            .json(
+                utils.successFalse(responseMessage.DB_ERROR, missDataToSubmit)
+            );
+        return isNoticeDeleteSuccess;
+    }
+
+    const isNoticeDeleteSuccess = res
+        .status(statusCode.OK)
+        .json(utils.successTrue(responseMessage.POST_DELETE_SUCCESS, daoRow));
+    return isNoticeDeleteSuccess;
+};
+
 const fileUpload = async (req, res) => {
     multerUpload(req, res, err => {
         if (err) {
             const isfileUploadSuccess = res
                 .status(statusCode.DB_ERROR)
-                .json(utils.successFalse(responseMessage.FILE_UPLOAD_FAIL, err));
+                .json(
+                    utils.successFalse(responseMessage.FILE_UPLOAD_FAIL, err)
+                );
             return isfileUploadSuccess;
         }
         const dataToSubmit = {
@@ -89,5 +135,7 @@ module.exports = {
     noticeCreate,
     noticeList,
     noticeDetail,
+    noticeUpdate,
+    noticeDelete,
     fileUpload
 };
