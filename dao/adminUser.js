@@ -1,24 +1,5 @@
 const pool = require("./pool.js");
 
-const test = async () => {
-    try {
-        const connection = await pool.getConnection(async conn => conn);
-        try {
-            const sql = `SELECT user_idx, email, name FROM user`;
-            const [rows] = await connection.query(sql);
-            connection.release();
-            return rows;
-        } catch (err) {
-            console.log("Query Error");
-            connection.release();
-            return false;
-        }
-    } catch (err) {
-        console.log("DB Error");
-        return false;
-    }
-};
-
 const join = async ({ joinUser }) => {
     try {
         const connection = await pool.getConnection(async conn => conn);
@@ -57,11 +38,30 @@ const findUserByEmail = async email => {
     }
 };
 
-const updatePassword = async (email, password) => {
+const findUserByIdx = async idx => {
     try {
         const connection = await pool.getConnection(async conn => conn);
         try {
-            const sql = `UPDATE admin_user SET password = '${password}' WHERE email = '${email}'`;
+            const sql = `SELECT admin_user_idx, email, password, name FROM admin_user WHERE admin_user_idx = ${idx}`;
+            const [row] = await connection.query(sql);
+            connection.release();
+            return row;
+        } catch (err) {
+            console.log(`Query Error > ${err}`);
+            connection.release();
+            return false;
+        }
+    } catch (err) {
+        console.log(`DB Error > ${err}`);
+        return false;
+    }
+};
+
+const updatePassword = async (adminUserIdx, password) => {
+    try {
+        const connection = await pool.getConnection(async conn => conn);
+        try {
+            const sql = `UPDATE admin_user SET password = '${password}' WHERE admin_user_idx = ${adminUserIdx}`;
             const [row] = await connection.query(sql);
             connection.release();
             return row;
@@ -77,8 +77,8 @@ const updatePassword = async (email, password) => {
 };
 
 module.exports = {
-    test,
     join,
     findUserByEmail,
+    findUserByIdx,
     updatePassword
 };

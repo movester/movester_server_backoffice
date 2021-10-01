@@ -1,4 +1,5 @@
 const serviceCenterDao = require("../dao/serviceCenter");
+const commonDao = require("../dao/common");
 const statusCode = require("../utils/statusCode");
 const responseMessage = require("../utils/responseMessage");
 const utils = require("../utils/utils");
@@ -12,15 +13,13 @@ const noticeCreate = async ({ createPost }, res) => {
             .json(utils.successFalse(responseMessage.DB_ERROR));
         return isNoticeCreateSuccess;
     }
-    const idxDaoRow = await serviceCenterDao.getCreateIdx();
+    const idxDaoRow = await commonDao.getCreateIdx();
 
-    const isNoticeCreateSuccess = res
-        .status(statusCode.OK)
-        .json(
-            utils.successTrue(responseMessage.POST_CREATE_SUCCESS, {
-                noticeIdx: idxDaoRow[0].idx
-            })
-        );
+    const isNoticeCreateSuccess = res.status(statusCode.OK).json(
+        utils.successTrue(responseMessage.POST_CREATE_SUCCESS, {
+            noticeIdx: idxDaoRow[0].idx
+        })
+    );
 
     return isNoticeCreateSuccess;
 };
@@ -92,16 +91,14 @@ const noticeDelete = async (noticeIdx, res) => {
     if (!daoRow) {
         const isNoticeDeleteSuccess = res
             .status(statusCode.DB_ERROR)
-            .json(
-                utils.successFalse(responseMessage.DB_ERROR)
-            );
+            .json(utils.successFalse(responseMessage.DB_ERROR));
         return isNoticeDeleteSuccess;
     }
 
     const isNoticeDeleteSuccess = res
-    .status(statusCode.OK)
-    .json(utils.successTrue(responseMessage.POST_DELETE_SUCCESS));
-    console.log(isNoticeDeleteSuccess)
+        .status(statusCode.OK)
+        .json(utils.successTrue(responseMessage.POST_DELETE_SUCCESS));
+    console.log(isNoticeDeleteSuccess);
     return isNoticeDeleteSuccess;
 };
 

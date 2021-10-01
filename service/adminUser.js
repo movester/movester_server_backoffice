@@ -1,4 +1,5 @@
 const userDao = require("../dao/adminUser");
+const commonDao = require("../dao/common");
 const encrypt = require("../utils/encrypt");
 const statusCode = require("../utils/statusCode");
 const responseMessage = require("../utils/responseMessage");
@@ -128,9 +129,10 @@ const join = async ({ joinUser }, res) => {
         return isJoinSuccess;
     }
 
-    // FIXME : adminUserIdx 값 가져와야한다.
+    const idxDaoRow = await commonDao.getCreateIdx();
+
     const resData = {
-        adminUserIdx: null,
+        adminUserIdx: idxDaoRow[0].idx,
         email: joinUser.email,
         name: joinUser.name
     };
@@ -149,6 +151,14 @@ const findUserByEmail = async email => {
     return daoRow;
 };
 
+const findUserByIdx = async idx => {
+    const daoRow = await userDao.findUserByIdx(idx);
+    if (!daoRow) {
+        return false;
+    }
+    return daoRow;
+};
+
 const updatePassword = async ({ updatePasswordUser }, res) => {
     const hashPassword = await encrypt.hashPassword(
         updatePasswordUser.newPassword
@@ -161,7 +171,7 @@ const updatePassword = async ({ updatePasswordUser }, res) => {
     }
 
     const daoRow = await userDao.updatePassword(
-        updatePasswordUser.email,
+        updatePasswordUser.adminUserIdx,
         hashPassword
     );
     if (!daoRow) {
@@ -182,5 +192,6 @@ module.exports = {
     logout,
     join,
     findUserByEmail,
+    findUserByIdx,
     updatePassword
 };

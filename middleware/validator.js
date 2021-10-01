@@ -32,11 +32,8 @@ const login = [
 ];
 
 const updatePassword = [
-    check("email")
-        .notEmpty()
-        .withMessage("이메일을 입력해주세요.")
-        .isLength({ min: 4, max: 50 })
-        .withMessage("이메일은 최소 10글자부터 최대 50글자까지 가능합니다."),
+    check("adminUserIdx")
+        .notEmpty(),
     check("beforePassword")
         .notEmpty()
         .withMessage("비밀번호를 입력해주세요.")

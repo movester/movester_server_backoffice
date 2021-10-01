@@ -38,11 +38,11 @@ const noticeList = async () => {
     }
 };
 
-const noticeDetail = async (postId) => {
+const noticeDetail = async noticeIdx => {
     try {
         const connection = await pool.getConnection(async conn => conn);
         try {
-            const sql = `SELECT notice_idx, title, contents, create_at, update_at, admin_user_idx FROM notice WHERE notice_idx = ${postId}`;
+            const sql = `SELECT notice_idx, title, contents, create_at, update_at, admin_user_idx FROM notice WHERE notice_idx = ${noticeIdx}`;
             const [row] = await connection.query(sql);
             connection.release();
             return row;
@@ -61,7 +61,7 @@ const noticeUpdate = async ({ updatePost }) => {
     try {
         const connection = await pool.getConnection(async conn => conn);
         try {
-            const sql = `UPDATE notice SET title = '${updatePost.title}' WHERE notice_idx = ${updatePost.postId}`;
+            const sql = `UPDATE notice SET title = '${updatePost.title}', contents = '${updatePost.contents}', admin_user_idx = '${updatePost.adminUserIdx}', update_at = now() WHERE notice_idx = ${updatePost.noticeIdx}`;
             const [row] = await connection.query(sql);
             connection.release();
             return row;
@@ -76,30 +76,11 @@ const noticeUpdate = async ({ updatePost }) => {
     }
 };
 
-const noticeDelete = async (noticeIdx) => {
+const noticeDelete = async noticeIdx => {
     try {
         const connection = await pool.getConnection(async conn => conn);
         try {
             const sql = `DELETE FROM notice WHERE notice_idx = ${noticeIdx}`;
-            const [row] = await connection.query(sql);
-            connection.release();
-            return row;
-        } catch (err) {
-            console.log(`Query Error > ${err}`);
-            connection.release();
-            return false;
-        }
-    } catch (err) {
-        console.log(`DB Error > ${err}`);
-        return false;
-    }
-};
-
-const getCreateIdx = async () => {
-    try {
-        const connection = await pool.getConnection(async conn => conn);
-        try {
-            const sql = `SELECT LAST_INSERT_ID() AS "idx"`;
             const [row] = await connection.query(sql);
             connection.release();
             return row;
@@ -119,6 +100,5 @@ module.exports = {
     noticeList,
     noticeDetail,
     noticeUpdate,
-    noticeDelete,
-    getCreateIdx
+    noticeDelete
 };

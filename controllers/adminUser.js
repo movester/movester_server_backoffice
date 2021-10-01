@@ -58,14 +58,13 @@ const join = async (req, res) => {
 
 const updatePassword = async (req, res) => {
     const updatePasswordUser = req.body;
-
     if (updatePasswordUser.newPassword !== updatePasswordUser.confirmPassword) {
         return res
             .status(statusCode.BAD_REQUEST)
             .json(utils.successFalse(responseMessage.CONFIRM_PW_MISMATCH));
     }
 
-    const adminUser = await userService.findUserByEmail(updatePasswordUser.email)
+    const adminUser = await userService.findUserByIdx(updatePasswordUser.adminUserIdx)
     if (!adminUser) {
         const isUpdatePasswordSuccess = res
             .status(statusCode.DB_ERROR)
