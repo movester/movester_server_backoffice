@@ -23,7 +23,7 @@ const noticeList = async () => {
     try {
         const connection = await pool.getConnection(async conn => conn);
         try {
-            const sql = `SELECT notice_idx, title, create_at FROM notice order by notice_idx desc`;
+            const sql = `SELECT notice_idx, title, DATE_FORMAT(create_at,'%Y-%m-%d') as create_at FROM notice order by notice_idx desc`;
             const [row] = await connection.query(sql);
             connection.release();
             return row;
