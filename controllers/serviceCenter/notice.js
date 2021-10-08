@@ -1,8 +1,8 @@
-const serviceCenterService = require("../service/serviceCenter");
+const noticeService = require("../../service/serviceCenter/notice");
 
 const noticeCreate = async (req, res) => {
     const createPost = req.body;
-    const isNoticeCreateSuccess = await serviceCenterService.noticeCreate(
+    const isNoticeCreateSuccess = await noticeService.noticeCreate(
         { createPost },
         res
     );
@@ -10,12 +10,12 @@ const noticeCreate = async (req, res) => {
 };
 
 const noticeList = async (req, res) => {
-    const isNoticeListSuccess = await serviceCenterService.noticeList(res);
+    const isNoticeListSuccess = await noticeService.noticeList(res);
     return isNoticeListSuccess;
 };
 
 const noticeDetail = async (req, res) => {
-    const isNoticeDetailSuccess = await serviceCenterService.noticeDetail(
+    const isNoticeDetailSuccess = await noticeService.noticeDetail(
         req.body.noticeIdx,
         res
     );
@@ -24,7 +24,7 @@ const noticeDetail = async (req, res) => {
 
 const noticeUpdate = async (req, res) => {
     const updatePost = req.body;
-    const isNoticeUpdateSuccess = await serviceCenterService.noticeUpdate(
+    const isNoticeUpdateSuccess = await noticeService.noticeUpdate(
         { updatePost },
         res
     );
@@ -32,16 +32,11 @@ const noticeUpdate = async (req, res) => {
 };
 
 const noticeDelete = async (req, res) => {
-    const isNoticeDeleteSuccess = await serviceCenterService.noticeDelete(
+    const isNoticeDeleteSuccess = await noticeService.noticeDelete(
         req.body.noticeIdx,
         res
     );
     return isNoticeDeleteSuccess;
-};
-
-const fileUpload = async (req, res) => {
-    const isFileUploadSuccess = await serviceCenterService.fileUpload(req, res);
-    return isFileUploadSuccess;
 };
 
 module.exports = {
@@ -50,5 +45,4 @@ module.exports = {
     noticeDetail,
     noticeUpdate,
     noticeDelete,
-    fileUpload
 };

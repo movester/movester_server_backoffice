@@ -1,12 +1,12 @@
-const serviceCenterDao = require("../dao/serviceCenter");
-const commonDao = require("../dao/common");
-const statusCode = require("../utils/statusCode");
-const responseMessage = require("../utils/responseMessage");
-const utils = require("../utils/utils");
-const multerUpload = require("../utils/multer");
+const noticeDao = require("../../dao/serviceCenter/notice");
+const commonDao = require("../../dao/common");
+const statusCode = require("../../utils/statusCode");
+const responseMessage = require("../../utils/responseMessage");
+const utils = require("../../utils/utils");
+const multerUpload = require("../../utils/multer");
 
 const noticeCreate = async ({ createPost }, res) => {
-    const daoRow = await serviceCenterDao.noticeCreate({ createPost });
+    const daoRow = await noticeDao.noticeCreate({ createPost });
     if (!daoRow) {
         const isNoticeCreateSuccess = res
             .status(statusCode.DB_ERROR)
@@ -25,7 +25,7 @@ const noticeCreate = async ({ createPost }, res) => {
 };
 
 const noticeList = async res => {
-    const daoRow = await serviceCenterDao.noticeList();
+    const daoRow = await noticeDao.noticeList();
     if (!daoRow) {
         const isNoticeListSuccess = res
             .status(statusCode.DB_ERROR)
@@ -41,7 +41,7 @@ const noticeList = async res => {
 };
 
 const noticeDetail = async (noticeIdx, res) => {
-    const daoRow = await serviceCenterDao.noticeDetail(noticeIdx);
+    const daoRow = await noticeDao.noticeDetail(noticeIdx);
     if (!daoRow) {
         const isNoticeDetailSuccess = res
             .status(statusCode.DB_ERROR)
@@ -65,7 +65,7 @@ const noticeDetail = async (noticeIdx, res) => {
 };
 
 const noticeUpdate = async ({ updatePost }, res) => {
-    const daoRow = await serviceCenterDao.noticeUpdate({ updatePost });
+    const daoRow = await noticeDao.noticeUpdate({ updatePost });
     if (!daoRow) {
         const isNoticeUpdateSuccess = res
             .status(statusCode.DB_ERROR)
@@ -87,7 +87,7 @@ const noticeUpdate = async ({ updatePost }, res) => {
 };
 
 const noticeDelete = async (noticeIdx, res) => {
-    const daoRow = await serviceCenterDao.noticeDelete(noticeIdx);
+    const daoRow = await noticeDao.noticeDelete(noticeIdx);
     if (!daoRow) {
         const isNoticeDeleteSuccess = res
             .status(statusCode.DB_ERROR)
@@ -102,38 +102,10 @@ const noticeDelete = async (noticeIdx, res) => {
     return isNoticeDeleteSuccess;
 };
 
-const fileUpload = async (req, res) => {
-    multerUpload(req, res, err => {
-        if (err) {
-            const isfileUploadSuccess = res
-                .status(statusCode.DB_ERROR)
-                .json(
-                    utils.successFalse(responseMessage.FILE_UPLOAD_FAIL, err)
-                );
-            return isfileUploadSuccess;
-        }
-        const dataToSubmit = {
-            url: res.req.file.path,
-            fileName: res.req.file.filename
-        };
-
-        const isfileUploadSuccess = res
-            .status(statusCode.OK)
-            .json(
-                utils.successTrue(
-                    responseMessage.FILE_UPLOAD_SUCCESS,
-                    dataToSubmit
-                )
-            );
-        return isfileUploadSuccess;
-    });
-};
-
 module.exports = {
     noticeCreate,
     noticeList,
     noticeDetail,
     noticeUpdate,
     noticeDelete,
-    fileUpload
 };

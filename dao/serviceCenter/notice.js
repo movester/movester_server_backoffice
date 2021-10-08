@@ -1,4 +1,4 @@
-const pool = require("./pool.js");
+const pool = require("../pool.js");
 
 const noticeCreate = async ({ createPost }) => {
     try {
