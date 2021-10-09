@@ -2,41 +2,24 @@ const noticeService = require("../../service/serviceCenter/notice");
 
 const noticeCreate = async (req, res) => {
     const createPost = req.body;
-    const isNoticeCreateSuccess = await noticeService.noticeCreate(
-        { createPost },
-        res
-    );
-    return isNoticeCreateSuccess;
+    return await noticeService.noticeCreate({ createPost }, res);
 };
 
 const noticeList = async (req, res) => {
-    const isNoticeListSuccess = await noticeService.noticeList(res);
-    return isNoticeListSuccess;
+    return await noticeService.noticeList(res);
 };
 
 const noticeDetail = async (req, res) => {
-    const isNoticeDetailSuccess = await noticeService.noticeDetail(
-        req.body.noticeIdx,
-        res
-    );
-    return isNoticeDetailSuccess;
+    return await noticeService.noticeDetail(req.body.noticeIdx, res);
 };
 
 const noticeUpdate = async (req, res) => {
     const updatePost = req.body;
-    const isNoticeUpdateSuccess = await noticeService.noticeUpdate(
-        { updatePost },
-        res
-    );
-    return isNoticeUpdateSuccess;
+    return await noticeService.noticeUpdate({ updatePost }, res);
 };
 
 const noticeDelete = async (req, res) => {
-    const isNoticeDeleteSuccess = await noticeService.noticeDelete(
-        req.body.noticeIdx,
-        res
-    );
-    return isNoticeDeleteSuccess;
+    return await noticeService.noticeDelete(req.body.noticeIdx, res);
 };
 
 module.exports = {
@@ -44,5 +27,5 @@ module.exports = {
     noticeList,
     noticeDetail,
     noticeUpdate,
-    noticeDelete,
+    noticeDelete
 };

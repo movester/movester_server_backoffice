@@ -3,50 +3,43 @@ const commonDao = require("../../dao/common");
 const statusCode = require("../../utils/statusCode");
 const responseMessage = require("../../utils/responseMessage");
 const utils = require("../../utils/utils");
-const multerUpload = require("../../utils/multer");
 
 const noticeCreate = async ({ createPost }, res) => {
     const daoRow = await noticeDao.noticeCreate({ createPost });
     if (!daoRow) {
-        const isNoticeCreateSuccess = res
+        return res
             .status(statusCode.DB_ERROR)
             .json(utils.successFalse(responseMessage.DB_ERROR));
-        return isNoticeCreateSuccess;
     }
     const idxDaoRow = await commonDao.getCreateIdx();
 
-    const isNoticeCreateSuccess = res.status(statusCode.OK).json(
+    return res.status(statusCode.OK).json(
         utils.successTrue(responseMessage.POST_CREATE_SUCCESS, {
             noticeIdx: idxDaoRow[0].idx
         })
     );
-
-    return isNoticeCreateSuccess;
 };
 
 const noticeList = async res => {
     const daoRow = await noticeDao.noticeList();
     if (!daoRow) {
-        const isNoticeListSuccess = res
+        return res
             .status(statusCode.DB_ERROR)
             .json(utils.successFalse(responseMessage.DB_ERROR));
-        return isNoticeListSuccess;
     }
 
     // TODO : daoRow 칼럼명 snake > camelCase 변경
-    const isNoticeListSuccess = res
+    return res
         .status(statusCode.OK)
         .json(utils.successTrue(responseMessage.POST_LIST_SUCCESS, daoRow));
-    return isNoticeListSuccess;
 };
 
 const noticeDetail = async (noticeIdx, res) => {
     const daoRow = await noticeDao.noticeDetail(noticeIdx);
     if (!daoRow) {
-        const isNoticeDetailSuccess = res
+        return res
             .status(statusCode.DB_ERROR)
             .json(utils.successFalse(responseMessage.DB_ERROR));
-        return isNoticeDetailSuccess;
     }
 
     const resData = {
@@ -58,48 +51,41 @@ const noticeDetail = async (noticeIdx, res) => {
         updateAt: daoRow[0].update_at
     };
 
-    const isNoticeDetailSuccess = res
+    return res
         .status(statusCode.OK)
         .json(utils.successTrue(responseMessage.POST_DETAIL_SUCCESS, resData));
-    return isNoticeDetailSuccess;
 };
 
 const noticeUpdate = async ({ updatePost }, res) => {
     const daoRow = await noticeDao.noticeUpdate({ updatePost });
     if (!daoRow) {
-        const isNoticeUpdateSuccess = res
+        return res
             .status(statusCode.DB_ERROR)
             .json(
                 utils.successFalse(responseMessage.DB_ERROR, missDataToSubmit)
             );
-        return isNoticeUpdateSuccess;
     }
 
     dataToSubmit = { title: updatePost.title };
 
-    const isNoticeUpdateSuccess = res
+    return res
         .status(statusCode.OK)
         .json(
             utils.successTrue(responseMessage.POST_UPDATE_SUCCESS, dataToSubmit)
         );
-
-    return isNoticeUpdateSuccess;
 };
 
 const noticeDelete = async (noticeIdx, res) => {
     const daoRow = await noticeDao.noticeDelete(noticeIdx);
     if (!daoRow) {
-        const isNoticeDeleteSuccess = res
+        return res
             .status(statusCode.DB_ERROR)
             .json(utils.successFalse(responseMessage.DB_ERROR));
-        return isNoticeDeleteSuccess;
     }
 
-    const isNoticeDeleteSuccess = res
+    return res
         .status(statusCode.OK)
         .json(utils.successTrue(responseMessage.POST_DELETE_SUCCESS));
-    console.log(isNoticeDeleteSuccess);
-    return isNoticeDeleteSuccess;
 };
 
 module.exports = {
@@ -107,5 +93,5 @@ module.exports = {
     noticeList,
     noticeDetail,
     noticeUpdate,
-    noticeDelete,
+    noticeDelete
 };

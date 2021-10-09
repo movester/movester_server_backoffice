@@ -2,41 +2,24 @@ const faqService = require("../../service/serviceCenter/faq");
 
 const faqCreate = async (req, res) => {
     const createPost = req.body;
-    const isfaqCreateSuccess = await faqService.faqCreate(
-        { createPost },
-        res
-    );
-    return isfaqCreateSuccess;
+    return await faqService.faqCreate({ createPost }, res);
 };
 
 const faqList = async (req, res) => {
-    const isfaqListSuccess = await faqService.faqList(res);
-    return isfaqListSuccess;
+    return await faqService.faqList(res);
 };
 
 const faqDetail = async (req, res) => {
-    const isfaqDetailSuccess = await faqService.faqDetail(
-        req.body.faqIdx,
-        res
-    );
-    return isfaqDetailSuccess;
+    return await faqService.faqDetail(req.body.faqIdx, res);
 };
 
 const faqUpdate = async (req, res) => {
     const updatePost = req.body;
-    const isfaqUpdateSuccess = await faqService.faqUpdate(
-        { updatePost },
-        res
-    );
-    return isfaqUpdateSuccess;
+    return await faqService.faqUpdate({ updatePost }, res);
 };
 
 const faqDelete = async (req, res) => {
-    const isfaqDeleteSuccess = await faqService.faqDelete(
-        req.body.faqIdx,
-        res
-    );
-    return isfaqDeleteSuccess;
+    return await faqService.faqDelete(req.body.faqIdx, res);
 };
 
 module.exports = {
@@ -44,5 +27,5 @@ module.exports = {
     faqList,
     faqDetail,
     faqUpdate,
-    faqDelete,
+    faqDelete
 };

@@ -6,14 +6,12 @@ const encrypt = require("../utils/encrypt");
 
 const login = async (req, res) => {
     const loginUser = req.body;
-    const isLoginSuccess = await userService.login({ loginUser }, res);
-    return isLoginSuccess;
+    return await userService.login({ loginUser }, res);
 };
 
 const reissueAccessToken = async (req, res) => {
     const email = req.decodeRefreshToken.sub;
-    const isReissueAccessTokenSuccess = userService.reissueAccessToken(email, res);
-    return isReissueAccessTokenSuccess;
+    return userService.reissueAccessToken(email, res);
 };
 
 // accessToken, refeshToken 재발급 과정 동작이 원활한지 테스트를 만들도록 함
@@ -23,10 +21,7 @@ const dashboard = async (req, res) => {
 
 const logout = async (req, res) => {
     const email = req.decodeData.sub;
-
-    const isLogoutSuccess = await userService.logout(email, res);
-
-    return isLogoutSuccess;
+    return await userService.logout(email, res);
 };
 
 const auth = async (req, res) => {
@@ -52,8 +47,7 @@ const join = async (req, res) => {
             .status(statusCode.BAD_REQUEST)
             .json(utils.successFalse(responseMessage.EMAIL_ALREADY_EXIST));
     }
-    const isJoinSuccess = await userService.join({ joinUser }, res);
-    return isJoinSuccess;
+    return await userService.join({ joinUser }, res);
 };
 
 const updatePassword = async (req, res) => {
@@ -64,14 +58,13 @@ const updatePassword = async (req, res) => {
             .json(utils.successFalse(responseMessage.CONFIRM_PW_MISMATCH));
     }
 
-    const adminUser = await userService.findUserByIdx(updatePasswordUser.adminUserIdx)
+    const adminUser = await userService.findUserByIdx(
+        updatePasswordUser.adminUserIdx
+    );
     if (!adminUser) {
-        const isUpdatePasswordSuccess = res
+        return res
             .status(statusCode.DB_ERROR)
-            .json(
-                utils.successFalse(responseMessage.DB_ERROR)
-            );
-        return isUpdatePasswordSuccess;
+            .json(utils.successFalse(responseMessage.DB_ERROR));
     }
 
     const comparePassword = adminUser[0].password;
@@ -81,32 +74,19 @@ const updatePassword = async (req, res) => {
     );
 
     if (isCorrectBeforePassword === 0) {
-        const isUpdatePasswordSuccess = res
+        return res
             .status(statusCode.INTERNAL_SERVER_ERROR)
-            .json(
-                utils.successFalse(
-                    responseMessage.ENCRYPT_ERROR
-                )
-            );
-        return isUpdatePasswordSuccess;
+            .json(utils.successFalse(responseMessage.ENCRYPT_ERROR));
     }
 
     if (isCorrectBeforePassword === false) {
-        const isUpdatePasswordSuccess = res
+        return res
             .status(statusCode.BAD_REQUEST)
-            .json(
-                utils.successFalse(
-                    responseMessage.PW_MISMATCH
-                )
-            );
-        return isUpdatePasswordSuccess;
+            .json(utils.successFalse(responseMessage.PW_MISMATCH));
     }
 
-    const isUpdatePasswordSuccess = await userService.updatePassword({ updatePasswordUser }, res);
-    return isUpdatePasswordSuccess;
+    return await userService.updatePassword({ updatePasswordUser }, res);
 };
-
-
 
 module.exports = {
     login,
