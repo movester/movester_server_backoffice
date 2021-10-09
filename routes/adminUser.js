@@ -14,7 +14,7 @@ router.post(
     auth.verifyRefreshToken,
     userCtrl.reissueAccessToken
 );
-router.get("/logout", auth.verifyToken, userCtrl.logout);
+router.post("/logout", auth.verifyToken, userCtrl.logout);
 router.get("/auth", auth.verifyToken, userCtrl.auth);
 router.post("/join", Validator.join, ValidatorError.error, userCtrl.join);
 router.post("/updatePassword", Validator.updatePassword, ValidatorError.error, userCtrl.updatePassword);
