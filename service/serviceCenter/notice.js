@@ -4,8 +4,8 @@ const statusCode = require("../../utils/statusCode");
 const responseMessage = require("../../utils/responseMessage");
 const utils = require("../../utils/utils");
 
-const noticeCreate = async ({ createPost }, res) => {
-    const daoRow = await noticeDao.noticeCreate({ createPost });
+const noticeCreate = async (createPost, res) => {
+    const daoRow = await noticeDao.noticeCreate(createPost);
     if (!daoRow) {
         return res
             .status(statusCode.DB_ERROR)

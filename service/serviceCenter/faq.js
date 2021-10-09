@@ -4,8 +4,8 @@ const statusCode = require("../../utils/statusCode");
 const responseMessage = require("../../utils/responseMessage");
 const utils = require("../../utils/utils");
 
-const faqCreate = async ({ createPost }, res) => {
-    const daoRow = await faqDao.faqCreate({ createPost });
+const faqCreate = async (createPost, res) => {
+    const daoRow = await faqDao.faqCreate(createPost);
     if (!daoRow) {
         return res
             .status(statusCode.DB_ERROR)

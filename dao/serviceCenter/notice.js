@@ -1,6 +1,6 @@
 const pool = require("../pool.js");
 
-const noticeCreate = async ({ createPost }) => {
+const noticeCreate = async (createPost) => {
     try {
         const connection = await pool.getConnection(async conn => conn);
         try {

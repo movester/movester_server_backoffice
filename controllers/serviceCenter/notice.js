@@ -1,8 +1,7 @@
 const noticeService = require("../../service/serviceCenter/notice");
 
 const noticeCreate = async (req, res) => {
-    const createPost = req.body;
-    return await noticeService.noticeCreate({ createPost }, res);
+    return await noticeService.noticeCreate(req.body, res);
 };
 
 const noticeList = async (req, res) => {
