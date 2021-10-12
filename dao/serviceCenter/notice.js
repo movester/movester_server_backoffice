@@ -1,10 +1,10 @@
-const pool = require("./pool.js");
+const pool = require("../pool.js");
 
-const join = async ({ joinUser }) => {
+const noticeCreate = async (createPost) => {
     try {
         const connection = await pool.getConnection(async conn => conn);
         try {
-            const sql = `INSERT INTO admin_user (email, password, name, create_at) VALUES ('${joinUser.email}', '${joinUser.password}', '${joinUser.name}', now())`;
+            const sql = `INSERT INTO notice (title, contents, admin_user_idx, create_at, update_at) VALUES ('${createPost.title}', '${createPost.contents}', '${createPost.adminUserIdx}', now(), now())`;
             const [row] = await connection.query(sql);
             connection.release();
             return row;
@@ -19,11 +19,11 @@ const join = async ({ joinUser }) => {
     }
 };
 
-const findUserByEmail = async email => {
+const noticeList = async () => {
     try {
         const connection = await pool.getConnection(async conn => conn);
         try {
-            const sql = `SELECT admin_user_idx, email, password, name FROM admin_user WHERE email = '${email}'`;
+            const sql = `SELECT notice_idx, title, DATE_FORMAT(create_at,'%Y-%m-%d') as create_at FROM notice order by notice_idx desc`;
             const [row] = await connection.query(sql);
             connection.release();
             return row;
@@ -38,11 +38,11 @@ const findUserByEmail = async email => {
     }
 };
 
-const findUserByIdx = async idx => {
+const noticeDetail = async noticeIdx => {
     try {
         const connection = await pool.getConnection(async conn => conn);
         try {
-            const sql = `SELECT admin_user_idx, email, password, name FROM admin_user WHERE admin_user_idx = ${idx}`;
+            const sql = `SELECT notice_idx, title, contents, create_at, update_at, admin_user_idx FROM notice WHERE notice_idx = ${noticeIdx}`;
             const [row] = await connection.query(sql);
             connection.release();
             return row;
@@ -57,11 +57,30 @@ const findUserByIdx = async idx => {
     }
 };
 
-const updatePassword = async (adminUserIdx, password) => {
+const noticeUpdate = async ({ updatePost }) => {
     try {
         const connection = await pool.getConnection(async conn => conn);
         try {
-            const sql = `UPDATE admin_user SET password = '${password}' WHERE admin_user_idx = ${adminUserIdx}`;
+            const sql = `UPDATE notice SET title = '${updatePost.title}', contents = '${updatePost.contents}', admin_user_idx = '${updatePost.adminUserIdx}', update_at = now() WHERE notice_idx = ${updatePost.noticeIdx}`;
+            const [row] = await connection.query(sql);
+            connection.release();
+            return row;
+        } catch (err) {
+            console.log(`Query Error > ${err}`);
+            connection.release();
+            return false;
+        }
+    } catch (err) {
+        console.log(`DB Error > ${err}`);
+        return false;
+    }
+};
+
+const noticeDelete = async noticeIdx => {
+    try {
+        const connection = await pool.getConnection(async conn => conn);
+        try {
+            const sql = `DELETE FROM notice WHERE notice_idx = ${noticeIdx}`;
             const [row] = await connection.query(sql);
             connection.release();
             return row;
@@ -77,8 +96,9 @@ const updatePassword = async (adminUserIdx, password) => {
 };
 
 module.exports = {
-    join,
-    findUserByEmail,
-    findUserByIdx,
-    updatePassword
+    noticeCreate,
+    noticeList,
+    noticeDetail,
+    noticeUpdate,
+    noticeDelete
 };

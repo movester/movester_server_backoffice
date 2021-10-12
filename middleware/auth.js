@@ -15,13 +15,8 @@ const verifyToken = (req, res, next) => {
         req.accessToken = accessToken;
         next();
     } catch (err) {
-        const missDataToSubmit = {
-            isAuth: false,
-            accessToken: null,
-            email: null
-        };
         return res.json(
-            utils.successFalse(responseMessage.TOKEN_INVALID, missDataToSubmit)
+            utils.successFalse(responseMessage.TOKEN_INVALID, {isAuth: false})
         );
     }
 };
