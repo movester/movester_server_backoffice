@@ -59,7 +59,7 @@ const updatePassword = async (req, res) => {
     }
 
     const adminUser = await userService.findUserByIdx(
-        updatePasswordUser.adminUserIdx
+        req.params.adminUserIdx
     );
     if (!adminUser) {
         return res

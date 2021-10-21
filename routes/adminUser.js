@@ -17,6 +17,6 @@ router.post(
 router.post("/logout", auth.verifyToken, userCtrl.logout);
 router.get("/auth", auth.verifyToken, userCtrl.auth);
 router.post("/join", Validator.join, ValidatorError.error, userCtrl.join);
-router.post("/updatePassword", Validator.updatePassword, ValidatorError.error, userCtrl.updatePassword);
+router.put("/password/:adminUserIdx", Validator.updatePassword, ValidatorError.error, userCtrl.updatePassword);
 
 module.exports = router;
