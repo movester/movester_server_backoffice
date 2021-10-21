@@ -1,4 +1,4 @@
-const userDao = require("../dao/adminUser");
+const adminDao = require("../dao/admin");
 const commonDao = require("../dao/common");
 const encrypt = require("../utils/encrypt");
 const statusCode = require("../utils/statusCode");
@@ -9,7 +9,7 @@ const auth = require("../middleware/auth");
 const redisClient = require("../config/redis");
 
 const login = async ({ loginUser }, res) => {
-    const daoRow = await userDao.findUserByEmail(loginUser.email);
+    const daoRow = await adminDao.findUserByEmail(loginUser.email);
     if (!daoRow) {
         return res
             .status(statusCode.DB_ERROR)
@@ -58,7 +58,7 @@ const login = async ({ loginUser }, res) => {
 
     const resData = {
         isAuth: true,
-        adminUserIdx: daoRow[0].admin_user_idx,
+        adminIdx: daoRow[0].admin_idx,
         email: daoRow[0].email,
         name: daoRow[0].name,
         accessToken: accessToken,
@@ -112,7 +112,7 @@ const join = async ({ joinUser }, res) => {
     }
     joinUser.password = hashPassword;
 
-    const daoRow = await userDao.join({ joinUser });
+    const daoRow = await adminDao.join({ joinUser });
 
     if (!daoRow) {
         return res
@@ -123,7 +123,7 @@ const join = async ({ joinUser }, res) => {
     const idxDaoRow = await commonDao.getCreateIdx();
 
     const resData = {
-        adminUserIdx: idxDaoRow[0].idx,
+        adminIdx: idxDaoRow[0].idx,
         email: joinUser.email,
         name: joinUser.name
     };
@@ -134,12 +134,12 @@ const join = async ({ joinUser }, res) => {
 };
 
 const findUserByEmail = async email => {
-    const daoRow = await userDao.findUserByEmail(email);
+    const daoRow = await adminDao.findUserByEmail(email);
     return daoRow ? daoRow : false
 };
 
 const findUserByIdx = async idx => {
-    const daoRow = await userDao.findUserByIdx(idx);
+    const daoRow = await adminDao.findUserByIdx(idx);
     return daoRow ? daoRow : false
 };
 
@@ -153,8 +153,8 @@ const updatePassword = async ({ updatePasswordUser }, res) => {
             .json(utils.successFalse(responseMessage.ENCRYPT_ERROR));
     }
 
-    const daoRow = await userDao.updatePassword(
-        updatePasswordUser.adminUserIdx,
+    const daoRow = await adminDao.updatePassword(
+        updatePasswordUser.adminIdx,
         hashPassword
     );
     if (!daoRow) {

@@ -4,7 +4,7 @@ const faqCreate = async (createPost) => {
     try {
         const connection = await pool.getConnection(async conn => conn);
         try {
-            const sql = `INSERT INTO faq (title, contents, admin_user_idx, create_at, update_at) VALUES ('${createPost.title}', '${createPost.contents}', '${createPost.adminUserIdx}', now(), now())`;
+            const sql = `INSERT INTO faq (title, contents, admin_idx, create_at, update_at) VALUES ('${createPost.title}', '${createPost.contents}', '${createPost.adminIdx}', now(), now())`;
             const [row] = await connection.query(sql);
             connection.release();
             return row;
@@ -42,7 +42,7 @@ const faqDetail = async faqIdx => {
     try {
         const connection = await pool.getConnection(async conn => conn);
         try {
-            const sql = `SELECT faq_idx, title, contents, create_at, update_at, admin_user_idx FROM faq WHERE faq_idx = ${faqIdx}`;
+            const sql = `SELECT faq_idx, title, contents, create_at, update_at, admin_idx FROM faq WHERE faq_idx = ${faqIdx}`;
             const [row] = await connection.query(sql);
             connection.release();
             return row;
@@ -61,7 +61,7 @@ const faqUpdate = async (faqIdx, { updatePost }) => {
     try {
         const connection = await pool.getConnection(async conn => conn);
         try {
-            const sql = `UPDATE faq SET title = '${updatePost.title}', contents = '${updatePost.contents}', admin_user_idx = '${updatePost.adminUserIdx}', update_at = now() WHERE faq_idx = ${faqIdx}`;
+            const sql = `UPDATE faq SET title = '${updatePost.title}', contents = '${updatePost.contents}', admin_idx = '${updatePost.adminIdx}', update_at = now() WHERE faq_idx = ${faqIdx}`;
             const [row] = await connection.query(sql);
             connection.release();
             return row;

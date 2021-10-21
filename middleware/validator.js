@@ -32,7 +32,7 @@ const login = [
 ];
 
 const updatePassword = [
-    check("adminUserIdx")
+    check("adminIdx")
         .notEmpty(),
     check("beforePassword")
         .notEmpty()

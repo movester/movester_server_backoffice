@@ -46,7 +46,7 @@ const noticeDetail = async (noticeIdx, res) => {
         noticeIdx: daoRow[0].notice_idx,
         title: daoRow[0].title,
         contents: daoRow[0].contents,
-        adminUserIdx: daoRow[0].admin_user_idx,
+        adminIdx: daoRow[0].admin_idx,
         createAt: daoRow[0].create_at,
         updateAt: daoRow[0].update_at
     };

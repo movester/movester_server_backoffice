@@ -4,7 +4,7 @@ const noticeCreate = async (createPost) => {
     try {
         const connection = await pool.getConnection(async conn => conn);
         try {
-            const sql = `INSERT INTO notice (title, contents, admin_user_idx, create_at, update_at) VALUES ('${createPost.title}', '${createPost.contents}', '${createPost.adminUserIdx}', now(), now())`;
+            const sql = `INSERT INTO notice (title, contents, admin_idx, create_at, update_at) VALUES ('${createPost.title}', '${createPost.contents}', '${createPost.adminIdx}', now(), now())`;
             const [row] = await connection.query(sql);
             connection.release();
             return row;
@@ -42,7 +42,7 @@ const noticeDetail = async noticeIdx => {
     try {
         const connection = await pool.getConnection(async conn => conn);
         try {
-            const sql = `SELECT notice_idx, title, contents, create_at, update_at, admin_user_idx FROM notice WHERE notice_idx = ${noticeIdx}`;
+            const sql = `SELECT notice_idx, title, contents, create_at, update_at, admin_idx FROM notice WHERE notice_idx = ${noticeIdx}`;
             const [row] = await connection.query(sql);
             connection.release();
             return row;
@@ -58,11 +58,10 @@ const noticeDetail = async noticeIdx => {
 };
 
 const noticeUpdate = async (noticeIdx, { updatePost }) => {
-    console.log("NoticeIDx",noticeIdx)
     try {
         const connection = await pool.getConnection(async conn => conn);
         try {
-            const sql = `UPDATE notice SET title = '${updatePost.title}', contents = '${updatePost.contents}', admin_user_idx = '${updatePost.adminUserIdx}', update_at = now() WHERE notice_idx = ${noticeIdx}`;
+            const sql = `UPDATE notice SET title = '${updatePost.title}', contents = '${updatePost.contents}', admin_idx = '${updatePost.adminIdx}', update_at = now() WHERE notice_idx = ${noticeIdx}`;
             const [row] = await connection.query(sql);
             connection.release();
             return row;

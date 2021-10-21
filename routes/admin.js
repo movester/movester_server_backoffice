@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const userCtrl = require("../controllers/adminUser");
+const userCtrl = require("../controllers/admin");
 const Validator = require("../middleware/validator");
 const ValidatorError = require("../middleware/validatorError");
 const auth = require("../middleware/auth");
@@ -17,6 +17,6 @@ router.post(
 router.post("/logout", auth.verifyToken, userCtrl.logout);
 router.get("/auth", auth.verifyToken, userCtrl.auth);
 router.post("/join", Validator.join, ValidatorError.error, userCtrl.join);
-router.put("/password/:adminUserIdx", Validator.updatePassword, ValidatorError.error, userCtrl.updatePassword);
+router.put("/password/:adminIdx", Validator.updatePassword, ValidatorError.error, userCtrl.updatePassword);
 
 module.exports = router;
