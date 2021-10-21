@@ -14,7 +14,6 @@ const noticeDetail = async (req, res) => {
 
 const noticeUpdate = async (req, res) => {
     const updatePost = req.body;
-    console.log(updatePost)
     return await noticeService.noticeUpdate(req.params.noticeIdx, { updatePost }, res);
 };
 

@@ -56,13 +56,13 @@ const faqDetail = async (faqIdx, res) => {
         .json(utils.successTrue(responseMessage.POST_DETAIL_SUCCESS, resData));
 };
 
-const faqUpdate = async ({ updatePost }, res) => {
-    const daoRow = await faqDao.faqUpdate({ updatePost });
+const faqUpdate = async (faqIdx, { updatePost }, res) => {
+    const daoRow = await faqDao.faqUpdate(faqIdx, { updatePost });
     if (!daoRow) {
         return res
             .status(statusCode.DB_ERROR)
             .json(
-                utils.successFalse(responseMessage.DB_ERROR, missDataToSubmit)
+                utils.successFalse(responseMessage.DB_ERROR)
             );
     }
 

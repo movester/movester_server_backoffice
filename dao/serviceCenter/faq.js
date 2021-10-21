@@ -57,11 +57,11 @@ const faqDetail = async faqIdx => {
     }
 };
 
-const faqUpdate = async ({ updatePost }) => {
+const faqUpdate = async (faqIdx, { updatePost }) => {
     try {
         const connection = await pool.getConnection(async conn => conn);
         try {
-            const sql = `UPDATE faq SET title = '${updatePost.title}', contents = '${updatePost.contents}', admin_user_idx = '${updatePost.adminUserIdx}', update_at = now() WHERE faq_idx = ${updatePost.faqIdx}`;
+            const sql = `UPDATE faq SET title = '${updatePost.title}', contents = '${updatePost.contents}', admin_user_idx = '${updatePost.adminUserIdx}', update_at = now() WHERE faq_idx = ${faqIdx}`;
             const [row] = await connection.query(sql);
             connection.release();
             return row;

@@ -9,16 +9,16 @@ const faqList = async (req, res) => {
 };
 
 const faqDetail = async (req, res) => {
-    return await faqService.faqDetail(req.body.faqIdx, res);
+    return await faqService.faqDetail(req.params.faqIdx, res);
 };
 
 const faqUpdate = async (req, res) => {
     const updatePost = req.body;
-    return await faqService.faqUpdate({ updatePost }, res);
+    return await faqService.faqUpdate(req.params.faqIdx, { updatePost }, res);
 };
 
 const faqDelete = async (req, res) => {
-    return await faqService.faqDelete(req.body.faqIdx, res);
+    return await faqService.faqDelete(req.params.faqIdx, res);
 };
 
 module.exports = {

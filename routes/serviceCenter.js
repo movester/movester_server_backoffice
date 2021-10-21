@@ -11,10 +11,10 @@ router.put("/notices/:noticeIdx", noticeCtrl.noticeUpdate);
 router.delete("/notices/:noticeIdx", noticeCtrl.noticeDelete);
 
 // faq
-router.post("/faq/create", faqCtrl.faqCreate);
-router.get("/faq/list", faqCtrl.faqList);
-router.post("/faq/detail", faqCtrl.faqDetail);
-router.post("/faq/update", faqCtrl.faqUpdate);
-router.post("/faq/delete", faqCtrl.faqDelete);
+router.post("/faqs/", faqCtrl.faqCreate);
+router.get("/faqs", faqCtrl.faqList);
+router.get("/faqs/:faqIdx", faqCtrl.faqDetail);
+router.put("/faqs/:faqIdx", faqCtrl.faqUpdate);
+router.delete("/faqs/:faqIdx", faqCtrl.faqDelete);
 
 module.exports = router;
