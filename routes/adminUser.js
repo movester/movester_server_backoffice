@@ -10,7 +10,7 @@ router.get("/dashboard", auth.verifyToken, userCtrl.dashboard);
 
 router.post("/login", Validator.login, ValidatorError.error, userCtrl.login);
 router.post(
-    "/reissueAccessToken",
+    "/reissue-access-token",
     auth.verifyRefreshToken,
     userCtrl.reissueAccessToken
 );
