@@ -56,13 +56,13 @@ const noticeDetail = async (noticeIdx, res) => {
         .json(utils.successTrue(responseMessage.POST_DETAIL_SUCCESS, resData));
 };
 
-const noticeUpdate = async ({ updatePost }, res) => {
-    const daoRow = await noticeDao.noticeUpdate({ updatePost });
+const noticeUpdate = async (noticeIdx, { updatePost }, res) => {
+    const daoRow = await noticeDao.noticeUpdate(noticeIdx,{ updatePost });
     if (!daoRow) {
         return res
             .status(statusCode.DB_ERROR)
             .json(
-                utils.successFalse(responseMessage.DB_ERROR, missDataToSubmit)
+                utils.successFalse(responseMessage.DB_ERROR)
             );
     }
 

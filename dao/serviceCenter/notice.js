@@ -57,11 +57,12 @@ const noticeDetail = async noticeIdx => {
     }
 };
 
-const noticeUpdate = async ({ updatePost }) => {
+const noticeUpdate = async (noticeIdx, { updatePost }) => {
+    console.log("NoticeIDx",noticeIdx)
     try {
         const connection = await pool.getConnection(async conn => conn);
         try {
-            const sql = `UPDATE notice SET title = '${updatePost.title}', contents = '${updatePost.contents}', admin_user_idx = '${updatePost.adminUserIdx}', update_at = now() WHERE notice_idx = ${updatePost.noticeIdx}`;
+            const sql = `UPDATE notice SET title = '${updatePost.title}', contents = '${updatePost.contents}', admin_user_idx = '${updatePost.adminUserIdx}', update_at = now() WHERE notice_idx = ${noticeIdx}`;
             const [row] = await connection.query(sql);
             connection.release();
             return row;

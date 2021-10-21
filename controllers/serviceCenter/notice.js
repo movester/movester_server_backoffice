@@ -9,16 +9,17 @@ const noticeList = async (req, res) => {
 };
 
 const noticeDetail = async (req, res) => {
-    return await noticeService.noticeDetail(req.body.noticeIdx, res);
+    return await noticeService.noticeDetail(req.params.noticeIdx, res);
 };
 
 const noticeUpdate = async (req, res) => {
     const updatePost = req.body;
-    return await noticeService.noticeUpdate({ updatePost }, res);
+    console.log(updatePost)
+    return await noticeService.noticeUpdate(req.params.noticeIdx, { updatePost }, res);
 };
 
 const noticeDelete = async (req, res) => {
-    return await noticeService.noticeDelete(req.body.noticeIdx, res);
+    return await noticeService.noticeDelete(req.params.noticeIdx, res);
 };
 
 module.exports = {
