@@ -46,7 +46,7 @@ const faqDetail = async (faqIdx, res) => {
         faqIdx: daoRow[0].faq_idx,
         title: daoRow[0].title,
         contents: daoRow[0].contents,
-        adminUserIdx: daoRow[0].admin_user_idx,
+        adminIdx: daoRow[0].admin_idx,
         createAt: daoRow[0].create_at,
         updateAt: daoRow[0].update_at
     };
@@ -56,13 +56,13 @@ const faqDetail = async (faqIdx, res) => {
         .json(utils.successTrue(responseMessage.POST_DETAIL_SUCCESS, resData));
 };
 
-const faqUpdate = async ({ updatePost }, res) => {
-    const daoRow = await faqDao.faqUpdate({ updatePost });
+const faqUpdate = async (faqIdx, { updatePost }, res) => {
+    const daoRow = await faqDao.faqUpdate(faqIdx, { updatePost });
     if (!daoRow) {
         return res
             .status(statusCode.DB_ERROR)
             .json(
-                utils.successFalse(responseMessage.DB_ERROR, missDataToSubmit)
+                utils.successFalse(responseMessage.DB_ERROR)
             );
     }
 

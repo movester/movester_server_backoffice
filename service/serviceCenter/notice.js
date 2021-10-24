@@ -46,7 +46,7 @@ const noticeDetail = async (noticeIdx, res) => {
         noticeIdx: daoRow[0].notice_idx,
         title: daoRow[0].title,
         contents: daoRow[0].contents,
-        adminUserIdx: daoRow[0].admin_user_idx,
+        adminIdx: daoRow[0].admin_idx,
         createAt: daoRow[0].create_at,
         updateAt: daoRow[0].update_at
     };
@@ -56,13 +56,13 @@ const noticeDetail = async (noticeIdx, res) => {
         .json(utils.successTrue(responseMessage.POST_DETAIL_SUCCESS, resData));
 };
 
-const noticeUpdate = async ({ updatePost }, res) => {
-    const daoRow = await noticeDao.noticeUpdate({ updatePost });
+const noticeUpdate = async (noticeIdx, { updatePost }, res) => {
+    const daoRow = await noticeDao.noticeUpdate(noticeIdx,{ updatePost });
     if (!daoRow) {
         return res
             .status(statusCode.DB_ERROR)
             .json(
-                utils.successFalse(responseMessage.DB_ERROR, missDataToSubmit)
+                utils.successFalse(responseMessage.DB_ERROR)
             );
     }
 

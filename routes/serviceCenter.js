@@ -4,17 +4,17 @@ const noticeCtrl = require("../controllers/serviceCenter/notice");
 const faqCtrl = require("../controllers/serviceCenter/faq");
 
 // notice
-router.post("/notice/create", noticeCtrl.noticeCreate);
-router.get("/notice/list", noticeCtrl.noticeList);
-router.post("/notice/detail", noticeCtrl.noticeDetail);
-router.post("/notice/update", noticeCtrl.noticeUpdate);
-router.post("/notice/delete", noticeCtrl.noticeDelete);
+router.post("/notices", noticeCtrl.noticeCreate);
+router.get("/notices", noticeCtrl.noticeList);
+router.get("/notices/:noticeIdx", noticeCtrl.noticeDetail);
+router.put("/notices/:noticeIdx", noticeCtrl.noticeUpdate);
+router.delete("/notices/:noticeIdx", noticeCtrl.noticeDelete);
 
 // faq
-router.post("/faq/create", faqCtrl.faqCreate);
-router.get("/faq/list", faqCtrl.faqList);
-router.post("/faq/detail", faqCtrl.faqDetail);
-router.post("/faq/update", faqCtrl.faqUpdate);
-router.post("/faq/delete", faqCtrl.faqDelete);
+router.post("/faqs/", faqCtrl.faqCreate);
+router.get("/faqs", faqCtrl.faqList);
+router.get("/faqs/:faqIdx", faqCtrl.faqDetail);
+router.put("/faqs/:faqIdx", faqCtrl.faqUpdate);
+router.delete("/faqs/:faqIdx", faqCtrl.faqDelete);
 
 module.exports = router;
