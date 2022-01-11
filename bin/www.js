@@ -1,21 +1,20 @@
-const express = require("express");
+const express = require('express');
+
 const app = express();
-const bodyParser = require("body-parser");
-const router = require("../routes/index");
-const redis = require("redis");
+const bodyParser = require('body-parser');
+const redis = require('redis');
+const router = require('../routes/index');
 
 const port = process.env.PORT || 8000;
 const redisPort = process.env.PORT || 6379;
 
+// eslint-disable-next-line no-unused-vars
 const client = redis.createClient(redisPort);
 
-// parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }));
-
-// parse application/json
 app.use(bodyParser.json());
 // app.use(helmet());
-app.use("/", router);
+app.use('/', router);
 app.use('/uploads', express.static('uploads'));
 
 app.listen(port, () => console.log(`Dev Server listening on port ${port}!`));

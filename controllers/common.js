@@ -1,9 +1,7 @@
-const commonService = require("../service/common");
+const commonService = require('../service/common');
 
-const fileUpload = async (req, res) => {
-    return await commonService.fileUpload(req, res);
-};
+const fileUpload = async (req, res) => await commonService.fileUpload(req, res);
 
 module.exports = {
-    fileUpload
+  fileUpload,
 };
