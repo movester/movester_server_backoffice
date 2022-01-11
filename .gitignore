@@ -2,3 +2,6 @@ node_modules
 
 # dotenv environment variables file
 .env
+
+utils/test.js
+utils/test.spec.js
