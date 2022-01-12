@@ -1,57 +1,40 @@
-const jwt = require('jsonwebtoken');
+const jwt = require('../modules/jwt');
 const adminDao = require('../dao/admin');
 const commonDao = require('../dao/common');
-const encrypt = require('../utils/encrypt');
-const statusCode = require('../utils/statusCode');
-const responseMessage = require('../utils/responseMessage');
-const resForm = require('../utils/resForm');
+const encrypt = require('../modules/encrypt');
+const CODE = require('../utils/statusCode');
+const MSG = require('../utils/responseMessage');
+const form = require('../utils/responseForm');
 const auth = require('../middleware/auth');
 const redisClient = require('../config/redis');
 
-const login = async ({ email, password }, res) => {
+const login = async ({ email, password }) => {
   try {
-    const admin = await adminDao.findUserByEmail(email);
-    console.log('admin', admin);
+    const admin = await adminDao.findAdminByEmail(email);
+
     if (!admin) {
-      return statusCode.NOT_FOUND;
-    }
-    const hashPassword = admin.password;
-    const isCorrectPassword = await encrypt.compare(password, hashPassword);
-
-    // TODO : 0 과 false 는 둘 다 falsy 한 값으로 명확한 네이밍으로 수정 필요
-    if (isCorrectPassword === 0) {
-      return res.status(statusCode.INTERNAL_SERVER_ERROR).json(
-        resForm.successFalse(responseMessage.ENCRYPT_ERROR, {
-          isAuth: false,
-        })
-      );
+      return CODE.BAD_REQUEST;
     }
 
-    if (isCorrectPassword === false) {
-      return res.status(statusCode.BAD_REQUEST).json(
-        resForm.successFalse(responseMessage.PW_MISMATCH, {
-          isAuth: false,
-        })
-      );
+    const isCorrectPassword = await encrypt.compare(password, admin.password);
+
+    if (!isCorrectPassword) {
+      return CODE.NOT_FOUND;
     }
 
-    const accessToken = jwt.sign({ sub: email }, process.env.JWT_ACCESS_SECRET, {
-      expiresIn: process.env.JWT_ACCESS_TIME,
-    });
-    const refreshToken = auth.generateRefreshToken(email);
+    const token = await jwt.sign({ idx: admin.admin_idx, email: admin.email });
+    // const refreshToken = auth.generateRefreshToken(email);
 
-    const resData = {
+    return {
       isAuth: true,
-      adminIdx: admin[0].admin_idx,
-      email: admin[0].email,
-      name: admin[0].name,
-      accessToken,
-      refreshToken,
+      adminIdx: admin.admin_idx,
+      email: admin.email,
+      name: admin.name,
+      accessToken: token.accessToken,
+      refreshToken: token.refreshToken,
     };
-    return res.status(statusCode.OK).json(resForm.successTrue(responseMessage.LOGIN_SUCCESS, resData));
   } catch (err) {
-    // throw new Error(err);
-    console.log(err);
+    return CODE.INTERNAL_SERVER_ERROR;
   }
 };
 
@@ -66,26 +49,26 @@ const reissueAccessToken = (email, res) => {
     refreshToken,
   };
 
-  return res.status(statusCode.OK).json(resForm.successTrue(responseMessage.TOKEN_GENERATE_REFRESH_SUCCESS, token));
+  return res.status(CODE.OK).json(form.success(MSG.TOKEN_GENERATE_REFRESH_SUCCESS, token));
 };
 
 const logout = async (email, res) => {
   await redisClient.del(email.toString());
 
-  return res.status(statusCode.OK).json(resForm.successTrue(responseMessage.LOGOUT_SUCCESS, { isAuth: false }));
+  return res.status(CODE.OK).json(form.success(MSG.LOGOUT_SUCCESS, { isAuth: false }));
 };
 
 const join = async ({ joinUser }, res) => {
-  const hashedPassword = await encrypt.hashPassword(joinUser.password);
+  const hashedPassword = await encrypt.hash(joinUser.password);
   if (!hashedPassword) {
-    return res.status(statusCode.INTERNAL_SERVER_ERROR).json(resForm.successFalse(responseMessage.ENCRYPT_ERROR));
+    return res.status(CODE.INTERNAL_SERVER_ERROR).json(form.successFalse(MSG.ENCRYPT_ERROR));
   }
   joinUser.password = hashedPassword;
 
   const daoRow = await adminDao.join({ joinUser });
 
   if (!daoRow) {
-    return res.status(statusCode.DB_ERROR).json(resForm.successFalse(responseMessage.DB_ERROR));
+    return res.status(CODE.DB_ERROR).json(form.successFalse(MSG.DB_ERROR));
   }
 
   const idxDaoRow = await commonDao.getCreateIdx();
@@ -96,7 +79,7 @@ const join = async ({ joinUser }, res) => {
     name: joinUser.name,
   };
 
-  return res.status(statusCode.OK).json(resForm.successTrue(responseMessage.JOIN_SUCCESS, resData));
+  return res.status(CODE.OK).json(form.success(MSG.JOIN_SUCCESS, resData));
 };
 
 const findUserByEmail = async email => {
@@ -112,14 +95,14 @@ const findUserByIdx = async idx => {
 const updatePassword = async ({ updatePasswordUser }, res) => {
   const hashPassword = await encrypt.hashPassword(updatePasswordUser.newPassword);
   if (!hashPassword) {
-    return res.status(statusCode.INTERNAL_SERVER_ERROR).json(resForm.successFalse(responseMessage.ENCRYPT_ERROR));
+    return res.status(CODE.INTERNAL_SERVER_ERROR).json(form.successFalse(MSG.ENCRYPT_ERROR));
   }
 
   const daoRow = await adminDao.updatePassword(updatePasswordUser.adminIdx, hashPassword);
   if (!daoRow) {
-    return res.status(statusCode.DB_ERROR).json(resForm.successFalse(responseMessage.DB_ERROR));
+    return res.status(CODE.DB_ERROR).json(form.successFalse(MSG.DB_ERROR));
   }
-  return res.status(statusCode.OK).json(resForm.successTrue(responseMessage.UPDATE_PASSWORD_SUCCESS));
+  return res.status(CODE.OK).json(form.success(MSG.UPDATE_PASSWORD_SUCCESS));
 };
 
 module.exports = {

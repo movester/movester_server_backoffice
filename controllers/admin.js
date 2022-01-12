@@ -1,23 +1,27 @@
 const adminService = require('../service/admin');
-const statusCode = require('../utils/statusCode');
-const responseMessage = require('../utils/responseMessage');
-const resForm = require('../utils/resForm');
-const encrypt = require('../utils/encrypt');
+const CODE = require('../utils/statusCode');
+const MSG = require('../utils/responseMessage');
+const form = require('../utils/responseForm');
+const encrypt = require('../modules/encrypt');
 
 const login = async (req, res) => {
   const loginUser = req.body;
-  const isLogin = await adminService.login(loginUser, res);
+  const isLogin = await adminService.login(loginUser);
 
   if (typeof isLogin === 'number') {
-    return res.status(isLogin).json(resForm.successFalse(responseMessage.LOGIN_FAIL));
+    if (isLogin === CODE.BAD_REQUEST) {
+      return res.status(CODE.BAD_REQUEST).json(form.fail(MSG.EMAIL_NOT_EXIST));
+    }
+    if (isLogin === CODE.NOT_FOUND) {
+      return res.status(CODE.NOT_FOUND).json(form.fail(MSG.PW_MISMATCH));
+    }
+    if (isLogin === CODE.INTERNAL_SERVER_ERROR) {
+      return res.status(CODE.INTERNAL_SERVER_ERROR).json(form.fail(MSG.INTERNAL_SERVER_ERROR));
+    }
   }
-  res.send("isLogin");
-};
 
-// const login = async (req, res) => {
-//   const loginUser = req.body;
-//   return await adminService.login({ loginUser }, res);
-// };
+  return res.status(CODE.OK).json(form.success(isLogin));
+};
 
 const reissueAccessToken = async (req, res) => {
   const email = req.decodeRefreshToken.sub;
@@ -38,7 +42,7 @@ const auth = async (req, res) => {
     email: req.decodeData.sub,
     accessToken: req.accessToken,
   };
-  res.json(resForm.successTrue(responseMessage.LOGIN_SUCCESS, authUser));
+  res.json(form.successTrue(MSG.LOGIN_SUCCESS, authUser));
 };
 
 const join = async (req, res) => {
@@ -46,10 +50,10 @@ const join = async (req, res) => {
 
   const isEmail = await adminService.findUserByEmail(joinUser.email);
   if (!isEmail) {
-    return res.status(statusCode.DB_ERROR).json(resForm.successFalse(responseMessage.DB_ERROR));
+    return res.status(CODE.DB_ERROR).json(form.successFalse(MSG.DB_ERROR));
   }
   if (Object.keys(isEmail).length > 0) {
-    return res.status(statusCode.BAD_REQUEST).json(resForm.successFalse(responseMessage.EMAIL_ALREADY_EXIST));
+    return res.status(CODE.BAD_REQUEST).json(form.successFalse(MSG.EMAIL_ALREADY_EXIST));
   }
   return await adminService.join({ joinUser }, res);
 };
@@ -57,23 +61,23 @@ const join = async (req, res) => {
 const updatePassword = async (req, res) => {
   const updatePasswordUser = req.body;
   if (updatePasswordUser.newPassword !== updatePasswordUser.confirmPassword) {
-    return res.status(statusCode.BAD_REQUEST).json(resForm.successFalse(responseMessage.CONFIRM_PW_MISMATCH));
+    return res.status(CODE.BAD_REQUEST).json(form.successFalse(MSG.CONFIRM_PW_MISMATCH));
   }
 
   const admin = await adminService.findUserByIdx(req.params.adminIdx);
   if (!admin) {
-    return res.status(statusCode.DB_ERROR).json(resForm.successFalse(responseMessage.DB_ERROR));
+    return res.status(CODE.DB_ERROR).json(form.successFalse(MSG.DB_ERROR));
   }
 
   const comparePassword = admin[0].password;
   const isCorrectBeforePassword = await encrypt.comparePassword(updatePasswordUser.beforePassword, comparePassword);
 
   if (isCorrectBeforePassword === 0) {
-    return res.status(statusCode.INTERNAL_SERVER_ERROR).json(resForm.successFalse(responseMessage.ENCRYPT_ERROR));
+    return res.status(CODE.INTERNAL_SERVER_ERROR).json(form.successFalse(MSG.ENCRYPT_ERROR));
   }
 
   if (isCorrectBeforePassword === false) {
-    return res.status(statusCode.BAD_REQUEST).json(resForm.successFalse(responseMessage.PW_MISMATCH));
+    return res.status(CODE.BAD_REQUEST).json(form.successFalse(MSG.PW_MISMATCH));
   }
 
   return await adminService.updatePassword({ updatePasswordUser }, res);

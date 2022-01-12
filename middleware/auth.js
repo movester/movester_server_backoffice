@@ -1,25 +1,35 @@
-const jwt = require('jsonwebtoken');
+const jwt = require('../modules/jwt');
 const redisClient = require('../config/redis');
-const statusCode = require('../utils/statusCode');
-const responseMessage = require('../utils/responseMessage');
-const resForm = require('../utils/resForm');
+const CODE = require('../utils/statusCode');
+const MSG = require('../utils/responseMessage');
+const form = require('../utils/responseForm');
 
-const verifyToken = (req, res, next) => {
+const TOKEN_EXPIRED = -3;
+const TOKEN_INVALID = -2;
+
+const verifyToken = async (req, res, next) => {
   try {
-    const accessToken = req.headers.authorization.split('Bearer ')[1];
-    const decodeAccessToken = jwt.verify(accessToken, process.env.JWT_ACCESS_SECRET);
-    req.decodeData = decodeAccessToken;
-    req.accessToken = accessToken;
+    const { token } = req.headers;
+    if (!token) res.status(CODE.UNAUTHORIZED).json(form.fail(MSG.TOKEN_EMPTY));
+    const decode = await jwt.verify(token);
+
+    if (decode === TOKEN_EXPIRED) return res.status(CODE.UNAUTHORIZED).json(form.fail(MSG.EXPIRED_TOKEN));
+
+    if (decode === TOKEN_INVALID) return res.status(CODE.UNAUTHORIZED).json(form.fail(MSG.INVALID_TOKEN));
+
+    if (!decode.idx) return res.json(form.fail(MSG.INVALID_TOKEN));
+
+    req.idx = decode.idx;
     next();
   } catch (err) {
-    return res.json(resForm.successFalse(responseMessage.TOKEN_INVALID, { isAuth: false }));
+    return res.status(CODE.INTERNAL_SERVER_ERROR).json(form.fail(MSG.INTERNAL_SERVER_ERROR));
   }
 };
 
 const verifyRefreshToken = (req, res, next) => {
   const refreshToken = req.body.token;
   if (!refreshToken) {
-    return res.status(statusCode.BAD_REQUEST).json(resForm.successFalse(responseMessage.VALUE_NULL));
+    return res.status(CODE.BAD_REQUEST).json(form.fail(MSG.VALUE_NULL));
   }
   try {
     const decodeRefreshToken = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
@@ -29,19 +39,20 @@ const verifyRefreshToken = (req, res, next) => {
       if (err) throw err;
 
       if (!data) {
-        return res.status(statusCode.BAD_REQUEST).json(resForm.successFalse(responseMessage.TOKEN_EMPTY));
+        return res.status(CODE.BAD_REQUEST).json(form.fail(MSG.TOKEN_EMPTY));
       }
       if (JSON.parse(data).token !== refreshToken) {
-        return res.status(statusCode.BAD_REQUEST).json(resForm.successFalse(responseMessage.TOKEN_INVALID));
+        return res.status(CODE.BAD_REQUEST).json(form.fail(MSG.TOKEN_INVALID));
       }
       next();
     });
   } catch (err) {
     console.log(`verifyRefreshToken > ${err}`);
-    res.status(statusCode.BAD_REQUEST).json(resForm.successFalse(responseMessage.TOKEN_INVALID));
+    res.status(CODE.BAD_REQUEST).json(form.fail(MSG.TOKEN_INVALID));
   }
 };
 
+// TODO : fix
 const generateRefreshToken = email => {
   const refreshToken = jwt.sign({ sub: email, secret: 'movester' }, process.env.JWT_REFRESH_SECRET, {
     expiresIn: process.env.JWT_REFRESH_TIME,

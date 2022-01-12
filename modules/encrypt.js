@@ -2,7 +2,7 @@ const bcrypt = require('bcrypt');
 
 const saltRounds = 10;
 
-const hashPassword = password =>
+const hash = password =>
   new Promise((resolve, reject) => {
     bcrypt.genSalt(saltRounds, (err, salt) => {
       if (err) reject(err);
@@ -13,12 +13,12 @@ const hashPassword = password =>
     });
   });
 
-const comparePassword = async (password, hashPassword) => {
+const compare = async (password, hashPassword) => {
   const result = await bcrypt.compare(password, hashPassword);
   return result;
 };
 
 module.exports = {
-  hashPassword,
-  comparePassword,
+  hash,
+  compare,
 };

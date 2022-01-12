@@ -2,7 +2,7 @@ const noticeDao = require('../../dao/serviceCenter/notice');
 const commonDao = require('../../dao/common');
 const statusCode = require('../../utils/statusCode');
 const responseMessage = require('../../utils/responseMessage');
-const utils = require('../../utils/resForm');
+const utils = require('../../utils/responseForm');
 
 const noticeCreate = async (createPost, res) => {
   const daoRow = await noticeDao.noticeCreate(createPost);
