@@ -2,19 +2,19 @@ const express = require('express');
 
 const router = express.Router();
 const userCtrl = require('../controllers/admin');
-const Validator = require('../middleware/validator');
-const ValidatorError = require('../middleware/validatorError');
+const validator = require('../middleware/validator');
+const validatorError = require('../middleware/validatorError');
 const auth = require('../middleware/auth');
 
 // accessToken, refeshToken 재발급 과정 동작이 원활한지 테스트를 만들도록 함
-router.get('/dashboard', auth.verifyToken, userCtrl.dashboard);
+// router.get('/dashboard', auth.verifyToken, userCtrl.dashboard);
 router.get('/', (_, res) => res.send('hello'));
 
-router.post('/login', Validator.login, ValidatorError.error, userCtrl.login);
+router.post('/login', validator.login, validatorError.error, userCtrl.login);
 router.post('/reissue-access-token', auth.verifyRefreshToken, userCtrl.reissueAccessToken);
 router.post('/logout', auth.verifyToken, userCtrl.logout);
 router.get('/auth', auth.verifyToken, userCtrl.auth);
-router.post('/join', Validator.join, ValidatorError.error, userCtrl.join);
-router.put('/password/:adminIdx', Validator.updatePassword, ValidatorError.error, userCtrl.updatePassword);
+router.post('/join', validator.join, validatorError.error, userCtrl.join);
+router.put('/password/:adminIdx', validator.updatePassword, validatorError.error, userCtrl.updatePassword);
 
 module.exports = router;

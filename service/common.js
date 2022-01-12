@@ -1,7 +1,7 @@
 const multerUpload = require('../utils/multer');
 const statusCode = require('../utils/statusCode');
 const responseMessage = require('../utils/responseMessage');
-const utils = require('../utils/utils');
+const utils = require('../utils/resForm');
 
 const fileUpload = async (req, res) => {
   await multerUpload(req, res, err => {

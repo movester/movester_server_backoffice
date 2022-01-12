@@ -1,13 +1,13 @@
-const successTrue = (message, resData) => ({
+const successTrue = (message, data) => ({
   success: true,
   message,
-  resData,
+  data,
 });
 
-const successFalse = (message, resData) => ({
+const successFalse = (message, data) => ({
   success: false,
   message,
-  resData,
+  data,
 });
 
 module.exports = {

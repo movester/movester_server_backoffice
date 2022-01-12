@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 const redisClient = require('../config/redis');
 const statusCode = require('../utils/statusCode');
 const responseMessage = require('../utils/responseMessage');
-const utils = require('../utils/utils');
+const resForm = require('../utils/resForm');
 
 const verifyToken = (req, res, next) => {
   try {
@@ -12,14 +12,14 @@ const verifyToken = (req, res, next) => {
     req.accessToken = accessToken;
     next();
   } catch (err) {
-    return res.json(utils.successFalse(responseMessage.TOKEN_INVALID, { isAuth: false }));
+    return res.json(resForm.successFalse(responseMessage.TOKEN_INVALID, { isAuth: false }));
   }
 };
 
 const verifyRefreshToken = (req, res, next) => {
   const refreshToken = req.body.token;
   if (!refreshToken) {
-    return res.status(statusCode.BAD_REQUEST).json(utils.successFalse(responseMessage.VALUE_NULL));
+    return res.status(statusCode.BAD_REQUEST).json(resForm.successFalse(responseMessage.VALUE_NULL));
   }
   try {
     const decodeRefreshToken = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
@@ -29,16 +29,16 @@ const verifyRefreshToken = (req, res, next) => {
       if (err) throw err;
 
       if (!data) {
-        return res.status(statusCode.BAD_REQUEST).json(utils.successFalse(responseMessage.TOKEN_EMPTY));
+        return res.status(statusCode.BAD_REQUEST).json(resForm.successFalse(responseMessage.TOKEN_EMPTY));
       }
       if (JSON.parse(data).token !== refreshToken) {
-        return res.status(statusCode.BAD_REQUEST).json(utils.successFalse(responseMessage.TOKEN_INVALID));
+        return res.status(statusCode.BAD_REQUEST).json(resForm.successFalse(responseMessage.TOKEN_INVALID));
       }
       next();
     });
   } catch (err) {
     console.log(`verifyRefreshToken > ${err}`);
-    res.status(statusCode.BAD_REQUEST).json(utils.successFalse(responseMessage.TOKEN_INVALID));
+    res.status(statusCode.BAD_REQUEST).json(resForm.successFalse(responseMessage.TOKEN_INVALID));
   }
 };
 

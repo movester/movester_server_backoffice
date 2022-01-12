@@ -26,7 +26,7 @@ const findUserByEmail = async email => {
       const sql = `SELECT admin_idx, email, password, name FROM admin WHERE email = '${email}'`;
       const [row] = await connection.query(sql);
       connection.release();
-      return row;
+      return row.length ? row[0] : undefined;
     } catch (err) {
       console.log(`Query Error > ${err}`);
       connection.release();

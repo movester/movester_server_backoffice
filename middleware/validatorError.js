@@ -1,7 +1,7 @@
 const { validationResult } = require('express-validator');
 const statusCode = require('../utils/statusCode');
 const responseMessage = require('../utils/responseMessage');
-const utils = require('../utils/utils');
+const resForm = require('../utils/resForm');
 
 const error = (req, res, next) => {
   const err = validationResult(req);
@@ -9,7 +9,9 @@ const error = (req, res, next) => {
     requestParameteError: err.array(),
   };
   if (!err.isEmpty()) {
-    return res.status(statusCode.BAD_REQUEST).json(utils.successFalse(responseMessage.VALUE_INVALID, missDataToSubmit));
+    return res
+      .status(statusCode.BAD_REQUEST)
+      .json(resForm.successFalse(responseMessage.VALUE_INVALID, missDataToSubmit));
   }
   next();
 };
