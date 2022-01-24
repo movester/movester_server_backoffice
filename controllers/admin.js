@@ -47,15 +47,22 @@ const auth = async (req, res) => {
 
 const join = async (req, res) => {
   const joinUser = req.body;
+  try {
+    const isEmailDuplicate = await adminService.findAdminByEmail(joinUser.email);
+    if (isEmailDuplicate) {
+      return res.status(CODE.DUPLICATE).json(form.fail(MSG.EMAIL_ALREADY_EXIST));
+    }
 
-  const isEmail = await adminService.findUserByEmail(joinUser.email);
-  if (!isEmail) {
-    return res.status(CODE.DB_ERROR).json(form.successFalse(MSG.DB_ERROR));
+    const isNameDuplicate = await adminService.findAdminByName(joinUser.name);
+    if (isNameDuplicate) {
+      return res.status(CODE.DUPLICATE).json(form.fail(MSG.NAME_ALREADY_EXIST));
+    }
+  } catch (err) {
+    return res.status(CODE.INTERNAL_SERVER_ERROR).json(form.fail(MSG.INTERNAL_SERVER_ERROR));
   }
-  if (Object.keys(isEmail).length > 0) {
-    return res.status(CODE.BAD_REQUEST).json(form.successFalse(MSG.EMAIL_ALREADY_EXIST));
-  }
-  return await adminService.join({ joinUser }, res);
+
+  await adminService.join(joinUser);
+  return res.status(CODE.CREATED).json(form.success());
 };
 
 const updatePassword = async (req, res) => {

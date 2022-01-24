@@ -1,6 +1,5 @@
 const jwt = require('../modules/jwt');
 const adminDao = require('../dao/admin');
-const commonDao = require('../dao/common');
 const encrypt = require('../modules/encrypt');
 const CODE = require('../utils/statusCode');
 const MSG = require('../utils/responseMessage');
@@ -58,38 +57,43 @@ const logout = async (email, res) => {
   return res.status(CODE.OK).json(form.success(MSG.LOGOUT_SUCCESS, { isAuth: false }));
 };
 
-const join = async ({ joinUser }, res) => {
-  const hashedPassword = await encrypt.hash(joinUser.password);
-  if (!hashedPassword) {
-    return res.status(CODE.INTERNAL_SERVER_ERROR).json(form.successFalse(MSG.ENCRYPT_ERROR));
+const join = async (joinUser) => {
+  try {
+    const hashPassword = await encrypt.hash(joinUser.password);
+    joinUser.password = hashPassword;
+
+    const isJoin = await adminDao.join({ joinUser });
+    return isJoin
+  } catch (err) {
+    return CODE.INTERNAL_SERVER_ERROR;
   }
-  joinUser.password = hashedPassword;
-
-  const daoRow = await adminDao.join({ joinUser });
-
-  if (!daoRow) {
-    return res.status(CODE.DB_ERROR).json(form.successFalse(MSG.DB_ERROR));
-  }
-
-  const idxDaoRow = await commonDao.getCreateIdx();
-
-  const resData = {
-    adminIdx: idxDaoRow[0].idx,
-    email: joinUser.email,
-    name: joinUser.name,
-  };
-
-  return res.status(CODE.OK).json(form.success(MSG.JOIN_SUCCESS, resData));
 };
 
-const findUserByEmail = async email => {
-  const daoRow = await adminDao.findUserByEmail(email);
-  return daoRow || false;
+const findAdminByEmail = async idx => {
+  try {
+    const daoResult = await adminDao.findAdminByEmail(idx);
+    return daoResult;
+  } catch (err) {
+    throw new Error(err);
+  }
 };
 
-const findUserByIdx = async idx => {
-  const daoRow = await adminDao.findUserByIdx(idx);
-  return daoRow || false;
+const findAdminByName = async idx => {
+  try {
+    const daoResult = await adminDao.findAdminByName(idx);
+    return daoResult;
+  } catch (err) {
+    throw new Error(err);
+  }
+};
+
+const findAdminByIdx = async idx => {
+  try {
+    const daoResult = await adminDao.findAdminByIdx(idx);
+    return daoResult;
+  } catch (err) {
+    throw new Error(err);
+  }
 };
 
 const updatePassword = async ({ updatePasswordUser }, res) => {
@@ -98,8 +102,8 @@ const updatePassword = async ({ updatePasswordUser }, res) => {
     return res.status(CODE.INTERNAL_SERVER_ERROR).json(form.successFalse(MSG.ENCRYPT_ERROR));
   }
 
-  const daoRow = await adminDao.updatePassword(updatePasswordUser.adminIdx, hashPassword);
-  if (!daoRow) {
+  const daoResult = await adminDao.updatePassword(updatePasswordUser.adminIdx, hashPassword);
+  if (!daoResult) {
     return res.status(CODE.DB_ERROR).json(form.successFalse(MSG.DB_ERROR));
   }
   return res.status(CODE.OK).json(form.success(MSG.UPDATE_PASSWORD_SUCCESS));
@@ -110,7 +114,8 @@ module.exports = {
   reissueAccessToken,
   logout,
   join,
-  findUserByEmail,
-  findUserByIdx,
+  findAdminByEmail,
+  findAdminByName,
+  findAdminByIdx,
   updatePassword,
 };

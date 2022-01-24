@@ -9,7 +9,7 @@ const join = async ({ joinUser }) => {
     return row;
   } catch (err) {
     console.log(`===DB Error > ${err}===`);
-    return new Error(err);
+    throw new Error(err);
   } finally {
     connection.release();
   }
@@ -24,7 +24,22 @@ const findAdminByEmail = async email => {
     return row.length ? row[0] : undefined;
   } catch (err) {
     console.log(`===DB Error > ${err}===`);
-    return new Error(err);
+    throw new Error(err);
+  } finally {
+    connection.release();
+  }
+};
+
+const findAdminByName = async name => {
+  let connection;
+  try {
+    connection = await pool.getConnection(async conn => conn);
+    const sql = `SELECT admin_idx, email, password, name FROM admin WHERE name = '${name}'`;
+    const [row] = await connection.query(sql);
+    return row.length ? row[0] : undefined;
+  } catch (err) {
+    console.log(`===DB Error > ${err}===`);
+    throw new Error(err);
   } finally {
     connection.release();
   }
@@ -36,10 +51,10 @@ const findUserByIdx = async idx => {
     connection = await pool.getConnection(async conn => conn);
     const sql = `SELECT admin_idx, email, password, name FROM admin WHERE admin_idx = ${idx}`;
     const [row] = await connection.query(sql);
-    return row;
+    return row.length ? row[0] : undefined;
   } catch (err) {
     console.log(`===DB Error > ${err}===`);
-    return new Error(err);
+    throw new Error(err);
   } finally {
     connection.release();
   }
@@ -55,7 +70,7 @@ const updatePassword = async (adminIdx, password) => {
     return row;
   } catch (err) {
     console.log(`===DB Error > ${err}===`);
-    return new Error(err);
+    throw new Error(err);
   } finally {
     connection.release();
   }
@@ -64,6 +79,7 @@ const updatePassword = async (adminIdx, password) => {
 module.exports = {
   join,
   findAdminByEmail,
+  findAdminByName,
   findUserByIdx,
   updatePassword,
 };
