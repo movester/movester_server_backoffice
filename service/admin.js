@@ -57,13 +57,13 @@ const logout = async (email, res) => {
   return res.status(CODE.OK).json(form.success(MSG.LOGOUT_SUCCESS, { isAuth: false }));
 };
 
-const join = async (joinUser) => {
+const join = async joinUser => {
   try {
     const hashPassword = await encrypt.hash(joinUser.password);
     joinUser.password = hashPassword;
 
-    const isJoin = await adminDao.join({ joinUser });
-    return isJoin
+    const result = await adminDao.join({ joinUser });
+    return result;
   } catch (err) {
     return CODE.INTERNAL_SERVER_ERROR;
   }
@@ -71,8 +71,8 @@ const join = async (joinUser) => {
 
 const findAdminByEmail = async idx => {
   try {
-    const daoResult = await adminDao.findAdminByEmail(idx);
-    return daoResult;
+    const result = await adminDao.findAdminByEmail(idx);
+    return result;
   } catch (err) {
     throw new Error(err);
   }
@@ -80,8 +80,8 @@ const findAdminByEmail = async idx => {
 
 const findAdminByName = async idx => {
   try {
-    const daoResult = await adminDao.findAdminByName(idx);
-    return daoResult;
+    const result = await adminDao.findAdminByName(idx);
+    return result;
   } catch (err) {
     throw new Error(err);
   }
@@ -89,24 +89,21 @@ const findAdminByName = async idx => {
 
 const findAdminByIdx = async idx => {
   try {
-    const daoResult = await adminDao.findAdminByIdx(idx);
-    return daoResult;
+    const result = await adminDao.findAdminByIdx(idx);
+    return result;
   } catch (err) {
     throw new Error(err);
   }
 };
 
-const updatePassword = async ({ updatePasswordUser }, res) => {
-  const hashPassword = await encrypt.hashPassword(updatePasswordUser.newPassword);
-  if (!hashPassword) {
-    return res.status(CODE.INTERNAL_SERVER_ERROR).json(form.successFalse(MSG.ENCRYPT_ERROR));
+const updatePassword = async ({adminIdx, newPassword}) => {
+  try {
+    const hashPassword = await encrypt.hash(newPassword);
+    const result = await adminDao.updatePassword(adminIdx, hashPassword);
+    return result;
+  } catch (err) {
+    return CODE.INTERNAL_SERVER_ERROR;
   }
-
-  const daoResult = await adminDao.updatePassword(updatePasswordUser.adminIdx, hashPassword);
-  if (!daoResult) {
-    return res.status(CODE.DB_ERROR).json(form.successFalse(MSG.DB_ERROR));
-  }
-  return res.status(CODE.OK).json(form.success(MSG.UPDATE_PASSWORD_SUCCESS));
 };
 
 module.exports = {

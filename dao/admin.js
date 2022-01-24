@@ -6,7 +6,7 @@ const join = async ({ joinUser }) => {
     connection = await pool.getConnection(async conn => conn);
     const sql = `INSERT INTO admin (email, password, name, create_at) VALUES ('${joinUser.email}', '${joinUser.password}', '${joinUser.name}', now())`;
     const [row] = await connection.query(sql);
-    return row;
+    return !!Object.keys(row).length;
   } catch (err) {
     console.log(`===DB Error > ${err}===`);
     throw new Error(err);
@@ -45,7 +45,7 @@ const findAdminByName = async name => {
   }
 };
 
-const findUserByIdx = async idx => {
+const findAdminByIdx = async idx => {
   let connection;
   try {
     connection = await pool.getConnection(async conn => conn);
@@ -67,7 +67,7 @@ const updatePassword = async (adminIdx, password) => {
 
     const sql = `UPDATE admin SET password = '${password}' WHERE admin_idx = ${adminIdx}`;
     const [row] = await connection.query(sql);
-    return row;
+    return !!Object.keys(row);
   } catch (err) {
     console.log(`===DB Error > ${err}===`);
     throw new Error(err);
@@ -80,6 +80,6 @@ module.exports = {
   join,
   findAdminByEmail,
   findAdminByName,
-  findUserByIdx,
+  findAdminByIdx,
   updatePassword,
 };

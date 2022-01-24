@@ -10,11 +10,11 @@ const auth = require('../middleware/auth');
 // router.get('/dashboard', auth.verifyToken, userCtrl.dashboard);
 router.get('/', (_, res) => res.send('hello'));
 
+router.post('/join', validator.join, validatorError.error, userCtrl.join);
 router.post('/login', validator.login, validatorError.error, userCtrl.login);
+router.patch('/password/:adminIdx', validator.updatePassword, validatorError.error, userCtrl.updatePassword);
 router.post('/reissue-access-token', auth.verifyRefreshToken, userCtrl.reissueAccessToken);
 router.post('/logout', auth.verifyToken, userCtrl.logout);
 router.get('/auth', auth.verifyToken, userCtrl.auth);
-router.post('/join', validator.join, validatorError.error, userCtrl.join);
-router.put('/password/:adminIdx', validator.updatePassword, validatorError.error, userCtrl.updatePassword);
 
 module.exports = router;

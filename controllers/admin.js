@@ -6,21 +6,21 @@ const encrypt = require('../modules/encrypt');
 
 const login = async (req, res) => {
   const loginUser = req.body;
-  const isLogin = await adminService.login(loginUser);
+  const result = await adminService.login(loginUser);
 
-  if (typeof isLogin === 'number') {
-    if (isLogin === CODE.BAD_REQUEST) {
+  if (typeof result === 'number') {
+    if (result === CODE.BAD_REQUEST) {
       return res.status(CODE.BAD_REQUEST).json(form.fail(MSG.EMAIL_NOT_EXIST));
     }
-    if (isLogin === CODE.NOT_FOUND) {
+    if (result === CODE.NOT_FOUND) {
       return res.status(CODE.NOT_FOUND).json(form.fail(MSG.PW_MISMATCH));
     }
-    if (isLogin === CODE.INTERNAL_SERVER_ERROR) {
+    if (result === CODE.INTERNAL_SERVER_ERROR) {
       return res.status(CODE.INTERNAL_SERVER_ERROR).json(form.fail(MSG.INTERNAL_SERVER_ERROR));
     }
   }
 
-  return res.status(CODE.OK).json(form.success(isLogin));
+  return res.status(CODE.OK).json(form.success(result));
 };
 
 const reissueAccessToken = async (req, res) => {
@@ -61,33 +61,39 @@ const join = async (req, res) => {
     return res.status(CODE.INTERNAL_SERVER_ERROR).json(form.fail(MSG.INTERNAL_SERVER_ERROR));
   }
 
-  await adminService.join(joinUser);
-  return res.status(CODE.CREATED).json(form.success());
+  const result = await adminService.join(joinUser);
+  if (result === CODE.INTERNAL_SERVER_ERROR) {
+    return res.status(CODE.INTERNAL_SERVER_ERROR).json(form.fail(MSG.INTERNAL_SERVER_ERROR));
+  }
+  res.status(CODE.CREATED).json(form.success());
 };
 
 const updatePassword = async (req, res) => {
   const updatePasswordUser = req.body;
   if (updatePasswordUser.newPassword !== updatePasswordUser.confirmPassword) {
-    return res.status(CODE.BAD_REQUEST).json(form.successFalse(MSG.CONFIRM_PW_MISMATCH));
+    return res.status(CODE.BAD_REQUEST).json(form.fail(MSG.CONFIRM_PW_MISMATCH));
   }
 
-  const admin = await adminService.findUserByIdx(req.params.adminIdx);
+  const { adminIdx } = req.params;
+  const admin = await adminService.findAdminByIdx(adminIdx);
   if (!admin) {
-    return res.status(CODE.DB_ERROR).json(form.successFalse(MSG.DB_ERROR));
+    return res.status(CODE.BAD_REQUEST).json(form.fail(MSG.ID_NOT_EXIST));
+  }
+  updatePasswordUser.adminIdx = adminIdx;
+
+  const isCorrectBeforePassword = await encrypt.compare(updatePasswordUser.beforePassword, admin.password);
+
+  if (!isCorrectBeforePassword) {
+    return res.status(CODE.BAD_REQUEST).json(form.fail(MSG.PW_MISMATCH));
   }
 
-  const comparePassword = admin[0].password;
-  const isCorrectBeforePassword = await encrypt.comparePassword(updatePasswordUser.beforePassword, comparePassword);
+  const result = await adminService.updatePassword(updatePasswordUser);
 
-  if (isCorrectBeforePassword === 0) {
-    return res.status(CODE.INTERNAL_SERVER_ERROR).json(form.successFalse(MSG.ENCRYPT_ERROR));
+  if (result === CODE.INTERNAL_SERVER_ERROR) {
+    return res.status(CODE.INTERNAL_SERVER_ERROR).json(form.fail(MSG.INTERNAL_SERVER_ERROR));
   }
 
-  if (isCorrectBeforePassword === false) {
-    return res.status(CODE.BAD_REQUEST).json(form.successFalse(MSG.PW_MISMATCH));
-  }
-
-  return await adminService.updatePassword({ updatePasswordUser }, res);
+  return res.status(CODE.OK).json(form.success());
 };
 
 module.exports = {

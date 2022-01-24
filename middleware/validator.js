@@ -24,22 +24,12 @@ const login = [
 ];
 
 const updatePassword = [
-  body('adminIdx').exists(),
   body('beforePassword')
-    .exists()
-    .withMessage('비밀번호를 입력해주세요.')
-    .isLength({ min: 4, max: 20 })
-    .withMessage('비밀번호는 최소 8글자부터 최대 20글자까지 가능합니다.'),
+    .exists(),
   body('newPassword')
-    .exists()
-    .withMessage('비밀번호를 입력해주세요.')
-    .isLength({ min: 4, max: 20 })
-    .withMessage('비밀번호는 최소 8글자부터 최대 20글자까지 가능합니다.'),
+    .exists(),
   body('confirmPassword')
     .exists()
-    .withMessage('비밀번호를 입력해주세요.')
-    .isLength({ min: 4, max: 20 })
-    .withMessage('비밀번호는 최소 8글자부터 최대 20글자까지 가능합니다.'),
 ];
 
 module.exports = {
