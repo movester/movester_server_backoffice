@@ -1,5 +1,5 @@
 const jwt = require('../modules/jwt');
-const radis = require('../modules/radis');
+const redis = require('../modules/redis');
 const CODE = require('../utils/statusCode');
 const MSG = require('../utils/responseMessage');
 const form = require('../utils/responseForm');
@@ -18,12 +18,12 @@ const checkToken = async (req, res, next) => {
       return res.status(CODE.UNAUTHORIZED).json(form.fail(MSG.UNAUTHORIZED));
     }
     // access 만료 refesh 유효
-    const radisToken = await radis.get(refreshToken.idx);
+    const redisToken = await redis.get(refreshToken.idx);
 
-    if (req.cookies.refreshToken !== radisToken) {
+    if (req.cookies.refreshToken !== redisToken) {
       return res.status(CODE.UNAUTHORIZED).json(form.fail(MSG.TOKEN_INVALID));
     }
-    
+
     const newAccessToken = await jwt.signAccessToken({ idx: refreshToken.idx, email: refreshToken.email });
 
     res.cookie('accessToken', newAccessToken);
@@ -35,7 +35,7 @@ const checkToken = async (req, res, next) => {
 
     const newRefreshToken = await jwt.signRefreshToken({ idx: accessToken.idx, email: accessToken.email });
 
-    radis.set(accessToken.idx, newRefreshToken);
+    redis.set(accessToken.idx, newRefreshToken);
     res.cookie('refreshToken', newRefreshToken);
     req.cookies.refreshToken = newRefreshToken;
 

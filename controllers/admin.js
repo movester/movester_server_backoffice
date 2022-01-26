@@ -3,7 +3,7 @@ const CODE = require('../utils/statusCode');
 const MSG = require('../utils/responseMessage');
 const form = require('../utils/responseForm');
 const encrypt = require('../modules/encrypt');
-const radis = require('../modules/radis');
+const redis = require('../modules/redis');
 
 const login = async (req, res) => {
   const loginUser = req.body;
@@ -29,7 +29,7 @@ const login = async (req, res) => {
 };
 
 const logout = async (req, res) => {
-  radis.del(req.cookies.idx);
+  redis.del(req.cookies.idx);
   res.clearCookie('accessToken').clearCookie('refreshToken').status(CODE.OK).json(form.success(MSG.LOGOUT_SUCCESS));
 };
 
