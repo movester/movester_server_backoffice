@@ -2,9 +2,6 @@ const jwt = require('../modules/jwt');
 const adminDao = require('../dao/admin');
 const encrypt = require('../modules/encrypt');
 const CODE = require('../utils/statusCode');
-const MSG = require('../utils/responseMessage');
-const form = require('../utils/responseForm');
-const redisClient = require('../config/redis');
 
 const login = async ({ email, password }) => {
   try {
@@ -36,12 +33,6 @@ const login = async ({ email, password }) => {
   } catch (err) {
     return CODE.INTERNAL_SERVER_ERROR;
   }
-};
-
-const logout = async (email, res) => {
-  await redisClient.del(email.toString());
-
-  return res.status(CODE.OK).json(form.success(MSG.LOGOUT_SUCCESS, { isAuth: false }));
 };
 
 const join = async joinUser => {
@@ -95,7 +86,6 @@ const updatePassword = async ({ adminIdx, newPassword }) => {
 
 module.exports = {
   login,
-  logout,
   join,
   findAdminByEmail,
   findAdminByName,

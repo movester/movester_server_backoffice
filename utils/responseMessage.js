@@ -31,6 +31,7 @@ const responseMessage = {
   PW_MISMATCH: '비밀번호가 일치하지 않습니다',
   CONFIRM_PW_MISMATCH: '비밀번호 확인이 일치하지 않습니다.',
 
+  UNAUTHORIZED: 'api 사용 권한이 없습니다.',
   TOKEN_EMPTY: '토큰이 없습니다',
   TOKEN_EXPIRED: '만료된 토큰입니다.',
   TOKEN_INVALID: '올바르지 않은 토큰입니다.',

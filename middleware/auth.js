@@ -5,9 +5,8 @@ const MSG = require('../utils/responseMessage');
 const form = require('../utils/responseForm');
 
 const checkToken = async (req, res, next) => {
-  if (req.cookies.accessToken === undefined) {
-    console.log('쿠키 없음!');
-    res.status(CODE.UNAUTHORIZED).json(form.fail(MSG.TOKEN_EMPTY));
+  if (!req.cookies.accessToken) {
+    return res.status(CODE.UNAUTHORIZED).json(form.fail(MSG.UNAUTHORIZED));
   }
 
   const accessToken = await jwt.verifyAccessToken(req.cookies.accessToken);
@@ -15,11 +14,11 @@ const checkToken = async (req, res, next) => {
 
   console.log(accessToken, refreshToken);
 
-  if (accessToken === undefined) {
-    if (refreshToken === undefined) {
+  if (!accessToken) {
+    if (!refreshToken) {
       // access X refesh X
       console.log('access refesh 모두 만료');
-      return res.status(CODE.UNAUTHORIZED).json(form.fail('권한 없음!'));
+      return res.status(CODE.UNAUTHORIZED).json(form.fail(MSG.UNAUTHORIZED));
     }
     // access X refesh O
     console.log('access 만료 refresh 유효');
@@ -29,7 +28,7 @@ const checkToken = async (req, res, next) => {
     res.cookie('accessToken', newAccessToken);
     req.cookies.accessToken = newAccessToken;
     next();
-  } else if (refreshToken === undefined) {
+  } else if (!refreshToken) {
     // access O refesh X
     console.log('access 유효 refesh 만료');
     const newRefreshToken = await jwt.signRefreshToken({ idx: accessToken.idx, email: accessToken.email });
