@@ -1,6 +1,7 @@
 const jwt = require('../modules/jwt');
 const adminDao = require('../dao/admin');
 const encrypt = require('../modules/encrypt');
+const radis = require('../modules/radis');
 const CODE = require('../utils/statusCode');
 
 const login = async ({ email, password }) => {
@@ -22,6 +23,8 @@ const login = async ({ email, password }) => {
       refreshToken: await jwt.signRefreshToken({ idx: admin.admin_idx, email: admin.email }),
     };
 
+    radis.set(admin.admin_idx, token.refreshToken);
+
     return {
       admin: {
         adminIdx: admin.admin_idx,
@@ -31,6 +34,7 @@ const login = async ({ email, password }) => {
       token,
     };
   } catch (err) {
+    console.log(err);
     return CODE.INTERNAL_SERVER_ERROR;
   }
 };

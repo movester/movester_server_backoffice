@@ -3,7 +3,7 @@ const CODE = require('../utils/statusCode');
 const MSG = require('../utils/responseMessage');
 const form = require('../utils/responseForm');
 const encrypt = require('../modules/encrypt');
-// const redisClient = require('../config/redis');
+const radis = require('../modules/radis');
 
 const login = async (req, res) => {
   const loginUser = req.body;
@@ -28,18 +28,9 @@ const login = async (req, res) => {
     .json(form.success(result.admin));
 };
 
-const logout = async (req, res) =>
-  // const email = req.decodeData.sub;
-  // await redisClient.del(email.toString());
+const logout = async (req, res) => {
+  radis.del(req.cookies.idx);
   res.clearCookie('accessToken').clearCookie('refreshToken').status(CODE.OK).json(form.success(MSG.LOGOUT_SUCCESS));
-
-const auth = async (req, res) => {
-  const authUser = {
-    isAuth: true,
-    email: req.decodeData.sub,
-    accessToken: req.accessToken,
-  };
-  res.json(form.successTrue(MSG.LOGIN_SUCCESS, authUser));
 };
 
 const join = async (req, res) => {
@@ -96,7 +87,6 @@ const updatePassword = async (req, res) => {
 module.exports = {
   login,
   logout,
-  auth,
   join,
   updatePassword,
 };

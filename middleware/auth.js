@@ -1,5 +1,5 @@
 const jwt = require('../modules/jwt');
-const redisClient = require('../config/redis');
+const radis = require('../modules/radis');
 const CODE = require('../utils/statusCode');
 const MSG = require('../utils/responseMessage');
 const form = require('../utils/responseForm');
@@ -12,81 +12,41 @@ const checkToken = async (req, res, next) => {
   const accessToken = await jwt.verifyAccessToken(req.cookies.accessToken);
   const refreshToken = await jwt.verifyRefeshToken(req.cookies.refreshToken);
 
-  console.log(accessToken, refreshToken);
-
   if (!accessToken) {
     if (!refreshToken) {
-      // access X refesh X
-      console.log('access refesh 모두 만료');
+      // access 만료 refesh 만료
       return res.status(CODE.UNAUTHORIZED).json(form.fail(MSG.UNAUTHORIZED));
     }
-    // access X refesh O
-    console.log('access 만료 refresh 유효');
-    // db에서 payload에 담을 데이터 가져오기
+    // access 만료 refesh 유효
+    const radisToken = await radis.get(refreshToken.idx);
+
+    if (req.cookies.refreshToken !== radisToken) {
+      return res.status(CODE.UNAUTHORIZED).json(form.fail(MSG.TOKEN_INVALID));
+    }
+    
     const newAccessToken = await jwt.signAccessToken({ idx: refreshToken.idx, email: refreshToken.email });
-    console.log('newAccessToken', newAccessToken);
+
     res.cookie('accessToken', newAccessToken);
     req.cookies.accessToken = newAccessToken;
+
     next();
   } else if (!refreshToken) {
-    // access O refesh X
-    console.log('access 유효 refesh 만료');
+    // access 유효 refesh 만료
+
     const newRefreshToken = await jwt.signRefreshToken({ idx: accessToken.idx, email: accessToken.email });
-    // db에 새로 발급된 refresh token 삽입
-    console.log('newRefreshToken', newRefreshToken);
+
+    radis.set(accessToken.idx, newRefreshToken);
     res.cookie('refreshToken', newRefreshToken);
     req.cookies.refreshToken = newRefreshToken;
+
     next();
   } else {
-    // access O refesh O
-    console.log('access/refresh 둘다 유효!');
+    // access 유효 refesh 유효
+    req.cookies.idx = accessToken.idx;
     next();
   }
-};
-
-const verifyRefreshToken = (req, res, next) => {
-  const refreshToken = req.body.token;
-  if (!refreshToken) {
-    return res.status(CODE.BAD_REQUEST).json(form.fail(MSG.VALUE_NULL));
-  }
-  try {
-    const decodeRefreshToken = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
-    req.decodeRefreshToken = decodeRefreshToken;
-
-    redisClient.get(decodeRefreshToken.sub.toString(), (err, data) => {
-      if (err) throw err;
-
-      if (!data) {
-        return res.status(CODE.BAD_REQUEST).json(form.fail(MSG.TOKEN_EMPTY));
-      }
-      if (JSON.parse(data).token !== refreshToken) {
-        return res.status(CODE.BAD_REQUEST).json(form.fail(MSG.TOKEN_INVALID));
-      }
-      next();
-    });
-  } catch (err) {
-    console.log(`verifyRefreshToken > ${err}`);
-    res.status(CODE.BAD_REQUEST).json(form.fail(MSG.TOKEN_INVALID));
-  }
-};
-
-// TODO : fix
-const generateRefreshToken = email => {
-  const refreshToken = jwt.sign({ sub: email, secret: 'movester' }, process.env.JWT_REFRESH_SECRET, {
-    expiresIn: process.env.JWT_REFRESH_TIME,
-  });
-
-  redisClient.get(email.toString(), (err, data) => {
-    if (err) throw err;
-    console.log(data);
-    redisClient.set(email.toString(), JSON.stringify({ token: refreshToken }));
-  });
-
-  return refreshToken;
 };
 
 module.exports = {
   checkToken,
-  verifyRefreshToken,
-  generateRefreshToken,
 };
