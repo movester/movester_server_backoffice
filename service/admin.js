@@ -4,7 +4,6 @@ const encrypt = require('../modules/encrypt');
 const CODE = require('../utils/statusCode');
 const MSG = require('../utils/responseMessage');
 const form = require('../utils/responseForm');
-const auth = require('../middleware/auth');
 const redisClient = require('../config/redis');
 
 const login = async ({ email, password }) => {
@@ -21,34 +20,22 @@ const login = async ({ email, password }) => {
       return CODE.NOT_FOUND;
     }
 
-    const token = await jwt.sign({ idx: admin.admin_idx, email: admin.email });
-    // const refreshToken = auth.generateRefreshToken(email);
+    const token = {
+      accessToken: await jwt.signAccessToken({ idx: admin.admin_idx, email: admin.email }),
+      refreshToken: await jwt.signRefreshToken({ idx: admin.admin_idx, email: admin.email }),
+    };
 
     return {
-      isAuth: true,
-      adminIdx: admin.admin_idx,
-      email: admin.email,
-      name: admin.name,
-      accessToken: token.accessToken,
-      refreshToken: token.refreshToken,
+      admin: {
+        adminIdx: admin.admin_idx,
+        email: admin.email,
+        name: admin.name,
+      },
+      token,
     };
   } catch (err) {
     return CODE.INTERNAL_SERVER_ERROR;
   }
-};
-
-const reissueAccessToken = (email, res) => {
-  const accessToken = jwt.sign({ sub: email }, process.env.JWT_ACCESS_SECRET, {
-    expiresIn: process.env.JWT_ACCESS_TIME,
-  });
-  const refreshToken = auth.generateRefreshToken(email);
-
-  const token = {
-    accessToken,
-    refreshToken,
-  };
-
-  return res.status(CODE.OK).json(form.success(MSG.TOKEN_GENERATE_REFRESH_SUCCESS, token));
 };
 
 const logout = async (email, res) => {
@@ -96,7 +83,7 @@ const findAdminByIdx = async idx => {
   }
 };
 
-const updatePassword = async ({adminIdx, newPassword}) => {
+const updatePassword = async ({ adminIdx, newPassword }) => {
   try {
     const hashPassword = await encrypt.hash(newPassword);
     const result = await adminDao.updatePassword(adminIdx, hashPassword);
@@ -108,7 +95,6 @@ const updatePassword = async ({adminIdx, newPassword}) => {
 
 module.exports = {
   login,
-  reissueAccessToken,
   logout,
   join,
   findAdminByEmail,

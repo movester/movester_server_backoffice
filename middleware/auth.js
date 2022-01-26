@@ -4,25 +4,44 @@ const CODE = require('../utils/statusCode');
 const MSG = require('../utils/responseMessage');
 const form = require('../utils/responseForm');
 
-const TOKEN_EXPIRED = -3;
-const TOKEN_INVALID = -2;
+const checkToken = async (req, res, next) => {
+  if (req.cookies.accessToken === undefined) {
+    console.log('쿠키 없음!');
+    res.status(CODE.UNAUTHORIZED).json(form.fail(MSG.TOKEN_EMPTY));
+  }
 
-const verifyToken = async (req, res, next) => {
-  try {
-    const { token } = req.headers;
-    if (!token) res.status(CODE.UNAUTHORIZED).json(form.fail(MSG.TOKEN_EMPTY));
-    const decode = await jwt.verify(token);
+  const accessToken = await jwt.verifyAccessToken(req.cookies.accessToken);
+  const refreshToken = await jwt.verifyRefeshToken(req.cookies.refreshToken);
 
-    if (decode === TOKEN_EXPIRED) return res.status(CODE.UNAUTHORIZED).json(form.fail(MSG.EXPIRED_TOKEN));
+  console.log(accessToken, refreshToken);
 
-    if (decode === TOKEN_INVALID) return res.status(CODE.UNAUTHORIZED).json(form.fail(MSG.INVALID_TOKEN));
-
-    if (!decode.idx) return res.json(form.fail(MSG.INVALID_TOKEN));
-
-    req.idx = decode.idx;
+  if (accessToken === undefined) {
+    if (refreshToken === undefined) {
+      // access X refesh X
+      console.log('access refesh 모두 만료');
+      return res.status(CODE.UNAUTHORIZED).json(form.fail('권한 없음!'));
+    }
+    // access X refesh O
+    console.log('access 만료 refresh 유효');
+    // db에서 payload에 담을 데이터 가져오기
+    const newAccessToken = await jwt.signAccessToken({ idx: refreshToken.idx, email: refreshToken.email });
+    console.log('newAccessToken', newAccessToken);
+    res.cookie('accessToken', newAccessToken);
+    req.cookies.accessToken = newAccessToken;
     next();
-  } catch (err) {
-    return res.status(CODE.INTERNAL_SERVER_ERROR).json(form.fail(MSG.INTERNAL_SERVER_ERROR));
+  } else if (refreshToken === undefined) {
+    // access O refesh X
+    console.log('access 유효 refesh 만료');
+    const newRefreshToken = await jwt.signRefreshToken({ idx: accessToken.idx, email: accessToken.email });
+    // db에 새로 발급된 refresh token 삽입
+    console.log('newRefreshToken', newRefreshToken);
+    res.cookie('refreshToken', newRefreshToken);
+    req.cookies.refreshToken = newRefreshToken;
+    next();
+  } else {
+    // access O refesh O
+    console.log('access/refresh 둘다 유효!');
+    next();
   }
 };
 
@@ -68,7 +87,7 @@ const generateRefreshToken = email => {
 };
 
 module.exports = {
-  verifyToken,
+  checkToken,
   verifyRefreshToken,
   generateRefreshToken,
 };

@@ -20,16 +20,12 @@ const login = async (req, res) => {
     }
   }
 
-  return res.status(CODE.OK).json(form.success(result));
+  return res
+    .status(CODE.OK)
+    .cookie('accessToken', result.token.accessToken, { httpOnly: true })
+    .cookie('refreshToken', result.token.refreshToken, { httpOnly: true })
+    .json(form.success(result.admin));
 };
-
-const reissueAccessToken = async (req, res) => {
-  const email = req.decodeRefreshToken.sub;
-  return adminService.reissueAccessToken(email, res);
-};
-
-// accessToken, refeshToken 재발급 과정 동작이 원활한지 테스트를 만들도록 함
-const dashboard = async (req, res) => res.json({ status: true, message: 'hello from dashboard' });
 
 const logout = async (req, res) => {
   const email = req.decodeData.sub;
@@ -98,8 +94,6 @@ const updatePassword = async (req, res) => {
 
 module.exports = {
   login,
-  reissueAccessToken,
-  dashboard,
   logout,
   auth,
   join,
