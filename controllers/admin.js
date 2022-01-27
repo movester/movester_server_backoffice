@@ -65,7 +65,7 @@ const updatePassword = async (req, res) => {
   const { adminIdx } = req.params;
   const admin = await adminService.findAdminByIdx(adminIdx);
   if (!admin) {
-    return res.status(CODE.BAD_REQUEST).json(form.fail(MSG.ID_NOT_EXIST));
+    return res.status(CODE.NOT_FOUND).json(form.fail(MSG.ID_NOT_EXIST));
   }
   updatePasswordUser.adminIdx = adminIdx;
 
