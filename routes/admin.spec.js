@@ -4,61 +4,65 @@ const app = require('../index');
 
 // TODO : test시, auth.checkToken 삭제해야함
 describe('POST /admins/join', () => {
-  // TODO : 테스트시 새로운 데이터로 교체
-  // describe('성공시', () => {
-  //   const adminUser = {
-  //     email: 'abcdeF',
-  //     password: '12345',
-  //     name: 'abcdef',
-  //   };
-  //   it('success true를 반환한다.', done => {
-  //     request(app)
-  //       .post('/api/admins/join')
-  //       .send(adminUser)
-  //       .expect(201)
-  //       .end((err, res) => {
-  //         expect(res.body).to.have.property('success', true);
-  //         done();
-  //       });
-  //   });
-  // });
-  describe('실패시', () => {
-    it('이미 등록된 email일 경우 409를 응답한다.', done => {
+  // TODO: test시, newAdminUser 삭제해야함
+  describe('성공시', () => {
+    it('success true를 반환한다.', done => {
       request(app)
         .post('/api/admins/join')
         .send({
-          email: 'abcd',
+          email: 'newAdminUser',
           password: '12345',
-          name: '콩순이',
+          name: 'newAdminUser',
         })
-        .expect(409)
-        .end(done);
+        .expect(201)
+        .end((_, res) => {
+          expect(res.body).to.have.property('success', true);
+          done();
+        });
     });
-    it('이미 등록된 name일 경우 409를 응답한다.', done => {
+  });
+  describe('실패시', () => {
+    it('이미 존재하는 email일 경우, 409을 응답한다.', done => {
       request(app)
         .post('/api/admins/join')
         .send({
-          email: 'hrrrr',
-          password: '12345',
-          name: 'abced',
+          email: 'existed',
+          password: '123123',
+          name: 'jonahyun',
         })
         .expect(409)
-        .end(done);
+        .end((_, res) => {
+          expect(res.body).to.have.property('success', false);
+          done();
+        });
+    });
+    it('이미 존재하는 name일 경우, 409을 응답한다.', done => {
+      request(app)
+        .post('/api/admins/join')
+        .send({
+          email: 'newAdminUser1',
+          password: '123123',
+          name: 'existed',
+        })
+        .expect(409)
+        .end((_, res) => {
+          expect(res.body).to.have.property('success', false);
+          done();
+        });
     });
   });
 });
 
 describe('PATCH /admins/password', () => {
   describe('성공시', () => {
-    const adminUser = {
-      beforePassword: '12345',
-      newPassword: '123123',
-      confirmPassword: '123123',
-    };
     it('success true를 반환한다.', done => {
       request(app)
         .patch('/api/admins/password/23')
-        .send(adminUser)
+        .send({
+          beforePassword: '12345',
+          newPassword: '123123',
+          confirmPassword: '123123',
+        })
         .expect(200)
         .end((err, res) => {
           expect(res.body).to.have.property('success', true);
@@ -76,7 +80,10 @@ describe('PATCH /admins/password', () => {
           confirmPassword: '123124',
         })
         .expect(400)
-        .end(done);
+        .end((_, res) => {
+          expect(res.body).to.have.property('success', false);
+          done();
+        });
     });
     it('존재하지 않는 idx일 경우 404을 응답한다.', done => {
       request(app)
@@ -87,7 +94,10 @@ describe('PATCH /admins/password', () => {
           confirmPassword: '12345',
         })
         .expect(404)
-        .end(done);
+        .end((_, res) => {
+          expect(res.body).to.have.property('success', false);
+          done();
+        });
     });
     it('잘못된 비밀번호일 경우 400를 응답한다.', done => {
       request(app)
@@ -98,7 +108,10 @@ describe('PATCH /admins/password', () => {
           confirmPassword: '12345',
         })
         .expect(400)
-        .end(done);
+        .end((_, res) => {
+          expect(res.body).to.have.property('success', false);
+          done();
+        });
     });
   });
   describe('api 데이터 원상 복구', () => {
@@ -111,7 +124,10 @@ describe('PATCH /admins/password', () => {
           confirmPassword: '12345',
         })
         .expect(200)
-        .end(done);
+        .end((_, res) => {
+          expect(res.body).to.have.property('success', true);
+          done();
+        });
     });
   });
 });
