@@ -11,7 +11,7 @@ const login = async (req, res) => {
 
   if (typeof result === 'number') {
     if (result === CODE.BAD_REQUEST) {
-      return res.status(CODE.BAD_REQUEST).json(form.fail(MSG.EMAIL_NOT_EXIST));
+      return res.status(CODE.BAD_REQUEST).json(form.fail(MSG.ID_NOT_EXIST));
     }
     if (result === CODE.NOT_FOUND) {
       return res.status(CODE.NOT_FOUND).json(form.fail(MSG.PW_MISMATCH));
@@ -36,9 +36,9 @@ const logout = async (req, res) => {
 const join = async (req, res) => {
   const joinUser = req.body;
   try {
-    const isEmailDuplicate = await adminService.findAdminByEmail(joinUser.email);
-    if (isEmailDuplicate) {
-      return res.status(CODE.DUPLICATE).json(form.fail(MSG.EMAIL_ALREADY_EXIST));
+    const isIdDuplicate = await adminService.findAdminById(joinUser.id);
+    if (isIdDuplicate) {
+      return res.status(CODE.DUPLICATE).json(form.fail(MSG.ID_ALREADY_EXIST));
     }
 
     const isNameDuplicate = await adminService.findAdminByName(joinUser.name);
@@ -65,7 +65,7 @@ const updatePassword = async (req, res) => {
   const { adminIdx } = req.params;
   const admin = await adminService.findAdminByIdx(adminIdx);
   if (!admin) {
-    return res.status(CODE.NOT_FOUND).json(form.fail(MSG.ID_NOT_EXIST));
+    return res.status(CODE.NOT_FOUND).json(form.fail(MSG.IDX_NOT_EXIST));
   }
   updatePasswordUser.adminIdx = adminIdx;
 
