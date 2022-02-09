@@ -30,6 +30,7 @@ const login = async ({ id, password }) => {
         adminIdx: admin.admin_idx,
         id: admin.id,
         name: admin.name,
+        rank: admin.admin_rank
       },
       token,
     };
