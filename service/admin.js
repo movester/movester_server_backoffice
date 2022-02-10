@@ -51,18 +51,18 @@ const join = async joinUser => {
   }
 };
 
-const findAdminByEmail = async idx => {
+const findAdminByEmail = async email => {
   try {
-    const result = await adminDao.findAdminByEmail(idx);
+    const result = await adminDao.findAdminByEmail(email);
     return result;
   } catch (err) {
     throw new Error(err);
   }
 };
 
-const findAdminByName = async idx => {
+const findAdminByName = async name => {
   try {
-    const result = await adminDao.findAdminByName(idx);
+    const result = await adminDao.findAdminByName(name);
     return result;
   } catch (err) {
     throw new Error(err);

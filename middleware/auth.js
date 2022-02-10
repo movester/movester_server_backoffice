@@ -4,6 +4,9 @@ const CODE = require('../utils/statusCode');
 const MSG = require('../utils/responseMessage');
 const form = require('../utils/responseForm');
 
+const TOKEN_EXPIRED = -3;
+const TOKEN_INVALID = -2;
+
 const checkToken = async (req, res, next) => {
   if (!req.cookies.accessToken) {
     return res.status(CODE.UNAUTHORIZED).json(form.fail(MSG.UNAUTHORIZED));
@@ -12,8 +15,11 @@ const checkToken = async (req, res, next) => {
   const accessToken = await jwt.verifyAccessToken(req.cookies.accessToken);
   const refreshToken = await jwt.verifyRefeshToken(req.cookies.refreshToken);
 
-  if (!accessToken) {
-    if (!refreshToken) {
+  if (accessToken === TOKEN_INVALID || refreshToken === TOKEN_INVALID) {
+    return res.status(CODE.UNAUTHORIZED).json(form.fail(MSG.UNAUTHORIZED));
+  }
+  if (accessToken === TOKEN_EXPIRED) {
+    if (refreshToken === TOKEN_EXPIRED) {
       // access 만료 refesh 만료
       return res.status(CODE.UNAUTHORIZED).json(form.fail(MSG.UNAUTHORIZED));
     }
@@ -30,7 +36,7 @@ const checkToken = async (req, res, next) => {
     req.cookies.accessToken = newAccessToken;
 
     next();
-  } else if (!refreshToken) {
+  } else if (refreshToken === TOKEN_EXPIRED) {
     // access 유효 refesh 만료
 
     const newRefreshToken = await jwt.signRefreshToken({ idx: accessToken.idx, email: accessToken.email });
