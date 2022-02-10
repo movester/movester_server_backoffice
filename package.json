@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon bin/www.js",
-    "test": "NODE_ENV=test mocha routes/admin.spec.js"
+    "test": "NODE_ENV=test mocha routes/user.spec.js"
   },
   "author": "",
   "license": "ISC",
