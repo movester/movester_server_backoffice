@@ -1,11 +1,11 @@
 const { body } = require('express-validator');
 
 const join = [
-  body('email')
+  body('id')
     .exists()
-    .withMessage('이메일을 입력해주세요.')
-    .isLength({ min: 4, max: 50 })
-    .withMessage('이메일은 최소 4글자부터 최대 50글자까지 가능합니다.'),
+    .withMessage('아이디를 입력해주세요.')
+    .isLength({ min: 4, max: 10 })
+    .withMessage('이메일은 최소 4글자부터 최대 10글자까지 가능합니다.'),
   body('name')
     .exists()
     .withMessage('이름 입력해주세요.')
@@ -19,7 +19,7 @@ const join = [
 ];
 
 const login = [
-  body('email').exists().isLength({ min: 4, max: 10 }),
+  body('id').exists().isLength({ min: 4, max: 10 }),
   body('password').exists().isLength({ min: 4, max: 20 }),
 ];
 

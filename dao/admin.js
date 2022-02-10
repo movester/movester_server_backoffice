@@ -4,7 +4,7 @@ const join = async ({ joinUser }) => {
   let connection;
   try {
     connection = await pool.getConnection(async conn => conn);
-    const sql = `INSERT INTO admin (email, password, name, create_at) VALUES ('${joinUser.email}', '${joinUser.password}', '${joinUser.name}', now())`;
+    const sql = `INSERT INTO admin (id, password, name, admin_rank, create_at) VALUES ('${joinUser.id}', '${joinUser.password}', '${joinUser.name}', ${joinUser.rank}, now())`;
     const [row] = await connection.query(sql);
     return !!Object.keys(row).length;
   } catch (err) {
@@ -15,11 +15,11 @@ const join = async ({ joinUser }) => {
   }
 };
 
-const findAdminByEmail = async email => {
+const findAdminById = async id => {
   let connection;
   try {
     connection = await pool.getConnection(async conn => conn);
-    const sql = `SELECT admin_idx, email, password, name FROM admin WHERE email = '${email}'`;
+    const sql = `SELECT admin_idx, id, password, name, admin_rank FROM admin WHERE id = '${id}'`;
     const [row] = await connection.query(sql);
     return row.length ? row[0] : undefined;
   } catch (err) {
@@ -34,7 +34,7 @@ const findAdminByName = async name => {
   let connection;
   try {
     connection = await pool.getConnection(async conn => conn);
-    const sql = `SELECT admin_idx, email, password, name FROM admin WHERE name = '${name}'`;
+    const sql = `SELECT admin_idx, id, password, name, admin_rank FROM admin WHERE name = '${name}'`;
     const [row] = await connection.query(sql);
     return row.length ? row[0] : undefined;
   } catch (err) {
@@ -49,7 +49,7 @@ const findAdminByIdx = async idx => {
   let connection;
   try {
     connection = await pool.getConnection(async conn => conn);
-    const sql = `SELECT admin_idx, email, password, name FROM admin WHERE admin_idx = ${idx}`;
+    const sql = `SELECT admin_idx, id, password, name, admin_rank FROM admin WHERE admin_idx = ${idx}`;
     const [row] = await connection.query(sql);
     return row.length ? row[0] : undefined;
   } catch (err) {
@@ -64,7 +64,6 @@ const updatePassword = async (adminIdx, password) => {
   let connection;
   try {
     connection = await pool.getConnection(async conn => conn);
-
     const sql = `UPDATE admin SET password = '${password}' WHERE admin_idx = ${adminIdx}`;
     const [row] = await connection.query(sql);
     return !!Object.keys(row);
@@ -78,7 +77,7 @@ const updatePassword = async (adminIdx, password) => {
 
 module.exports = {
   join,
-  findAdminByEmail,
+  findAdminById,
   findAdminByName,
   findAdminByIdx,
   updatePassword,

@@ -4,9 +4,9 @@ const encrypt = require('../modules/encrypt');
 const redis = require('../modules/redis');
 const CODE = require('../utils/statusCode');
 
-const login = async ({ email, password }) => {
+const login = async ({ id, password }) => {
   try {
-    const admin = await adminDao.findAdminByEmail(email);
+    const admin = await adminDao.findAdminById(id);
 
     if (!admin) {
       return CODE.BAD_REQUEST;
@@ -19,8 +19,8 @@ const login = async ({ email, password }) => {
     }
 
     const token = {
-      accessToken: await jwt.signAccessToken({ idx: admin.admin_idx, email: admin.email }),
-      refreshToken: await jwt.signRefreshToken({ idx: admin.admin_idx, email: admin.email }),
+      accessToken: await jwt.signAccessToken({ idx: admin.admin_idx, id: admin.id }),
+      refreshToken: await jwt.signRefreshToken({ idx: admin.admin_idx, id: admin.id }),
     };
 
     redis.set(admin.admin_idx, token.refreshToken);
@@ -28,8 +28,9 @@ const login = async ({ email, password }) => {
     return {
       admin: {
         adminIdx: admin.admin_idx,
-        email: admin.email,
+        id: admin.id,
         name: admin.name,
+        rank: admin.admin_rank
       },
       token,
     };
@@ -51,9 +52,9 @@ const join = async joinUser => {
   }
 };
 
-const findAdminByEmail = async email => {
+const findAdminById = async idx => {
   try {
-    const result = await adminDao.findAdminByEmail(email);
+    const result = await adminDao.findAdminById(idx);
     return result;
   } catch (err) {
     throw new Error(err);
@@ -91,7 +92,7 @@ const updatePassword = async ({ adminIdx, newPassword }) => {
 module.exports = {
   login,
   join,
-  findAdminByEmail,
+  findAdminById,
   findAdminByName,
   findAdminByIdx,
   updatePassword,

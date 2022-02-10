@@ -4,13 +4,12 @@ const app = require('../index');
 
 // TODO : test시, auth.checkToken 삭제해야함
 describe('POST /admins/join', () => {
-  // TODO: test시, newAdminUser 삭제해야함
   describe('성공시', () => {
     it('success true를 반환한다.', done => {
       request(app)
         .post('/api/admins/join')
         .send({
-          email: 'newAdminUser',
+          id: 'newAdminUser',
           password: '12345',
           name: 'newAdminUser',
         })
@@ -22,11 +21,11 @@ describe('POST /admins/join', () => {
     });
   });
   describe('실패시', () => {
-    it('이미 존재하는 email일 경우, 409을 응답한다.', done => {
+    it('이미 존재하는 id일 경우, 409을 응답한다.', done => {
       request(app)
         .post('/api/admins/join')
         .send({
-          email: 'existed',
+          id: 'admin1',
           password: '123123',
           name: 'jonahyun',
         })
@@ -40,9 +39,9 @@ describe('POST /admins/join', () => {
       request(app)
         .post('/api/admins/join')
         .send({
-          email: 'newAdminUser1',
+          id: 'newAdmin1',
           password: '123123',
-          name: 'existed',
+          name: 'admin1',
         })
         .expect(409)
         .end((_, res) => {
@@ -57,11 +56,11 @@ describe('PATCH /admins/password', () => {
   describe('성공시', () => {
     it('success true를 반환한다.', done => {
       request(app)
-        .patch('/api/admins/password/23')
+        .patch('/api/admins/password/2')
         .send({
-          beforePassword: '12345',
-          newPassword: '123123',
-          confirmPassword: '123123',
+          beforePassword: 'admin2',
+          newPassword: '2admin',
+          confirmPassword: '2admin',
         })
         .expect(200)
         .end((err, res) => {
@@ -75,9 +74,9 @@ describe('PATCH /admins/password', () => {
       request(app)
         .patch('/api/admins/password/23')
         .send({
-          beforePassword: '123123',
-          newPassword: '123123',
-          confirmPassword: '123124',
+          beforePassword: 'admin2',
+          newPassword: '2admin',
+          confirmPassword: '3admin',
         })
         .expect(400)
         .end((_, res) => {
@@ -89,9 +88,9 @@ describe('PATCH /admins/password', () => {
       request(app)
         .patch('/api/admins/password/999')
         .send({
-          beforePassword: '999999',
-          newPassword: '12345',
-          confirmPassword: '12345',
+          beforePassword: 'admin2',
+          newPassword: '2admin',
+          confirmPassword: '2admin',
         })
         .expect(404)
         .end((_, res) => {
@@ -101,11 +100,11 @@ describe('PATCH /admins/password', () => {
     });
     it('잘못된 비밀번호일 경우 400를 응답한다.', done => {
       request(app)
-        .patch('/api/admins/password/23')
+        .patch('/api/admins/password/2')
         .send({
-          beforePassword: '999999',
-          newPassword: '12345',
-          confirmPassword: '12345',
+          beforePassword: 'admin3',
+          newPassword: '2admin',
+          confirmPassword: '2admin',
         })
         .expect(400)
         .end((_, res) => {
@@ -117,11 +116,11 @@ describe('PATCH /admins/password', () => {
   describe('api 데이터 원상 복구', () => {
     it('비밀번호 원래대로', done => {
       request(app)
-        .patch('/api/admins/password/23')
+        .patch('/api/admins/password/2')
         .send({
-          beforePassword: '123123',
-          newPassword: '12345',
-          confirmPassword: '12345',
+          beforePassword: '2admin',
+          newPassword: 'admin2',
+          confirmPassword: 'admin2',
         })
         .expect(200)
         .end((_, res) => {
