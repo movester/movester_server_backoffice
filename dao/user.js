@@ -53,7 +53,7 @@ const getAttendPoint = async (idx) => {
   try {
     connection = await pool.getConnection(async conn => conn);
     // TODO: FIX SQL
-    const sql = `SELECT user_idx AS 'userIdx', email, name, kakao_id AS 'kakaoId', email_verify_key AS 'emailVerifyKey', is_email_verify AS 'isEmailVerify', create_at AS 'createAt', delete_at AS 'deleteAt' FROM user WHERE user_idx = ${idx}`;
+    const sql = `SELECT * FROM attend_point WHERE user_idx = ${idx}`;
     const [row] = await connection.query(sql);
     return row.length ? row : null;
   } catch (err) {
