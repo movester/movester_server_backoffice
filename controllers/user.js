@@ -13,6 +13,17 @@ const getUsers = async (req, res) => {
   return res.status(CODE.OK).json(form.success(result));
 };
 
+const getUsersCount = async (req, res) => {
+  const result = await userService.getUsersCount();
+
+  if (result === CODE.INTERNAL_SERVER_ERROR) {
+    return res.status(CODE.INTERNAL_SERVER_ERROR).json(form.fail(MSG.INTERNAL_SERVER_ERROR));
+  }
+
+  return res.status(CODE.OK).json(form.success(result));
+};
+
 module.exports = {
   getUsers,
+  getUsersCount,
 };
