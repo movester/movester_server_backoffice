@@ -39,9 +39,20 @@ const getAttendPoint = async idx => {
   }
 };
 
+const getRecord = async idx => {
+  try {
+    const result = await userDao.getRecord(idx);
+    if(!result) return CODE.NOT_FOUND
+    return result;
+  } catch (err) {
+    return CODE.INTERNAL_SERVER_ERROR;
+  }
+};
+
 module.exports = {
   getUsers,
   getUserByIdx,
   getUsersCount,
-  getAttendPoint
+  getAttendPoint,
+  getRecord
 };
