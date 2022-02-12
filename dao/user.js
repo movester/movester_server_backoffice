@@ -48,8 +48,25 @@ const getUsersCount = async () => {
   }
 };
 
+const getUsersByIdx = async (limitStart) => {
+  let connection;
+  try {
+    connection = await pool.getConnection(async conn => conn);
+    // TODO: FIX SQL
+    const sql = `SELECT user_idx AS 'userIdx', email, name, create_at AS 'createAt' FROM user ORDER BY user_idx DESC LIMIT ${limitStart},10`;
+    const [row] = await connection.query(sql);
+    return row.length ? row : null;
+  } catch (err) {
+    console.log(`===DB Error > ${err}===`);
+    throw new Error(err);
+  } finally {
+    connection.release();
+  }
+};
+
 module.exports = {
   getUsers,
   getUserByIdx,
   getUsersCount,
+  getUsersByIdx
 };

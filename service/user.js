@@ -13,7 +13,7 @@ const getUsers = async () => {
 const getUserByIdx = async idx => {
   try {
     const result = await userDao.getUserByIdx(idx);
-    if(!result) return CODE.NOT_FOUND
+    if (!result) return CODE.NOT_FOUND;
     return result;
   } catch (err) {
     return CODE.INTERNAL_SERVER_ERROR;
@@ -29,8 +29,19 @@ const getUsersCount = async () => {
   }
 };
 
+const getUsersByIdx = async pages => {
+  try {
+    const getLimitStart = pages => (pages === 1 ? 0 : (pages - 1) * 10 - 1);
+    const result = await userDao.getUsersByIdx(getLimitStart(pages));
+    return result;
+  } catch (err) {
+    return CODE.INTERNAL_SERVER_ERROR;
+  }
+};
+
 module.exports = {
   getUsers,
   getUserByIdx,
-  getUsersCount
+  getUsersCount,
+  getUsersByIdx,
 };
