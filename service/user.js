@@ -20,7 +20,17 @@ const getUserByIdx = async idx => {
   }
 };
 
+const getUsersCount = async () => {
+  try {
+    const result = await userDao.getUsersCount();
+    return result;
+  } catch (err) {
+    return CODE.INTERNAL_SERVER_ERROR;
+  }
+};
+
 module.exports = {
   getUsers,
   getUserByIdx,
+  getUsersCount
 };

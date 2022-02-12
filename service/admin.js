@@ -19,18 +19,18 @@ const login = async ({ id, password }) => {
     }
 
     const token = {
-      accessToken: await jwt.signAccessToken({ idx: admin.admin_idx, id: admin.id }),
-      refreshToken: await jwt.signRefreshToken({ idx: admin.admin_idx, id: admin.id }),
+      accessToken: await jwt.signAccessToken({ idx: admin.adminIdx, id: admin.id }),
+      refreshToken: await jwt.signRefreshToken({ idx: admin.adminIdx, id: admin.id }),
     };
 
-    redis.set(admin.admin_idx, token.refreshToken);
+    redis.set(admin.adminIdx, token.refreshToken);
 
     return {
       admin: {
-        adminIdx: admin.admin_idx,
+        adminIdx: admin.adminIdx,
         id: admin.id,
         name: admin.name,
-        rank: admin.admin_rank
+        rank: admin.rank,
       },
       token,
     };
@@ -52,9 +52,9 @@ const join = async joinUser => {
   }
 };
 
-const findAdminById = async idx => {
+const findAdminById = async id => {
   try {
-    const result = await adminDao.findAdminById(idx);
+    const result = await adminDao.findAdminById(id);
     return result;
   } catch (err) {
     throw new Error(err);
