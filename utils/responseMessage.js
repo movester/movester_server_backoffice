@@ -41,6 +41,8 @@ const responseMessage = {
   VALUE_NULL: '필요한 값이 없습니다.',
   VALUE_INVALID: '파라미터 값이 잘못 되었습니다.',
 
+  TITLE_ALREADY_EXIST: '존재하는 TITLE 입니다.',
+
   ENCRYPT_ERROR: '비밀번호 암호화/복호화 에러',
   EMIAL_SENDER_ERROR: '이메일 인증 메일 전송 오류',
   DB_ERROR: '데이터베이스 오류',
