@@ -17,11 +17,11 @@ describe('GET /users/', () => {
   });
 });
 
-describe('GET /users/:id', () => {
+describe('GET /users/info/:id', () => {
   describe('성공시', () => {
     it('success true를 반환한다.', done => {
       request(app)
-        .get('/api/users/1')
+        .get('/api/users/info/1')
         .expect(200)
         .end((err, res) => {
           expect(res.body).to.have.property('success', true);
@@ -32,7 +32,7 @@ describe('GET /users/:id', () => {
   describe('실패시', () => {
     it('존재하지 않는 idx일 경우 404을 응답한다.', done => {
       request(app)
-        .get('/api/users/1000')
+        .get('/api/users/info/1000')
         .expect(404)
         .end((_, res) => {
           expect(res.body).to.have.property('success', false);
