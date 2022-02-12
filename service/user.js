@@ -29,9 +29,10 @@ const getUsersCount = async () => {
   }
 };
 
-const getUsersByIdx = async pages => {
+const getUsersList = async (pages, sort) => {
   try {
     const getLimitStart = pages => (pages === 1 ? 0 : (pages - 1) * 10 - 1);
+    // TODO: sort 로직 처리
     const result = await userDao.getUsersByIdx(getLimitStart(pages));
     return result;
   } catch (err) {
@@ -43,5 +44,5 @@ module.exports = {
   getUsers,
   getUserByIdx,
   getUsersCount,
-  getUsersByIdx,
+  getUsersList,
 };

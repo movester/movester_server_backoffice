@@ -6,6 +6,6 @@ const auth = require('../middleware/auth');
 
 router.get('/info/:idx', auth.checkToken, userCtrl.getUserByIdx);
 router.get('/count', auth.checkToken, userCtrl.getUsersCount);
-router.get('/list/idx-order', auth.checkToken, userCtrl.getUsersByIdx);
+router.get('/list', auth.checkToken, userCtrl.getUsersList);
 
 module.exports = router;
