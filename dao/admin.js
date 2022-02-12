@@ -19,8 +19,9 @@ const findAdminById = async id => {
   let connection;
   try {
     connection = await pool.getConnection(async conn => conn);
-    const sql = `SELECT admin_idx, id, password, name, admin_rank FROM admin WHERE id = '${id}'`;
+    const sql = `SELECT admin_idx AS 'adminIdx', id, password, name, admin_rank AS 'rank' FROM admin WHERE id = '${id}'`;
     const [row] = await connection.query(sql);
+    console.log(row);
     return row.length ? row[0] : undefined;
   } catch (err) {
     console.log(`===DB Error > ${err}===`);
@@ -34,7 +35,7 @@ const findAdminByName = async name => {
   let connection;
   try {
     connection = await pool.getConnection(async conn => conn);
-    const sql = `SELECT admin_idx, id, password, name, admin_rank FROM admin WHERE name = '${name}'`;
+    const sql = `SELECT admin_idx AS 'adminIdx', id, password, name, admin_rank AS 'rank' FROM admin WHERE name = '${name}'`;
     const [row] = await connection.query(sql);
     return row.length ? row[0] : undefined;
   } catch (err) {
@@ -49,7 +50,7 @@ const findAdminByIdx = async idx => {
   let connection;
   try {
     connection = await pool.getConnection(async conn => conn);
-    const sql = `SELECT admin_idx, id, password, name, admin_rank FROM admin WHERE admin_idx = ${idx}`;
+    const sql = `SELECT admin_idx AS 'adminIdx', id, password, name, admin_rank AS 'rank' FROM admin WHERE admin_idx = ${idx}`;
     const [row] = await connection.query(sql);
     return row.length ? row[0] : undefined;
   } catch (err) {
