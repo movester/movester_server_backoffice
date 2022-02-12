@@ -34,6 +34,11 @@ const logout = async (req, res) => {
 };
 
 const join = async (req, res) => {
+  const reqAdminUser = await adminService.findAdminByIdx(req.cookies.idx);
+  if (!reqAdminUser.rank) {
+    return res.status(CODE.UNAUTHORIZED).json(form.fail(MSG.SUPER_ADMIN_ONLY));
+  }
+
   const joinUser = req.body;
   try {
     const isIdDuplicate = await adminService.findAdminById(joinUser.id);
