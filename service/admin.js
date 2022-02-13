@@ -4,6 +4,18 @@ const encrypt = require('../modules/encrypt');
 const redis = require('../modules/redis');
 const CODE = require('../utils/statusCode');
 
+const join = async joinUser => {
+  try {
+    const hashPassword = await encrypt.hash(joinUser.password);
+    joinUser.password = hashPassword;
+
+    const isJoin = await adminDao.join({ joinUser });
+    return isJoin;
+  } catch (err) {
+    return CODE.INTERNAL_SERVER_ERROR;
+  }
+};
+
 const login = async ({ id, password }) => {
   try {
     const admin = await adminDao.findAdminById(id);
@@ -40,22 +52,10 @@ const login = async ({ id, password }) => {
   }
 };
 
-const join = async joinUser => {
-  try {
-    const hashPassword = await encrypt.hash(joinUser.password);
-    joinUser.password = hashPassword;
-
-    const result = await adminDao.join({ joinUser });
-    return result;
-  } catch (err) {
-    return CODE.INTERNAL_SERVER_ERROR;
-  }
-};
-
 const findAdminById = async id => {
   try {
-    const result = await adminDao.findAdminById(id);
-    return result;
+    const admin = await adminDao.findAdminById(id);
+    return admin;
   } catch (err) {
     throw new Error(err);
   }
@@ -63,8 +63,8 @@ const findAdminById = async id => {
 
 const findAdminByName = async name => {
   try {
-    const result = await adminDao.findAdminByName(name);
-    return result;
+    const admin = await adminDao.findAdminByName(name);
+    return admin;
   } catch (err) {
     throw new Error(err);
   }
@@ -72,8 +72,8 @@ const findAdminByName = async name => {
 
 const findAdminByIdx = async idx => {
   try {
-    const result = await adminDao.findAdminByIdx(idx);
-    return result;
+    const admin = await adminDao.findAdminByIdx(idx);
+    return admin;
   } catch (err) {
     throw new Error(err);
   }
@@ -82,16 +82,16 @@ const findAdminByIdx = async idx => {
 const updatePassword = async ({ adminIdx, newPassword }) => {
   try {
     const hashPassword = await encrypt.hash(newPassword);
-    const result = await adminDao.updatePassword(adminIdx, hashPassword);
-    return result;
+    const isUpdatePassword = await adminDao.updatePassword(adminIdx, hashPassword);
+    return isUpdatePassword;
   } catch (err) {
     return CODE.INTERNAL_SERVER_ERROR;
   }
 };
 
 module.exports = {
-  login,
   join,
+  login,
   findAdminById,
   findAdminByName,
   findAdminByIdx,
