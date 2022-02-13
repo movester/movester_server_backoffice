@@ -38,10 +38,11 @@ const getUsersCount = async (req, res) => {
   return res.status(CODE.OK).json(form.success(result));
 };
 
-const getUsersListByCreateAt = async (req, res) => {
+const getUsersList = async (req, res) => {
   const page = +req.query.page;
+  const { sort } = req.query;
 
-  const usersList = await userService.getUsersListByCreateAt(page);
+  const usersList = await userService.getUsersList(page, sort);
 
   if (usersList === CODE.INTERNAL_SERVER_ERROR) {
     return res.status(CODE.INTERNAL_SERVER_ERROR).json(form.fail(MSG.INTERNAL_SERVER_ERROR));
@@ -54,5 +55,5 @@ module.exports = {
   getUsers,
   getUserByIdx,
   getUsersCount,
-  getUsersListByCreateAt,
+  getUsersList,
 };

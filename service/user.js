@@ -29,11 +29,21 @@ const getUsersCount = async () => {
   }
 };
 
-const getUsersListByCreateAt = async page => {
+const getUsersList = async (page, sort) => {
   try {
-    const getLimitStart = page => (page - 1) * 10;
-    const usersList = await userDao.getUsersListByCreateAt(getLimitStart(page));
-    return usersList;
+    const SORT_LIST = ['JOIN', 'ATTEND_POINT'];
+
+    const getSearchStart = page => (page - 1) * 10;
+
+    if (sort === SORT_LIST[0]) {
+      const usersList = await userDao.getUsersListByCreateAt(getSearchStart(page));
+      return usersList;
+    }
+    
+    if (sort === SORT_LIST[1]) {
+      const usersList = await userDao.getUsersListByAttendPoint(getSearchStart(page));
+      return usersList;
+    }
   } catch (err) {
     return CODE.INTERNAL_SERVER_ERROR;
   }
@@ -43,5 +53,5 @@ module.exports = {
   getUsers,
   getUserByIdx,
   getUsersCount,
-  getUsersListByCreateAt,
+  getUsersList,
 };

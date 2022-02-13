@@ -48,7 +48,7 @@ const getUsersCount = async () => {
   }
 };
 
-const getUsersListByCreateAt = async page => {
+const getUsersListByCreateAt = async searchStart => {
   let connection;
   try {
     connection = await pool.getConnection(async conn => conn);
@@ -63,7 +63,36 @@ const getUsersListByCreateAt = async page => {
                         ,0) AS 'attendPoint'
                 FROM user
                 ORDER BY create_at DESC
-                LIMIT ${page},10`;
+                LIMIT ${searchStart},10`;
+
+    const [row] = await connection.query(sql);
+
+    return row.length ? row : null;
+  } catch (err) {
+    console.log(`===DB Error > ${err}===`);
+    throw new Error(err);
+  } finally {
+    connection.release();
+  }
+};
+
+const getUsersListByAttendPoint = async searchStart => {
+  let connection;
+  try {
+    connection = await pool.getConnection(async conn => conn);
+
+    const sql = `SELECT *
+                   FROM (SELECT user_idx AS 'userIdx', email, name,  DATE_FORMAT(create_at,'%Y.%m.%d') AS 'createAt'
+                           , IFNULL((SELECT COUNT(*) * 10
+                                       FROM attend_point
+                                      WHERE user_idx = t1.user_idx
+                                        AND attend_year = YEAR(CURDATE())
+                                        AND attend_month = MONTH(CURDATE())
+                                   GROUP BY user_idx, attend_year, attend_month),0) AS attendCnt
+                          FROM user t1
+                        ) t2
+              ORDER BY attendCnt DESC
+              LIMIT ${searchStart},10;`;
 
     const [row] = await connection.query(sql);
 
@@ -81,4 +110,5 @@ module.exports = {
   getUserByIdx,
   getUsersCount,
   getUsersListByCreateAt,
+  getUsersListByAttendPoint,
 };

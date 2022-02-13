@@ -24,12 +24,9 @@ const login = [
 ];
 
 const updatePassword = [
-  body('beforePassword')
-    .exists(),
-  body('newPassword')
-    .exists(),
-  body('confirmPassword')
-    .exists()
+  body('beforePassword').exists(),
+  body('newPassword').exists(),
+  body('confirmPassword').exists(),
 ];
 
 module.exports = {

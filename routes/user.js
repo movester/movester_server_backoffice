@@ -9,11 +9,12 @@ const validatorError = require('../middleware/validatorError');
 router.get('/info/:idx', auth.checkToken, userCtrl.getUserByIdx);
 router.get('/count', auth.checkToken, userCtrl.getUsersCount);
 router.get(
-  '/list/join-date',
+  '/list',
   auth.checkToken,
-  validator.getUsersListByCreateAt,
+  validator.getUsersList,
   validatorError.error,
-  userCtrl.getUsersListByCreateAt
+  userCtrl.getUsersList
 );
+
 
 module.exports = router;
