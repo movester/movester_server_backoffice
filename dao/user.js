@@ -75,10 +75,10 @@ const getUsersListByAttendPoint = async searchStart => {
                                       WHERE user_idx = t1.user_idx
                                         AND attend_year = YEAR(CURDATE())
                                         AND attend_month = MONTH(CURDATE())
-                                   GROUP BY user_idx, attend_year, attend_month),0) AS attendCnt
+                                   GROUP BY user_idx, attend_year, attend_month),0) AS attendPoint
                           FROM user t1
                         ) t2
-              ORDER BY attendCnt DESC
+              ORDER BY attendPoint DESC
               LIMIT ${searchStart},10;`;
 
     const [row] = await connection.query(sql);
