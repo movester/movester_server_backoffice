@@ -22,8 +22,8 @@ const getUserByIdx = async idx => {
 
 const getUsersCount = async () => {
   try {
-    const result = await userDao.getUsersCount();
-    return result;
+    const usersCount = await userDao.getUsersCount();
+    return usersCount;
   } catch (err) {
     return CODE.INTERNAL_SERVER_ERROR;
   }

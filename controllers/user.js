@@ -29,13 +29,13 @@ const getUserByIdx = async (req, res) => {
 };
 
 const getUsersCount = async (req, res) => {
-  const result = await userService.getUsersCount();
+  const usersCount = await userService.getUsersCount();
 
-  if (result === CODE.INTERNAL_SERVER_ERROR) {
+  if (usersCount === CODE.INTERNAL_SERVER_ERROR) {
     return res.status(CODE.INTERNAL_SERVER_ERROR).json(form.fail(MSG.INTERNAL_SERVER_ERROR));
   }
 
-  return res.status(CODE.OK).json(form.success(result));
+  return res.status(CODE.OK).json(form.success(usersCount));
 };
 
 
