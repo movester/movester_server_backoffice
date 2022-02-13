@@ -41,19 +41,30 @@ const getUsersList = async (req, res) => {
   return res.status(CODE.OK).json(form.success(usersList));
 };
 
-const getAttendPoint = async (req, res) => {
+const getUserAttendPoint = async (req, res) => {
   const { idx } = req.params;
-  const result = await userService.getAttendPoint(idx);
+  const { year } = req.query;
 
-  if (result === CODE.INTERNAL_SERVER_ERROR) {
+  try {
+    const user = await userService.getUserByIdx(idx);
+    if (!user) {
+      return res.status(CODE.NOT_FOUND).json(form.fail(MSG.IDX_NOT_EXIST));
+    }
+  } catch (err) {
     return res.status(CODE.INTERNAL_SERVER_ERROR).json(form.fail(MSG.INTERNAL_SERVER_ERROR));
   }
 
-  if (result === CODE.NOT_FOUND) {
+  const attendPoint = await userService.getUserAttendPoint(idx, year);
+
+  if (attendPoint === CODE.INTERNAL_SERVER_ERROR) {
+    return res.status(CODE.INTERNAL_SERVER_ERROR).json(form.fail(MSG.INTERNAL_SERVER_ERROR));
+  }
+
+  if (attendPoint === CODE.NOT_FOUND) {
     return res.status(CODE.NOT_FOUND).json(form.fail(MSG.IDX_NOT_EXIST));
   }
 
-  return res.status(CODE.OK).json(form.success(result));
+  return res.status(CODE.OK).json(form.success(attendPoint));
 };
 
 const getRecord = async (req, res) => {
@@ -75,6 +86,6 @@ module.exports = {
   getUserInfo,
   getUsersCount,
   getUsersList,
-  getAttendPoint,
+  getUserAttendPoint,
   getRecord,
 };

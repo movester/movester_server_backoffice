@@ -4,7 +4,7 @@ const CODE = require('../utils/statusCode');
 const getUserInfo = async idx => {
   try {
     const userInfo = await userDao.getUserInfo(idx);
-    if(!userInfo) return CODE.NOT_FOUND
+    if (!userInfo) return CODE.NOT_FOUND;
     return userInfo;
   } catch (err) {
     return CODE.INTERNAL_SERVER_ERROR;
@@ -40,11 +40,23 @@ const getUsersList = async (page, sort) => {
   }
 };
 
-const getAttendPoint = async idx => {
+const getUserByIdx = async idx => {
   try {
-    const result = await userDao.getAttendPoint(idx);
-    if(!result) return CODE.NOT_FOUND
-    return result;
+    const attendPoint = await userDao.getUserByIdx(idx);
+    return attendPoint;
+  } catch (err) {
+    throw new Error(err);
+  }
+};
+
+const getUserAttendPoint = async (idx, year) => {
+  try {
+    const tempAttendPoint = await userDao.getUserAttendPoint(idx, year);
+    const attendPoint = new Array(12).fill(0);
+    tempAttendPoint.forEach(({ month, attendPoint: point }) => {
+      attendPoint[month - 1] = point;
+    });
+    return attendPoint;
   } catch (err) {
     return CODE.INTERNAL_SERVER_ERROR;
   }
@@ -53,7 +65,7 @@ const getAttendPoint = async idx => {
 const getRecord = async idx => {
   try {
     const result = await userDao.getRecord(idx);
-    if(!result) return CODE.NOT_FOUND
+    if (!result) return CODE.NOT_FOUND;
     return result;
   } catch (err) {
     return CODE.INTERNAL_SERVER_ERROR;
@@ -64,6 +76,7 @@ module.exports = {
   getUserInfo,
   getUsersCount,
   getUsersList,
-  getAttendPoint,
+  getUserByIdx,
+  getUserAttendPoint,
   getRecord,
 };
