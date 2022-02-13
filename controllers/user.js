@@ -5,6 +5,7 @@ const form = require('../utils/responseForm');
 
 const getUserInfo = async (req, res) => {
   const { idx } = req.params;
+
   const userInfo = await userService.getUserInfo(idx);
 
   if (userInfo === CODE.INTERNAL_SERVER_ERROR) {
@@ -29,8 +30,7 @@ const getUsersCount = async (req, res) => {
 };
 
 const getUsersList = async (req, res) => {
-  const page = +req.query.page;
-  const { sort } = req.query;
+  const { page, sort } = req.query;
 
   const usersList = await userService.getUsersList(page, sort);
 
