@@ -38,25 +38,21 @@ const getUsersCount = async (req, res) => {
   return res.status(CODE.OK).json(form.success(result));
 };
 
-const getUsersList = async (req, res) => {
-  const pages = +req.query.pages;
-  const { sort } = req.query;
-  if (!pages || !['idx', 'attendPoint', 'legRecord', 'armRecord'].includes(sort)) {
-    return res.status(CODE.BAD_REQUEST).json(form.fail(MSG.VALUE_INVALID));
-  }
+const getUsersListByCreateAt = async (req, res) => {
+  const page = +req.query.page;
 
-  const result = await userService.getUsersList(pages, sort);
+  const usersList = await userService.getUsersListByCreateAt(page);
 
-  if (result === CODE.INTERNAL_SERVER_ERROR) {
+  if (usersList === CODE.INTERNAL_SERVER_ERROR) {
     return res.status(CODE.INTERNAL_SERVER_ERROR).json(form.fail(MSG.INTERNAL_SERVER_ERROR));
   }
 
-  return res.status(CODE.OK).json(form.success(result));
+  return res.status(CODE.OK).json(form.success(usersList));
 };
 
 module.exports = {
   getUsers,
   getUserByIdx,
   getUsersCount,
-  getUsersList,
+  getUsersListByCreateAt,
 };
