@@ -45,8 +45,8 @@ const join = async joinUser => {
     const hashPassword = await encrypt.hash(joinUser.password);
     joinUser.password = hashPassword;
 
-    const result = await adminDao.join({ joinUser });
-    return result;
+    const isJoin = await adminDao.join({ joinUser });
+    return isJoin;
   } catch (err) {
     return CODE.INTERNAL_SERVER_ERROR;
   }
@@ -54,8 +54,8 @@ const join = async joinUser => {
 
 const findAdminById = async id => {
   try {
-    const result = await adminDao.findAdminById(id);
-    return result;
+    const admin = await adminDao.findAdminById(id);
+    return admin;
   } catch (err) {
     throw new Error(err);
   }
@@ -63,8 +63,8 @@ const findAdminById = async id => {
 
 const findAdminByName = async name => {
   try {
-    const result = await adminDao.findAdminByName(name);
-    return result;
+    const admin = await adminDao.findAdminByName(name);
+    return admin;
   } catch (err) {
     throw new Error(err);
   }
@@ -72,8 +72,8 @@ const findAdminByName = async name => {
 
 const findAdminByIdx = async idx => {
   try {
-    const result = await adminDao.findAdminByIdx(idx);
-    return result;
+    const admin = await adminDao.findAdminByIdx(idx);
+    return admin;
   } catch (err) {
     throw new Error(err);
   }
@@ -82,8 +82,8 @@ const findAdminByIdx = async idx => {
 const updatePassword = async ({ adminIdx, newPassword }) => {
   try {
     const hashPassword = await encrypt.hash(newPassword);
-    const result = await adminDao.updatePassword(adminIdx, hashPassword);
-    return result;
+    const isUpdatePassword = await adminDao.updatePassword(adminIdx, hashPassword);
+    return isUpdatePassword;
   } catch (err) {
     return CODE.INTERNAL_SERVER_ERROR;
   }
