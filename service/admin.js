@@ -4,6 +4,18 @@ const encrypt = require('../modules/encrypt');
 const redis = require('../modules/redis');
 const CODE = require('../utils/statusCode');
 
+const join = async joinUser => {
+  try {
+    const hashPassword = await encrypt.hash(joinUser.password);
+    joinUser.password = hashPassword;
+
+    const isJoin = await adminDao.join({ joinUser });
+    return isJoin;
+  } catch (err) {
+    return CODE.INTERNAL_SERVER_ERROR;
+  }
+};
+
 const login = async ({ id, password }) => {
   try {
     const admin = await adminDao.findAdminById(id);
@@ -36,18 +48,6 @@ const login = async ({ id, password }) => {
     };
   } catch (err) {
     console.log(err);
-    return CODE.INTERNAL_SERVER_ERROR;
-  }
-};
-
-const join = async joinUser => {
-  try {
-    const hashPassword = await encrypt.hash(joinUser.password);
-    joinUser.password = hashPassword;
-
-    const isJoin = await adminDao.join({ joinUser });
-    return isJoin;
-  } catch (err) {
     return CODE.INTERNAL_SERVER_ERROR;
   }
 };
@@ -90,8 +90,8 @@ const updatePassword = async ({ adminIdx, newPassword }) => {
 };
 
 module.exports = {
-  login,
   join,
+  login,
   findAdminById,
   findAdminByName,
   findAdminByIdx,

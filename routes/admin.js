@@ -8,6 +8,7 @@ const auth = require('../middleware/auth');
 
 router.post('/join', auth.checkToken, validator.join, validatorError.error, adminCtrl.join);
 router.post('/login', validator.login, validatorError.error, adminCtrl.login);
+router.post('/logout', auth.checkToken, adminCtrl.logout);
 router.patch(
   '/password/:adminIdx',
   auth.checkToken,
@@ -15,6 +16,5 @@ router.patch(
   validatorError.error,
   adminCtrl.updatePassword
 );
-router.post('/logout', auth.checkToken, adminCtrl.logout);
 
 module.exports = router;

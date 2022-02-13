@@ -5,34 +5,6 @@ const form = require('../utils/responseForm');
 const encrypt = require('../modules/encrypt');
 const redis = require('../modules/redis');
 
-const login = async (req, res) => {
-  const reqAdmin = req.body;
-  const loginAdmin = await adminService.login(reqAdmin);
-
-  if (typeof loginAdmin === 'number') {
-    if (loginAdmin === CODE.BAD_REQUEST) {
-      return res.status(CODE.BAD_REQUEST).json(form.fail(MSG.ID_NOT_EXIST));
-    }
-    if (loginAdmin === CODE.NOT_FOUND) {
-      return res.status(CODE.NOT_FOUND).json(form.fail(MSG.PW_MISMATCH));
-    }
-    if (loginAdmin === CODE.INTERNAL_SERVER_ERROR) {
-      return res.status(CODE.INTERNAL_SERVER_ERROR).json(form.fail(MSG.INTERNAL_SERVER_ERROR));
-    }
-  }
-
-  return res
-    .status(CODE.OK)
-    .cookie('accessToken', loginAdmin.token.accessToken, { httpOnly: true })
-    .cookie('refreshToken', loginAdmin.token.refreshToken, { httpOnly: true })
-    .json(form.success(loginAdmin.admin));
-};
-
-const logout = async (req, res) => {
-  redis.del(req.cookies.idx);
-  res.clearCookie('accessToken').clearCookie('refreshToken').status(CODE.OK).json(form.success(MSG.LOGOUT_SUCCESS));
-};
-
 const join = async (req, res) => {
   const reqAdmin = await adminService.findAdminByIdx(req.cookies.idx);
   if (!reqAdmin.rank) {
@@ -59,6 +31,34 @@ const join = async (req, res) => {
     return res.status(CODE.INTERNAL_SERVER_ERROR).json(form.fail(MSG.INTERNAL_SERVER_ERROR));
   }
   res.status(CODE.CREATED).json(form.success());
+};
+
+const login = async (req, res) => {
+  const reqAdmin = req.body;
+  const loginAdmin = await adminService.login(reqAdmin);
+
+  if (typeof loginAdmin === 'number') {
+    if (loginAdmin === CODE.BAD_REQUEST) {
+      return res.status(CODE.BAD_REQUEST).json(form.fail(MSG.ID_NOT_EXIST));
+    }
+    if (loginAdmin === CODE.NOT_FOUND) {
+      return res.status(CODE.NOT_FOUND).json(form.fail(MSG.PW_MISMATCH));
+    }
+    if (loginAdmin === CODE.INTERNAL_SERVER_ERROR) {
+      return res.status(CODE.INTERNAL_SERVER_ERROR).json(form.fail(MSG.INTERNAL_SERVER_ERROR));
+    }
+  }
+
+  return res
+    .status(CODE.OK)
+    .cookie('accessToken', loginAdmin.token.accessToken, { httpOnly: true })
+    .cookie('refreshToken', loginAdmin.token.refreshToken, { httpOnly: true })
+    .json(form.success(loginAdmin.admin));
+};
+
+const logout = async (req, res) => {
+  redis.del(req.cookies.idx);
+  res.clearCookie('accessToken').clearCookie('refreshToken').status(CODE.OK).json(form.success(MSG.LOGOUT_SUCCESS));
 };
 
 const updatePassword = async (req, res) => {
@@ -90,8 +90,8 @@ const updatePassword = async (req, res) => {
 };
 
 module.exports = {
+  join,
   login,
   logout,
-  join,
   updatePassword,
 };
