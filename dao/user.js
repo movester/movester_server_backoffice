@@ -1,27 +1,11 @@
 const pool = require('./pool');
 
-const getUsers = async () => {
+const getUserInfo = async (idx) => {
   let connection;
   try {
     connection = await pool.getConnection(async conn => conn);
 
-    const sql = `SELECT user_idx AS 'userIdx', email, name, kakao_id AS 'kakaoId', is_email_verify AS 'isEmailVerify', create_at AS 'createAt', delete_at AS 'deleteAt' FROM user`;
-    const [row] = await connection.query(sql);
-    return row.length ? row : null;
-  } catch (err) {
-    console.log(`===DB Error > ${err}===`);
-    throw new Error(err);
-  } finally {
-    connection.release();
-  }
-};
-
-const getUserByIdx = async idx => {
-  let connection;
-  try {
-    connection = await pool.getConnection(async conn => conn);
-
-    const sql = `SELECT user_idx AS 'userIdx', email, name, kakao_id AS 'kakaoId', email_verify_key AS 'emailVerifyKey', is_email_verify AS 'isEmailVerify', create_at AS 'createAt', delete_at AS 'deleteAt' FROM user WHERE user_idx = ${idx}`;
+    const sql = `SELECT user_idx AS 'userIdx', email, name, kakao_id AS 'kakaoId', is_email_verify AS 'isEmailVerify', create_at AS 'createAt' FROM user WHERE user_idx = ${idx}`;
     const [row] = await connection.query(sql);
     return row.length ? row : null;
   } catch (err) {
@@ -39,7 +23,7 @@ const getUsersCount = async () => {
 
     const sql = `SELECT COUNT(*) AS count FROM user`;
     const [row] = await connection.query(sql);
-    return row[0].count;
+    return row.length ? row : null;
   } catch (err) {
     console.log(`===DB Error > ${err}===`);
     throw new Error(err);
@@ -106,8 +90,7 @@ const getUsersListByAttendPoint = async searchStart => {
 };
 
 module.exports = {
-  getUsers,
-  getUserByIdx,
+  getUserInfo,
   getUsersCount,
   getUsersListByCreateAt,
   getUsersListByAttendPoint,
