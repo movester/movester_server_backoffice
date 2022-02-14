@@ -49,24 +49,31 @@ const getUserByIdx = async idx => {
   }
 };
 
-const getUserAttendPoint = async (idx, year) => {
+const getUserAttendPoints = async (idx, year) => {
   try {
-    const tempAttendPoint = await userDao.getUserAttendPoint(idx, year);
-    const attendPoint = new Array(12).fill(0);
-    tempAttendPoint.forEach(({ month, attendPoint: point }) => {
-      attendPoint[month - 1] = point;
+    const tempAttendPoints = await userDao.getUserAttendPoints(idx, year);
+    const attendPoints = new Array(12).fill(0);
+
+    tempAttendPoints.forEach(({ month, attendPoint }) => {
+      attendPoints[month - 1] = attendPoint;
     });
-    return attendPoint;
+
+    return attendPoints;
   } catch (err) {
     return CODE.INTERNAL_SERVER_ERROR;
   }
 };
 
-const getRecord = async idx => {
+const getUserRecords = async (idx, year) => {
   try {
-    const result = await userDao.getRecord(idx);
-    if (!result) return CODE.NOT_FOUND;
-    return result;
+    const tempRecords = await userDao.getUserRecords(idx, year);
+
+    const records = new Array(12).fill([0, 0]);
+    tempRecords.forEach(({ month, shoulder, leg }) => {
+      records[month - 1] = [shoulder, leg];
+    });
+    
+    return records;
   } catch (err) {
     return CODE.INTERNAL_SERVER_ERROR;
   }
@@ -77,6 +84,6 @@ module.exports = {
   getUsersCount,
   getUsersList,
   getUserByIdx,
-  getUserAttendPoint,
-  getRecord,
+  getUserAttendPoints,
+  getUserRecords,
 };

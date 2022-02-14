@@ -16,7 +16,7 @@ const getUsersList = [
     .withMessage('정해진 sort 기준에 없는 값입니다.'),
 ];
 
-const getUserAttendPoint = [
+const getUserAttendPoints = [
   param('idx').matches(/^\d+$/).withMessage('idx 는 숫자로만 이루어져야 합니다.').toInt(),
   query('year')
     .exists()
@@ -29,5 +29,5 @@ const getUserAttendPoint = [
 module.exports = {
   getUserInfo,
   getUsersList,
-  getUserAttendPoint
+  getUserAttendPoints
 };

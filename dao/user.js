@@ -111,7 +111,7 @@ const getUserByIdx = async (idx) => {
   }
 };
 
-const getUserAttendPoint = async (idx, year) => {
+const getUserAttendPoints = async (idx, year) => {
   let connection;
   try {
     connection = await pool.getConnection(async conn => conn);
@@ -133,14 +133,50 @@ const getUserAttendPoint = async (idx, year) => {
   }
 };
 
-const getRecord = async (idx) => {
+const getUserRecords = async (idx, year) => {
   let connection;
   try {
     connection = await pool.getConnection(async conn => conn);
-    // TODO: FIX SQL
-    const sql = `SELECT * FROM user_record WHERE user_idx = ${idx}`;
+
+    const sql = `SELECT record_month AS month
+                   ,IFNULL(ROUND(
+                     (SELECT record
+                        FROM user_record
+                       WHERE record_type = 1
+                         AND user_idx = ${idx}
+                         AND create_at =
+                                        (SELECT max(create_at)
+                                           FROM user_record
+                                          WHERE user_idx = ${idx}
+                                            AND record_year = ${year}
+                                            AND record_type = 1
+                                            AND record_month = t1.record_month
+                                       GROUP BY record_month)
+                     )
+                    ,2),0) AS shoulder
+                    ,IFNULL(ROUND(
+                      (SELECT record
+                       FROM user_record
+                      WHERE record_type = 2
+                        AND user_idx = ${idx}
+                        AND create_at =
+                                        (SELECT max(create_at)
+                                           FROM user_record
+                                          WHERE user_idx = ${idx}
+                                            AND record_year = ${year}
+                                            AND record_type = 2
+                                            AND record_month = t1.record_month
+                                       GROUP BY record_month)
+                      )
+                    ,2),0) AS leg
+                 FROM user_record t1
+                WHERE user_idx = ${idx}
+                  AND record_year = ${year}
+             GROUP BY record_month`;
+
     const [row] = await connection.query(sql);
-    return row.length ? row : null;
+
+    return row
   } catch (err) {
     console.log(`===DB Error > ${err}===`);
     throw new Error(err);
@@ -155,6 +191,6 @@ module.exports = {
   getUsersListByCreateAt,
   getUsersListByAttendPoint,
   getUserByIdx,
-  getUserAttendPoint,
-  getRecord,
+  getUserAttendPoints,
+  getUserRecords,
 };

@@ -41,7 +41,7 @@ const getUsersList = async (req, res) => {
   return res.status(CODE.OK).json(form.success(usersList));
 };
 
-const getUserAttendPoint = async (req, res) => {
+const getUserAttendPoints = async (req, res) => {
   const { idx } = req.params;
   const { year } = req.query;
 
@@ -54,38 +54,45 @@ const getUserAttendPoint = async (req, res) => {
     return res.status(CODE.INTERNAL_SERVER_ERROR).json(form.fail(MSG.INTERNAL_SERVER_ERROR));
   }
 
-  const attendPoint = await userService.getUserAttendPoint(idx, year);
+  const attendPoints = await userService.getUserAttendPoints(idx, year);
 
-  if (attendPoint === CODE.INTERNAL_SERVER_ERROR) {
+  if (attendPoints === CODE.INTERNAL_SERVER_ERROR) {
     return res.status(CODE.INTERNAL_SERVER_ERROR).json(form.fail(MSG.INTERNAL_SERVER_ERROR));
   }
 
-  if (attendPoint === CODE.NOT_FOUND) {
+  if (attendPoints === CODE.NOT_FOUND) {
     return res.status(CODE.NOT_FOUND).json(form.fail(MSG.IDX_NOT_EXIST));
   }
 
-  return res.status(CODE.OK).json(form.success(attendPoint));
+  return res.status(CODE.OK).json(form.success(attendPoints));
 };
 
-const getRecord = async (req, res) => {
+const getUserRecords = async (req, res) => {
   const { idx } = req.params;
-  const result = await userService.getRecord(idx);
+  const { year } = req.query;
 
-  if (result === CODE.INTERNAL_SERVER_ERROR) {
+  try {
+    const user = await userService.getUserByIdx(idx);
+    if (!user) {
+      return res.status(CODE.NOT_FOUND).json(form.fail(MSG.IDX_NOT_EXIST));
+    }
+  } catch (err) {
     return res.status(CODE.INTERNAL_SERVER_ERROR).json(form.fail(MSG.INTERNAL_SERVER_ERROR));
   }
 
-  if (result === CODE.NOT_FOUND) {
-    return res.status(CODE.NOT_FOUND).json(form.fail(MSG.IDX_NOT_EXIST));
+  const records = await userService.getUserRecords(idx, year);
+
+  if (records === CODE.INTERNAL_SERVER_ERROR) {
+    return res.status(CODE.INTERNAL_SERVER_ERROR).json(form.fail(MSG.INTERNAL_SERVER_ERROR));
   }
 
-  return res.status(CODE.OK).json(form.success(result));
+  return res.status(CODE.OK).json(form.success(records));
 };
 
 module.exports = {
   getUserInfo,
   getUsersCount,
   getUsersList,
-  getUserAttendPoint,
-  getRecord,
+  getUserAttendPoints,
+  getUserRecords,
 };
