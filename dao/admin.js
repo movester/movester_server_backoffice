@@ -79,7 +79,7 @@ const updatePassword = async (adminIdx, password) => {
   let connection;
   try {
     connection = await pool.getConnection(async conn => conn);
-    
+
     const sql = `UPDATE admin
                  SET password = '${password}'
                  WHERE admin_idx = ${adminIdx}`;

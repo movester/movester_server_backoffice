@@ -5,7 +5,7 @@ const getUserInfo = async (idx) => {
   try {
     connection = await pool.getConnection(async conn => conn);
 
-    const sql = `SELECT user_idx AS 'userIdx', email, name, kakao_id AS 'kakaoId', is_email_verify AS 'isEmailVerify', DATE_FORMAT(create_at,'%Y.%m.%d') AS 'createAt'
+    const sql = `SELECT user_idx AS 'userIdx', email, name, kakao_id AS 'kakaoId', is_email_auth AS 'isEmailAuth', DATE_FORMAT(create_at,'%Y.%m.%d') AS 'createAt'
                  FROM user
                  WHERE user_idx = ${idx}`;
     const [row] = await connection.query(sql);
