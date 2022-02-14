@@ -6,7 +6,7 @@ const getUsersList = [
   query('page')
     .exists()
     .withMessage('page 값이 없습니다.')
-    .matches(/^\d+$/)
+    .isInt()
     .withMessage('idx 는 숫자로만 이루어져야 합니다.')
     .toInt(),
   query('sort')
@@ -17,11 +17,11 @@ const getUsersList = [
 ];
 
 const getUserAttendPoints = [
-  param('idx').matches(/^\d+$/).withMessage('idx 는 숫자로만 이루어져야 합니다.').toInt(),
+  param('idx').isInt().withMessage('idx 는 숫자로만 이루어져야 합니다.').toInt(),
   query('year')
     .exists()
     .withMessage('year 값이 없습니다.')
-    .matches(/^\d+$/)
+    .isInt()
     .withMessage('year 는 숫자로만 이루어져야 합니다.')
     .toInt(),
 ];

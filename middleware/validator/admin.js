@@ -19,7 +19,7 @@ const join = [
   body('rank')
     .exists()
     .withMessage('등급을 입력해주세요.')
-    .matches(/^\d+$/)
+    .isInt()
     .withMessage('rank 는 숫자로만 이루어져야 합니다.')
     .toInt(),
 ];
