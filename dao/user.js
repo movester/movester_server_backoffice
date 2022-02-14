@@ -53,7 +53,6 @@ const getUsersListByCreateAt = async searchStart => {
                 LIMIT ${searchStart},10`;
 
     const [row] = await connection.query(sql);
-    console.log(row)
     return row.length ? row : null;
   } catch (err) {
     console.log(`===DB Error > ${err}===`);

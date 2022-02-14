@@ -76,7 +76,7 @@ const getUserRecords = async (idx, year) => {
     const tempRecords = await userDao.getUserRecords(idx, year);
 
     const records = new Array(12).fill([null, null]);
-    
+
     tempRecords.forEach(({ month, shoulder, leg }) => {
       const calcShoulder = !shoulder ? shoulder : shoulder.toFixed(1);
       const calcLeg = !leg ? leg : leg.toFixed(1);
