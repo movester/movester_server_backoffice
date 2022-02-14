@@ -68,11 +68,11 @@ const getUserRecords = async (idx, year) => {
   try {
     const tempRecords = await userDao.getUserRecords(idx, year);
 
-    const records = new Array(12).fill([0, 0]);
+    const records = new Array(12).fill([null, null]);
     tempRecords.forEach(({ month, shoulder, leg }) => {
       records[month - 1] = [shoulder, leg];
     });
-    
+
     return records;
   } catch (err) {
     return CODE.INTERNAL_SERVER_ERROR;

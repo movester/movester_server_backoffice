@@ -139,7 +139,7 @@ const getUserRecords = async (idx, year) => {
     connection = await pool.getConnection(async conn => conn);
 
     const sql = `SELECT record_month AS month
-                   ,IFNULL(ROUND(
+                   ,ROUND(
                      (SELECT record
                         FROM user_record
                        WHERE record_type = 1
@@ -153,8 +153,8 @@ const getUserRecords = async (idx, year) => {
                                             AND record_month = t1.record_month
                                        GROUP BY record_month)
                      )
-                    ,2),0) AS shoulder
-                    ,IFNULL(ROUND(
+                    ,2) AS shoulder
+                    ,ROUND(
                       (SELECT record
                        FROM user_record
                       WHERE record_type = 2
@@ -168,7 +168,7 @@ const getUserRecords = async (idx, year) => {
                                             AND record_month = t1.record_month
                                        GROUP BY record_month)
                       )
-                    ,2),0) AS leg
+                    ,2) AS leg
                  FROM user_record t1
                 WHERE user_idx = ${idx}
                   AND record_year = ${year}
