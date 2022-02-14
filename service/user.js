@@ -26,15 +26,22 @@ const getUsersList = async (page, sort) => {
 
     const getSearchStart = page => (page - 1) * 10;
 
+    let tempUsersList;
+
     if (sort === SORT_LIST[0]) {
-      const usersList = await userDao.getUsersListByCreateAt(getSearchStart(page));
-      return usersList;
+      tempUsersList = await userDao.getUsersListByCreateAt(getSearchStart(page));
     }
 
     if (sort === SORT_LIST[1]) {
-      const usersList = await userDao.getUsersListByAttendPoint(getSearchStart(page));
-      return usersList;
+      tempUsersList = await userDao.getUsersListByAttendPoint(getSearchStart(page));
     }
+
+    const usersList = tempUsersList.map(user => {
+      user.attendPoint = user.attendPoint * 10 || 0;
+      return user;
+    });
+
+    return usersList;
   } catch (err) {
     return CODE.INTERNAL_SERVER_ERROR;
   }
@@ -69,8 +76,11 @@ const getUserRecords = async (idx, year) => {
     const tempRecords = await userDao.getUserRecords(idx, year);
 
     const records = new Array(12).fill([null, null]);
+    
     tempRecords.forEach(({ month, shoulder, leg }) => {
-      records[month - 1] = [shoulder, leg];
+      const calcShoulder = !shoulder ? shoulder : shoulder.toFixed(1);
+      const calcLeg = !leg ? leg : leg.toFixed(1);
+      records[month - 1] = [calcShoulder, calcLeg];
     });
 
     return records;

@@ -41,19 +41,19 @@ const getUsersListByCreateAt = async searchStart => {
     connection = await pool.getConnection(async conn => conn);
 
     const sql = `SELECT user_idx AS 'userIdx', email, name, DATE_FORMAT(create_at,'%Y.%m.%d') AS 'createAt'
-                      , IFNULL((SELECT COUNT(*) * 10
+                      , (SELECT COUNT(*)
                                   FROM attend_point
                                  WHERE user_idx = user.user_idx
                                    AND attend_year = YEAR(CURDATE())
                                    AND attend_month = MONTH(CURDATE())
-                              GROUP BY user_idx, attend_year, attend_month)
-                        ,0) AS 'attendPoint'
+                              GROUP BY user_idx, attend_year, attend_month
+                        ) AS 'attendPoint'
                 FROM user
                 ORDER BY create_at DESC
                 LIMIT ${searchStart},10`;
 
     const [row] = await connection.query(sql);
-
+    console.log(row)
     return row.length ? row : null;
   } catch (err) {
     console.log(`===DB Error > ${err}===`);
@@ -70,14 +70,15 @@ const getUsersListByAttendPoint = async searchStart => {
 
     const sql = `SELECT *
                    FROM (SELECT user_idx AS 'userIdx', email, name,  DATE_FORMAT(create_at,'%Y.%m.%d') AS 'createAt'
-                           , IFNULL((SELECT COUNT(*) * 10
+                           , (SELECT COUNT(*)
                                        FROM attend_point
-                                      WHERE user_idx = t1.user_idx
+                                      WHERE user_idx = user.user_idx
                                         AND attend_year = YEAR(CURDATE())
                                         AND attend_month = MONTH(CURDATE())
-                                   GROUP BY user_idx, attend_year, attend_month),0) AS attendPoint
-                          FROM user t1
-                        ) t2
+                                   GROUP BY user_idx, attend_year, attend_month
+                              ) AS attendPoint
+                          FROM user
+                        ) userAttendPoint
               ORDER BY attendPoint DESC
               LIMIT ${searchStart},10;`;
 
@@ -139,7 +140,7 @@ const getUserRecords = async (idx, year) => {
     connection = await pool.getConnection(async conn => conn);
 
     const sql = `SELECT record_month AS month
-                   ,ROUND(
+                   ,
                      (SELECT record
                         FROM user_record
                        WHERE record_type = 1
@@ -150,11 +151,9 @@ const getUserRecords = async (idx, year) => {
                                           WHERE user_idx = ${idx}
                                             AND record_year = ${year}
                                             AND record_type = 1
-                                            AND record_month = t1.record_month
+                                            AND record_month = recordByMonth.record_month
                                        GROUP BY record_month)
-                     )
-                    ,2) AS shoulder
-                    ,ROUND(
+                     ) AS shoulder,
                       (SELECT record
                        FROM user_record
                       WHERE record_type = 2
@@ -165,11 +164,10 @@ const getUserRecords = async (idx, year) => {
                                           WHERE user_idx = ${idx}
                                             AND record_year = ${year}
                                             AND record_type = 2
-                                            AND record_month = t1.record_month
+                                            AND record_month = recordByMonth.record_month
                                        GROUP BY record_month)
-                      )
-                    ,2) AS leg
-                 FROM user_record t1
+                      ) AS leg
+                 FROM user_record recordByMonth
                 WHERE user_idx = ${idx}
                   AND record_year = ${year}
              GROUP BY record_month`;
