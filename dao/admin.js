@@ -24,7 +24,7 @@ const findAdminById = async id => {
     connection = await pool.getConnection(async conn => conn);
 
     const sql = `SELECT admin_idx AS 'adminIdx', id, password, name, admin_type AS 'rank'
-                 FROM admin WHERE id = '${id}'`;
+                   FROM admin WHERE id = '${id}'`;
 
     const [row] = await connection.query(sql);
     return row.length ? row[0] : null;
@@ -42,8 +42,8 @@ const findAdminByName = async name => {
     connection = await pool.getConnection(async conn => conn);
 
     const sql = `SELECT admin_idx AS 'adminIdx', id, password, name, admin_type AS 'rank'
-                 FROM admin
-                 WHERE name = '${name}'`;
+                   FROM admin
+                  WHERE name = '${name}'`;
 
     const [row] = await connection.query(sql);
     return row.length ? row[0] : null;
@@ -62,7 +62,7 @@ const findAdminByIdx = async idx => {
     connection = await pool.getConnection(async conn => conn);
 
     const sql = `SELECT admin_idx AS 'adminIdx', id, password, name, admin_type AS 'rank'
-                 FROM admin
+                  FROM admin
                  WHERE admin_idx = ${idx}`;
 
     const [row] = await connection.query(sql);
@@ -81,11 +81,31 @@ const updatePassword = async (adminIdx, password) => {
     connection = await pool.getConnection(async conn => conn);
 
     const sql = `UPDATE admin
-                 SET password = '${password}'
-                 WHERE admin_idx = ${adminIdx}`;
+                    SET password = '${password}'
+                  WHERE admin_idx = ${adminIdx}`;
 
     const [row] = await connection.query(sql);
     return !!Object.keys(row);
+  } catch (err) {
+    console.log(`===DB Error > ${err}===`);
+    throw new Error(err);
+  } finally {
+    connection.release();
+  }
+};
+
+const getAdminsList = async () => {
+  let connection;
+
+  try {
+    connection = await pool.getConnection(async conn => conn);
+
+    const sql = `SELECT admin_idx AS 'adminIdx', id, name, admin_type AS 'rank', DATE_FORMAT(create_at,'%Y.%m.%d') AS 'createAt'
+                   FROM admin
+                  ORDER BY createAt desc`;
+
+    const [row] = await connection.query(sql);
+    return row;
   } catch (err) {
     console.log(`===DB Error > ${err}===`);
     throw new Error(err);
@@ -100,4 +120,5 @@ module.exports = {
   findAdminByName,
   findAdminByIdx,
   updatePassword,
+  getAdminsList,
 };

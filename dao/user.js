@@ -6,8 +6,8 @@ const getUserInfo = async (idx) => {
     connection = await pool.getConnection(async conn => conn);
 
     const sql = `SELECT user_idx AS 'userIdx', email, name, kakao_id AS 'kakaoId', is_email_auth AS 'isEmailAuth', DATE_FORMAT(create_at,'%Y.%m.%d') AS 'createAt'
-                 FROM user
-                 WHERE user_idx = ${idx}`;
+                   FROM user
+                  WHERE user_idx = ${idx}`;
     const [row] = await connection.query(sql);
     return row.length ? row : null;
   } catch (err) {
@@ -24,7 +24,7 @@ const getUsersCount = async () => {
     connection = await pool.getConnection(async conn => conn);
 
     const sql = `SELECT COUNT(*) AS count
-                 FROM user`;
+                   FROM user`;
     const [row] = await connection.query(sql);
     return row.length ? row : null;
   } catch (err) {
@@ -48,9 +48,9 @@ const getUsersListByCreateAt = async searchStart => {
                                    AND attend_month = MONTH(CURDATE())
                               GROUP BY user_idx, attend_year, attend_month
                         ) AS 'attendPoint'
-                FROM user
-                ORDER BY create_at DESC
-                LIMIT ${searchStart},10`;
+                  FROM user
+                 ORDER BY create_at DESC
+                 LIMIT ${searchStart},10`;
 
     const [row] = await connection.query(sql);
     return row.length ? row : null;
@@ -79,7 +79,7 @@ const getUsersListByAttendPoint = async searchStart => {
                           FROM user
                         ) userAttendPoint
               ORDER BY attendPoint DESC
-              LIMIT ${searchStart},10;`;
+                 LIMIT ${searchStart},10;`;
 
     const [row] = await connection.query(sql);
 
@@ -98,8 +98,8 @@ const getUserByIdx = async (idx) => {
     connection = await pool.getConnection(async conn => conn);
 
     const sql = `SELECT user_idx AS userIdx, email
-                 FROM user
-                 WHERE user_idx = ${idx}`;
+                   FROM user
+                  WHERE user_idx = ${idx}`;
 
     const [row] = await connection.query(sql);
     return row.length ? row : null;

@@ -89,9 +89,20 @@ const updatePassword = async (req, res) => {
   return res.status(CODE.OK).json(form.success());
 };
 
+const getAdminsList = async (req, res) => {
+  const adminsList = await adminService.getAdminsList();
+
+  if (adminsList === CODE.INTERNAL_SERVER_ERROR) {
+    return res.status(CODE.INTERNAL_SERVER_ERROR).json(form.fail(MSG.INTERNAL_SERVER_ERROR));
+  }
+
+  return res.status(CODE.OK).json(form.success(adminsList));
+};
+
 module.exports = {
   join,
   login,
   logout,
   updatePassword,
+  getAdminsList
 };

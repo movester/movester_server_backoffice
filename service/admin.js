@@ -89,6 +89,15 @@ const updatePassword = async ({ adminIdx, newPassword }) => {
   }
 };
 
+const getAdminsList = async () => {
+  try {
+    const adminsList = await adminDao.getAdminsList();
+    return adminsList;
+  } catch (err) {
+    return CODE.INTERNAL_SERVER_ERROR;
+  }
+};
+
 module.exports = {
   join,
   login,
@@ -96,4 +105,5 @@ module.exports = {
   findAdminByName,
   findAdminByIdx,
   updatePassword,
+  getAdminsList
 };

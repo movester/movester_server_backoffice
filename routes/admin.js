@@ -16,5 +16,6 @@ router.patch(
   validatorError.error,
   adminCtrl.updatePassword
 );
+router.get('/list', auth.checkToken, adminCtrl.getAdminsList);
 
 module.exports = router;
