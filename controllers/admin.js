@@ -105,7 +105,12 @@ const deleteAdmin = async (req, res) => {
     if (!reqAdmin.rank) {
       return res.status(CODE.UNAUTHORIZED).json(form.fail(MSG.SUPER_ADMIN_ONLY));
     }
+
     const { idx } = req.params;
+
+    if(req.cookies.idx === idx){
+      return res.status(CODE.BAD_REQUEST).json(form.fail("본인 계정은 본인이 삭제할 수 없습니다."));
+    }
 
     const isExistAdminIdx = await adminService.findAdminByIdx(idx);
     if (!isExistAdminIdx) {
