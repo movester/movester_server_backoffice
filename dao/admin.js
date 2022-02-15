@@ -27,7 +27,7 @@ const findAdminById = async id => {
                    FROM admin WHERE id = '${id}'`;
 
     const [row] = await connection.query(sql);
-    return row.length ? row[0] : null;
+    return !!Object.keys(row).length;
   } catch (err) {
     console.log(`===DB Error > ${err}===`);
     throw new Error(err);
@@ -114,6 +114,27 @@ const getAdminsList = async () => {
   }
 };
 
+const deleteAdmin = async (idx) => {
+  let connection;
+
+  try {
+    connection = await pool.getConnection(async conn => conn);
+
+    const sql = `DELETE
+                   FROM admin
+                  WHERE admin_idx = ${idx}`;
+
+    const [row] = await connection.query(sql);
+
+    return row;
+  } catch (err) {
+    console.log(`===DB Error > ${err}===`);
+    throw new Error(err);
+  } finally {
+    connection.release();
+  }
+};
+
 module.exports = {
   join,
   findAdminById,
@@ -121,4 +142,5 @@ module.exports = {
   findAdminByIdx,
   updatePassword,
   getAdminsList,
+  deleteAdmin
 };

@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 const adminCtrl = require('../controllers/admin');
 const validator = require('../middleware/validator/admin');
+const commonValidator = require('../middleware/validator/common');
 const validatorError = require('../middleware/validatorError');
 const auth = require('../middleware/auth');
 
@@ -17,5 +18,6 @@ router.patch(
   adminCtrl.updatePassword
 );
 router.get('/list', auth.checkToken, adminCtrl.getAdminsList);
+router.delete('/:idx', auth.checkToken, commonValidator.checkIdx, validatorError.error, adminCtrl.deleteAdmin);
 
 module.exports = router;

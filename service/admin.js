@@ -98,6 +98,15 @@ const getAdminsList = async () => {
   }
 };
 
+const deleteAdmin = async (idx) => {
+  try {
+    const adminsList = await adminDao.deleteAdmin(idx);
+    return adminsList;
+  } catch (err) {
+    return CODE.INTERNAL_SERVER_ERROR;
+  }
+};
+
 module.exports = {
   join,
   login,
@@ -105,5 +114,6 @@ module.exports = {
   findAdminByName,
   findAdminByIdx,
   updatePassword,
-  getAdminsList
+  getAdminsList,
+  deleteAdmin
 };
