@@ -26,8 +26,18 @@ const getUserAttendPoints = [
     .toInt(),
 ];
 
+const getUsersSearch = [
+  query('type')
+    .exists()
+    .withMessage('검색 기준 값이 없습니다.')
+    .isIn(['USER_IDX', 'EMAIL', 'NAME'])
+    .withMessage('정해진 type 기준에 없는 값입니다.'),
+  query('value').exists().withMessage('검색 값이 없습니다.'),
+];
+
 module.exports = {
   getUserInfo,
   getUsersList,
-  getUserAttendPoints
+  getUserAttendPoints,
+  getUsersSearch,
 };

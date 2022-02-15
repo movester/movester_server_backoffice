@@ -11,5 +11,6 @@ router.get('/count', auth.checkToken, userCtrl.getUsersCount);
 router.get('/list', auth.checkToken, validator.getUsersList, validatorError.error, userCtrl.getUsersList);
 router.get('/attend-points/:idx', auth.checkToken, validator.getUserAttendPoints, validatorError.error, userCtrl.getUserAttendPoints);
 router.get('/records/:idx', auth.checkToken, validator.getUserAttendPoints, validatorError.error, userCtrl.getUserRecords);
+router.get('/search', auth.checkToken, validator.getUsersSearch, validatorError.error, userCtrl.getUsersSearch);
 
 module.exports = router;

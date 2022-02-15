@@ -89,6 +89,28 @@ const getUserRecords = async (idx, year) => {
   }
 };
 
+const getUsersSearch = async (type, value) => {
+  try {
+    const serachType = {
+      USER_IDX: 'user_idx',
+      EMAIL: 'email',
+      NAME: 'name',
+    };
+
+    const tempSearchedUsers = await userDao.getUsersSearch(serachType[type], value);
+
+    const searchedUsers = tempSearchedUsers.map(user => {
+      user.attendPoint = user.attendPoint * 10 || 0;
+      return user;
+    });
+
+    return searchedUsers;
+  } catch (err) {
+    console.log(err);
+    return CODE.INTERNAL_SERVER_ERROR;
+  }
+};
+
 module.exports = {
   getUserInfo,
   getUsersCount,
@@ -96,4 +118,5 @@ module.exports = {
   getUserByIdx,
   getUserAttendPoints,
   getUserRecords,
+  getUsersSearch,
 };

@@ -89,10 +89,27 @@ const getUserRecords = async (req, res) => {
   return res.status(CODE.OK).json(form.success(records));
 };
 
+const getUsersSearch = async (req, res) => {
+  const { type, value } = req.query;
+
+  try {
+    const searchedUsers = await userService.getUsersSearch(type, value);
+
+    if (searchedUsers === CODE.INTERNAL_SERVER_ERROR) {
+      return res.status(CODE.INTERNAL_SERVER_ERROR).json(form.fail(MSG.INTERNAL_SERVER_ERROR));
+    }
+
+    return res.status(CODE.OK).json(form.success(searchedUsers));
+  } catch (err) {
+    return res.status(CODE.INTERNAL_SERVER_ERROR).json(form.fail(MSG.INTERNAL_SERVER_ERROR));
+  }
+};
+
 module.exports = {
   getUserInfo,
   getUsersCount,
   getUsersList,
   getUserAttendPoints,
   getUserRecords,
+  getUsersSearch,
 };
