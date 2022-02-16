@@ -182,6 +182,35 @@ const getUserRecords = async (idx, year) => {
   }
 };
 
+const getUsersSearch = async (type, value) => {
+  let connection;
+
+  try {
+    connection = await pool.getConnection(async conn => conn);
+
+    const sql = `SELECT user_idx AS 'userIdx', email, name, DATE_FORMAT(create_at,'%Y.%m.%d') AS 'createAt'
+                        , (SELECT COUNT(*)
+                             FROM attend_point
+                            WHERE user_idx = user.user_idx
+                              AND attend_year = YEAR(CURDATE())
+                              AND attend_month = MONTH(CURDATE())
+                         GROUP BY user_idx, attend_year, attend_month
+                       ) AS 'attendPoint'
+                   FROM user
+                  WHERE ${type} LIKE '%${value}%'
+               ORDER BY create_at DESC;`;
+
+    const [row] = await connection.query(sql);
+
+    return row;
+  } catch (err) {
+    console.log(`===DB Error > ${err}===`);
+    throw new Error(err);
+  } finally {
+    connection.release();
+  }
+};
+
 module.exports = {
   getUserInfo,
   getUsersCount,
@@ -190,4 +219,5 @@ module.exports = {
   getUserByIdx,
   getUserAttendPoints,
   getUserRecords,
+  getUsersSearch
 };
