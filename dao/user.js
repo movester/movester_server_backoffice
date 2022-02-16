@@ -187,7 +187,7 @@ const getUsersSearch = async (type, value) => {
 
   try {
     connection = await pool.getConnection(async conn => conn);
-    console.log(type, value)
+
     const sql = `SELECT user_idx AS 'userIdx', email, name, DATE_FORMAT(create_at,'%Y.%m.%d') AS 'createAt'
                         , (SELECT COUNT(*)
                              FROM attend_point
@@ -201,6 +201,7 @@ const getUsersSearch = async (type, value) => {
                ORDER BY create_at DESC;`;
 
     const [row] = await connection.query(sql);
+
     return row;
   } catch (err) {
     console.log(`===DB Error > ${err}===`);

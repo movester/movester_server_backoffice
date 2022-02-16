@@ -93,13 +93,13 @@ const getUsersSearch = async (req, res) => {
   const { type, value } = req.query;
 
   try {
-    const searchedUsers = await userService.getUsersSearch(type, value);
+    const users = await userService.getUsersSearch(type, value);
 
-    if (searchedUsers === CODE.INTERNAL_SERVER_ERROR) {
+    if (users === CODE.INTERNAL_SERVER_ERROR) {
       return res.status(CODE.INTERNAL_SERVER_ERROR).json(form.fail(MSG.INTERNAL_SERVER_ERROR));
     }
 
-    return res.status(CODE.OK).json(form.success(searchedUsers));
+    return res.status(CODE.OK).json(form.success(users));
   } catch (err) {
     return res.status(CODE.INTERNAL_SERVER_ERROR).json(form.fail(MSG.INTERNAL_SERVER_ERROR));
   }
