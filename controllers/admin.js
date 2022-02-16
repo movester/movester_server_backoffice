@@ -6,11 +6,6 @@ const encrypt = require('../modules/encrypt');
 const redis = require('../modules/redis');
 
 const join = async (req, res) => {
-  const reqAdmin = await adminService.findAdminByIdx(req.cookies.idx);
-  if (!reqAdmin.rank) {
-    return res.status(CODE.UNAUTHORIZED).json(form.fail(MSG.SUPER_ADMIN_ONLY));
-  }
-
   const joinAdmin = req.body;
   try {
     const isIdDuplicate = await adminService.findAdminById(joinAdmin.id);
@@ -99,10 +94,36 @@ const getAdminsList = async (req, res) => {
   return res.status(CODE.OK).json(form.success(adminsList));
 };
 
+const deleteAdmin = async (req, res) => {
+  try {
+    const { idx } = req.params;
+
+    if(req.cookies.idx === idx){
+      return res.status(CODE.BAD_REQUEST).json(form.fail("본인 계정은 본인이 삭제할 수 없습니다."));
+    }
+
+    const isExistAdminIdx = await adminService.findAdminByIdx(idx);
+    if (!isExistAdminIdx) {
+      return res.status(CODE.NOT_FOUND).json(form.fail(MSG.IDX_NOT_EXIST));
+    }
+
+    const adminsList = await adminService.deleteAdmin(idx);
+
+    if (adminsList === CODE.INTERNAL_SERVER_ERROR) {
+      return res.status(CODE.INTERNAL_SERVER_ERROR).json(form.fail(MSG.INTERNAL_SERVER_ERROR));
+    }
+
+    return res.status(CODE.OK).json(form.success());
+  } catch (err) {
+    return res.status(CODE.INTERNAL_SERVER_ERROR).json(form.fail(MSG.INTERNAL_SERVER_ERROR));
+  }
+};
+
 module.exports = {
   join,
   login,
   logout,
   updatePassword,
-  getAdminsList
+  getAdminsList,
+  deleteAdmin,
 };
