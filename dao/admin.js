@@ -27,7 +27,7 @@ const findAdminById = async id => {
                    FROM admin WHERE id = '${id}'`;
 
     const [row] = await connection.query(sql);
-    return !!Object.keys(row).length;
+    return row.length ? row[0] : null;
   } catch (err) {
     console.log(`===DB Error > ${err}===`);
     throw new Error(err);

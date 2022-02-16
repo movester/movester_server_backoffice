@@ -6,11 +6,6 @@ const encrypt = require('../modules/encrypt');
 const redis = require('../modules/redis');
 
 const join = async (req, res) => {
-  const reqAdmin = await adminService.findAdminByIdx(req.cookies.idx);
-  if (!reqAdmin.rank) {
-    return res.status(CODE.UNAUTHORIZED).json(form.fail(MSG.SUPER_ADMIN_ONLY));
-  }
-
   const joinAdmin = req.body;
   try {
     const isIdDuplicate = await adminService.findAdminById(joinAdmin.id);
@@ -101,11 +96,6 @@ const getAdminsList = async (req, res) => {
 
 const deleteAdmin = async (req, res) => {
   try {
-    const reqAdmin = await adminService.findAdminByIdx(req.cookies.idx);
-    if (!reqAdmin.rank) {
-      return res.status(CODE.UNAUTHORIZED).json(form.fail(MSG.SUPER_ADMIN_ONLY));
-    }
-
     const { idx } = req.params;
 
     if(req.cookies.idx === idx){
