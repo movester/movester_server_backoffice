@@ -1,6 +1,6 @@
 const pool = require('./pool');
 
-const getUserInfo = async (idx) => {
+const getUserInfo = async idx => {
   let connection;
   try {
     connection = await pool.getConnection(async conn => conn);
@@ -92,7 +92,7 @@ const getUsersListByAttendPoint = async searchStart => {
   }
 };
 
-const getUserByIdx = async (idx) => {
+const getUserByIdx = async idx => {
   let connection;
   try {
     connection = await pool.getConnection(async conn => conn);
@@ -124,7 +124,7 @@ const getUserAttendPoints = async (idx, year) => {
                ORDER BY month ASC`;
 
     const [row] = await connection.query(sql);
-    return row
+    return row;
   } catch (err) {
     console.log(`===DB Error > ${err}===`);
     throw new Error(err);
@@ -173,7 +173,7 @@ const getUserRecords = async (idx, year) => {
 
     const [row] = await connection.query(sql);
 
-    return row
+    return row;
   } catch (err) {
     console.log(`===DB Error > ${err}===`);
     throw new Error(err);
@@ -182,7 +182,7 @@ const getUserRecords = async (idx, year) => {
   }
 };
 
-const getUsersSearch = async (type, value) => {
+const getUsersSearch = async (type, value, searchStart) => {
   let connection;
 
   try {
@@ -219,5 +219,5 @@ module.exports = {
   getUserByIdx,
   getUserAttendPoints,
   getUserRecords,
-  getUsersSearch
+  getUsersSearch,
 };

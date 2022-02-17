@@ -33,6 +33,12 @@ const getUsersSearch = [
     .isIn(['USER_IDX', 'EMAIL', 'NAME'])
     .withMessage('정해진 type 기준에 없는 값입니다.'),
   query('value').exists().withMessage('검색 값이 없습니다.'),
+  query('page')
+    .exists()
+    .withMessage('page 값이 없습니다.')
+    .isInt()
+    .withMessage('idx 는 숫자로만 이루어져야 합니다.')
+    .toInt(),
 ];
 
 module.exports = {

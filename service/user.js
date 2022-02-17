@@ -89,7 +89,7 @@ const getUserRecords = async (idx, year) => {
   }
 };
 
-const getUsersSearch = async (type, value) => {
+const getUsersSearch = async (type, value, page) => {
   try {
     const serachType = {
       USER_IDX: 'user_idx',
@@ -97,17 +97,20 @@ const getUsersSearch = async (type, value) => {
       NAME: 'name',
     };
 
-    const tempSearchedUsers = await userDao.getUsersSearch(serachType[type], value);
+    const getSearchStart = page => (page === 1 ? 0 : (page - 1) * 10 - 1);
 
-    const searchedUsers = tempSearchedUsers.map(user => {
+    const tempUsers = await userDao.getUsersSearch(serachType[type], value);
+    const searchCnt = tempUsers.length;
+
+    const users = tempUsers.splice(getSearchStart(page), 10).map(user => {
       user.attendPoint = user.attendPoint * 10 || 0;
       return user;
     });
 
-    return searchedUsers;
+    return { searchCnt, users };
   } catch (err) {
-    console.log(err);
-    return CODE.INTERNAL_SERVER_ERROR;
+    console.log('Service Error: getUsersSearch ', err);
+    throw new Error(err);
   }
 };
 

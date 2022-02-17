@@ -90,17 +90,14 @@ const getUserRecords = async (req, res) => {
 };
 
 const getUsersSearch = async (req, res) => {
-  const { type, value } = req.query;
+  const { type, value, page } = req.query;
 
   try {
-    const users = await userService.getUsersSearch(type, value);
-
-    if (users === CODE.INTERNAL_SERVER_ERROR) {
-      return res.status(CODE.INTERNAL_SERVER_ERROR).json(form.fail(MSG.INTERNAL_SERVER_ERROR));
-    }
+    const users = await userService.getUsersSearch(type, value, page);
 
     return res.status(CODE.OK).json(form.success(users));
   } catch (err) {
+    console.log('Ctrl Error: getUsersSearch ', err);
     return res.status(CODE.INTERNAL_SERVER_ERROR).json(form.fail(MSG.INTERNAL_SERVER_ERROR));
   }
 };
