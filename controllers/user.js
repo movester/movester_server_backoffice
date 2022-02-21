@@ -4,100 +4,91 @@ const MSG = require('../utils/responseMessage');
 const form = require('../utils/responseForm');
 
 const getUserInfo = async (req, res) => {
-  const { idx } = req.params;
+  try {
+    const { idx } = req.params;
 
-  const userInfo = await userService.getUserInfo(idx);
+    const userInfo = await userService.getUserInfo(idx);
 
-  if (userInfo === CODE.INTERNAL_SERVER_ERROR) {
+    if (userInfo === CODE.NOT_FOUND) return res.status(CODE.NOT_FOUND).json(form.fail(MSG.IDX_NOT_EXIST));
+
+    return res.status(CODE.OK).json(form.success(userInfo));
+  } catch (err) {
+    console.error(`=== User Ctrl getUserInfo Error: ${err} === `);
     return res.status(CODE.INTERNAL_SERVER_ERROR).json(form.fail(MSG.INTERNAL_SERVER_ERROR));
   }
-
-  if (userInfo === CODE.NOT_FOUND) {
-    return res.status(CODE.NOT_FOUND).json(form.fail(MSG.IDX_NOT_EXIST));
-  }
-
-  return res.status(CODE.OK).json(form.success(userInfo));
 };
 
-const getUsersCount = async (req, res) => {
-  const usersCount = await userService.getUsersCount();
-
-  if (usersCount === CODE.INTERNAL_SERVER_ERROR) {
+const getUsersCount = async (_, res) => {
+  try {
+    const usersCount = await userService.getUsersCount();
+    return res.status(CODE.OK).json(form.success(usersCount));
+  } catch (err) {
+    console.error(`=== User Ctrl getUsersCount Error: ${err} === `);
     return res.status(CODE.INTERNAL_SERVER_ERROR).json(form.fail(MSG.INTERNAL_SERVER_ERROR));
   }
-
-  return res.status(CODE.OK).json(form.success(usersCount));
 };
 
 const getUsersList = async (req, res) => {
-  const { page, sort } = req.query;
+  try {
+    const { page, sort } = req.query;
 
-  const usersList = await userService.getUsersList(page, sort);
-
-  if (usersList === CODE.INTERNAL_SERVER_ERROR) {
+    const usersList = await userService.getUsersList(page, sort);
+    return res.status(CODE.OK).json(form.success(usersList));
+  } catch (err) {
+    console.error(`=== User Ctrl getUsersList Error: ${err} === `);
     return res.status(CODE.INTERNAL_SERVER_ERROR).json(form.fail(MSG.INTERNAL_SERVER_ERROR));
   }
-
-  return res.status(CODE.OK).json(form.success(usersList));
 };
 
 const getUserAttendPoints = async (req, res) => {
-  const { idx } = req.params;
-  const { year } = req.query;
-
   try {
+    const { idx } = req.params;
+    const { year } = req.query;
+
     const user = await userService.getUserByIdx(idx);
     if (!user) {
       return res.status(CODE.NOT_FOUND).json(form.fail(MSG.IDX_NOT_EXIST));
     }
+
+    const attendPoints = await userService.getUserAttendPoints(idx, year);
+
+    if (attendPoints === CODE.NOT_FOUND) {
+      return res.status(CODE.NOT_FOUND).json(form.fail(MSG.IDX_NOT_EXIST));
+    }
+
+    return res.status(CODE.OK).json(form.success(attendPoints));
   } catch (err) {
+    console.error(`=== User Ctrl getUserAttendPoints Error: ${err} === `);
     return res.status(CODE.INTERNAL_SERVER_ERROR).json(form.fail(MSG.INTERNAL_SERVER_ERROR));
   }
-
-  const attendPoints = await userService.getUserAttendPoints(idx, year);
-
-  if (attendPoints === CODE.INTERNAL_SERVER_ERROR) {
-    return res.status(CODE.INTERNAL_SERVER_ERROR).json(form.fail(MSG.INTERNAL_SERVER_ERROR));
-  }
-
-  if (attendPoints === CODE.NOT_FOUND) {
-    return res.status(CODE.NOT_FOUND).json(form.fail(MSG.IDX_NOT_EXIST));
-  }
-
-  return res.status(CODE.OK).json(form.success(attendPoints));
 };
 
 const getUserRecords = async (req, res) => {
-  const { idx } = req.params;
-  const { year } = req.query;
-
   try {
+    const { idx } = req.params;
+    const { year } = req.query;
+
     const user = await userService.getUserByIdx(idx);
     if (!user) {
       return res.status(CODE.NOT_FOUND).json(form.fail(MSG.IDX_NOT_EXIST));
     }
+
+    const records = await userService.getUserRecords(idx, year);
+    return res.status(CODE.OK).json(form.success(records));
   } catch (err) {
+    console.error(`=== User Ctrl getUserRecords Error: ${err} === `);
     return res.status(CODE.INTERNAL_SERVER_ERROR).json(form.fail(MSG.INTERNAL_SERVER_ERROR));
   }
-
-  const records = await userService.getUserRecords(idx, year);
-
-  if (records === CODE.INTERNAL_SERVER_ERROR) {
-    return res.status(CODE.INTERNAL_SERVER_ERROR).json(form.fail(MSG.INTERNAL_SERVER_ERROR));
-  }
-
-  return res.status(CODE.OK).json(form.success(records));
 };
 
 const getUsersSearch = async (req, res) => {
-  const { type, value, page } = req.query;
-
   try {
+    const { type, value, page } = req.query;
     const users = await userService.getUsersSearch(type, value, page);
 
     return res.status(CODE.OK).json(form.success(users));
   } catch (err) {
-    console.log('User Ctrl Error: getUsersSearch ', err);
+    console.error(`=== User Ctrl getUsersSearch Error: ${err} === `);
     return res.status(CODE.INTERNAL_SERVER_ERROR).json(form.fail(MSG.INTERNAL_SERVER_ERROR));
   }
 };

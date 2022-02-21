@@ -11,7 +11,7 @@ const getUserInfo = async idx => {
     const [row] = await connection.query(sql);
     return row.length ? row : null;
   } catch (err) {
-    console.error(`===DB Error > ${err}===`);
+    console.error(`=== User Dao getUserInfo Error: ${err} === `);
     throw new Error(err);
   } finally {
     connection.release();
@@ -28,7 +28,7 @@ const getUsersCount = async () => {
     const [row] = await connection.query(sql);
     return row.length ? row : null;
   } catch (err) {
-    console.error(`===DB Error > ${err}===`);
+    console.error(`=== User Dao getUsersCount Error: ${err} === `);
     throw new Error(err);
   } finally {
     connection.release();
@@ -55,7 +55,7 @@ const getUsersListByCreateAt = async searchStart => {
     const [row] = await connection.query(sql);
     return row.length ? row : null;
   } catch (err) {
-    console.error(`===DB Error > ${err}===`);
+    console.error(`=== User Dao getUsersListByCreateAt Error: ${err} === `);
     throw new Error(err);
   } finally {
     connection.release();
@@ -85,7 +85,7 @@ const getUsersListByAttendPoint = async searchStart => {
 
     return row.length ? row : null;
   } catch (err) {
-    console.error(`===DB Error > ${err}===`);
+    console.error(`=== User Dao getUsersListByAttendPoint Error: ${err} === `);
     throw new Error(err);
   } finally {
     connection.release();
@@ -104,7 +104,7 @@ const getUserByIdx = async idx => {
     const [row] = await connection.query(sql);
     return row.length ? row : null;
   } catch (err) {
-    console.error(`===DB Error > ${err}===`);
+    console.error(`=== User Dao getUserByIdx Error: ${err} === `);
     throw new Error(err);
   } finally {
     connection.release();
@@ -126,7 +126,7 @@ const getUserAttendPoints = async (idx, year) => {
     const [row] = await connection.query(sql);
     return row;
   } catch (err) {
-    console.error(`===DB Error > ${err}===`);
+    console.error(`=== User Dao getUserAttendPoints Error: ${err} === `);
     throw new Error(err);
   } finally {
     connection.release();
@@ -175,14 +175,14 @@ const getUserRecords = async (idx, year) => {
 
     return row;
   } catch (err) {
-    console.error(`===DB Error > ${err}===`);
+    console.error(`=== User Dao getUserRecords Error: ${err} === `);
     throw new Error(err);
   } finally {
     connection.release();
   }
 };
 
-const getUsersSearch = async (type, value, searchStart) => {
+const getUsersSearch = async (type, value) => {
   let connection;
 
   try {
@@ -204,7 +204,7 @@ const getUsersSearch = async (type, value, searchStart) => {
 
     return row;
   } catch (err) {
-    console.error(`===DB Error > ${err}===`);
+    console.error(`=== User Dao getUsersSearch Error: ${err} === `);
     throw new Error(err);
   } finally {
     connection.release();

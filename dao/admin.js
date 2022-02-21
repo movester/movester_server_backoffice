@@ -11,7 +11,7 @@ const join = async ({ joinUser }) => {
     const [row] = await connection.query(sql);
     return !!Object.keys(row).length;
   } catch (err) {
-    console.error(`===DB Error > ${err}===`);
+    console.error(`=== Admin Dao join Error: ${err} === `);
     throw new Error(err);
   } finally {
     connection.release();
@@ -29,7 +29,7 @@ const findAdminById = async id => {
     const [row] = await connection.query(sql);
     return row.length ? row[0] : null;
   } catch (err) {
-    console.error(`===DB Error > ${err}===`);
+    console.error(`=== Admin Dao findAdminById Error: ${err} === `);
     throw new Error(err);
   } finally {
     connection.release();
@@ -48,7 +48,7 @@ const findAdminByName = async name => {
     const [row] = await connection.query(sql);
     return row.length ? row[0] : null;
   } catch (err) {
-    console.error(`===DB Error > ${err}===`);
+    console.error(`=== Admin Dao findAdminByName Error: ${err} === `);
     throw new Error(err);
   } finally {
     connection.release();
@@ -68,7 +68,7 @@ const findAdminByIdx = async idx => {
     const [row] = await connection.query(sql);
     return row.length ? row[0] : null;
   } catch (err) {
-    console.error(`===DB Error > ${err}===`);
+    console.error(`=== Admin Dao findAdminByIdx Error: ${err} === `);
     throw new Error(err);
   } finally {
     connection.release();
@@ -87,7 +87,7 @@ const updatePassword = async (adminIdx, password) => {
     const [row] = await connection.query(sql);
     return !!Object.keys(row);
   } catch (err) {
-    console.error(`===DB Error > ${err}===`);
+    console.error(`=== Admin Dao updatePassword Error: ${err} === `);
     throw new Error(err);
   } finally {
     connection.release();
@@ -102,12 +102,12 @@ const getAdminsList = async () => {
 
     const sql = `SELECT admin_idx AS 'adminIdx', id, name, admin_type AS 'rank', DATE_FORMAT(create_at,'%Y.%m.%d') AS 'createAt'
                    FROM admin
-                  ORDER BY createAt desc`;
+                  ORDER BY create_at desc`;
 
     const [row] = await connection.query(sql);
     return row;
   } catch (err) {
-    console.error(`===DB Error > ${err}===`);
+    console.error(`=== Admin Dao getAdminsList Error: ${err} === `);
     throw new Error(err);
   } finally {
     connection.release();
@@ -128,7 +128,7 @@ const deleteAdmin = async (idx) => {
 
     return row;
   } catch (err) {
-    console.error(`===DB Error > ${err}===`);
+    console.error(`=== Admin Dao deleteAdmin Error: ${err} === `);
     throw new Error(err);
   } finally {
     connection.release();

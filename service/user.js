@@ -7,7 +7,8 @@ const getUserInfo = async idx => {
     if (!userInfo) return CODE.NOT_FOUND;
     return userInfo;
   } catch (err) {
-    return CODE.INTERNAL_SERVER_ERROR;
+    console.error(`=== User Service getUserInfo Error: ${err} === `);
+    throw new Error(err);
   }
 };
 
@@ -16,7 +17,8 @@ const getUsersCount = async () => {
     const usersCount = await userDao.getUsersCount();
     return usersCount;
   } catch (err) {
-    return CODE.INTERNAL_SERVER_ERROR;
+    console.error(`=== User Service getUsersCount Error: ${err} === `);
+    throw new Error(err);
   }
 };
 
@@ -43,7 +45,8 @@ const getUsersList = async (page, sort) => {
 
     return usersList;
   } catch (err) {
-    return CODE.INTERNAL_SERVER_ERROR;
+    console.error(`=== User Service getUsersList Error: ${err} === `);
+    throw new Error(err);
   }
 };
 
@@ -52,6 +55,7 @@ const getUserByIdx = async idx => {
     const attendPoint = await userDao.getUserByIdx(idx);
     return attendPoint;
   } catch (err) {
+    console.error(`=== User Service getUserByIdx Error: ${err} === `);
     throw new Error(err);
   }
 };
@@ -67,7 +71,8 @@ const getUserAttendPoints = async (idx, year) => {
 
     return attendPoints;
   } catch (err) {
-    return CODE.INTERNAL_SERVER_ERROR;
+    console.error(`=== User Service getUserAttendPoints Error: ${err} === `);
+    throw new Error(err);
   }
 };
 
@@ -85,7 +90,8 @@ const getUserRecords = async (idx, year) => {
 
     return records;
   } catch (err) {
-    return CODE.INTERNAL_SERVER_ERROR;
+    console.error(`=== User Service getUserRecords Error: ${err} === `);
+    throw new Error(err);
   }
 };
 
@@ -97,7 +103,7 @@ const getUsersSearch = async (type, value, page) => {
       NAME: 'name',
     };
 
-    const getSearchStart = page => (page === 1 ? 0 : (page - 1) * 10 - 1);
+    const getSearchStart = page => (page === 1 ? 0 : (page - 1) * 10);
 
     const tempUsers = await userDao.getUsersSearch(serachType[type], value);
     const searchCnt = tempUsers.length;
@@ -109,7 +115,7 @@ const getUsersSearch = async (type, value, page) => {
 
     return { searchCnt, users };
   } catch (err) {
-    console.error(`===User Service Error > ${err}===`);
+    console.error(`=== User Service getUsersSearch Error: ${err} === `);
     throw new Error(err);
   }
 };

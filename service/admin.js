@@ -12,7 +12,8 @@ const join = async joinUser => {
     const isJoin = await adminDao.join({ joinUser });
     return isJoin;
   } catch (err) {
-    return CODE.INTERNAL_SERVER_ERROR;
+    console.error(`=== Admin Service join Error: ${err} === `);
+    throw new Error(err);
   }
 };
 
@@ -47,8 +48,8 @@ const login = async ({ id, password }) => {
       token,
     };
   } catch (err) {
-    console.error(`===Admin Service Error > ${err}===`);
-    return CODE.INTERNAL_SERVER_ERROR;
+    console.error(`=== Admin Service login Error: ${err} === `);
+    throw new Error(err);
   }
 };
 
@@ -57,6 +58,7 @@ const findAdminById = async id => {
     const admin = await adminDao.findAdminById(id);
     return admin;
   } catch (err) {
+    console.error(`=== Admin Service findAdminById Error: ${err} === `);
     throw new Error(err);
   }
 };
@@ -66,6 +68,7 @@ const findAdminByName = async name => {
     const admin = await adminDao.findAdminByName(name);
     return admin;
   } catch (err) {
+    console.error(`=== Admin Service findAdminByName Error: ${err} === `);
     throw new Error(err);
   }
 };
@@ -75,6 +78,7 @@ const findAdminByIdx = async idx => {
     const admin = await adminDao.findAdminByIdx(idx);
     return admin;
   } catch (err) {
+    console.error(`=== Admin Service findAdminByIdx Error: ${err} === `);
     throw new Error(err);
   }
 };
@@ -85,7 +89,8 @@ const updatePassword = async ({ adminIdx, newPassword }) => {
     const isUpdatePassword = await adminDao.updatePassword(adminIdx, hashPassword);
     return isUpdatePassword;
   } catch (err) {
-    return CODE.INTERNAL_SERVER_ERROR;
+    console.error(`=== Admin Service updatePassword Error: ${err} === `);
+    throw new Error(err);
   }
 };
 
@@ -94,7 +99,8 @@ const getAdminsList = async () => {
     const adminsList = await adminDao.getAdminsList();
     return adminsList;
   } catch (err) {
-    return CODE.INTERNAL_SERVER_ERROR;
+    console.error(`=== Admin Service getAdminsList Error: ${err} === `);
+    throw new Error(err);
   }
 };
 
@@ -103,7 +109,8 @@ const deleteAdmin = async (idx) => {
     const adminsList = await adminDao.deleteAdmin(idx);
     return adminsList;
   } catch (err) {
-    return CODE.INTERNAL_SERVER_ERROR;
+    console.error(`=== Admin Service deleteAdmin Error: ${err} === `);
+    throw new Error(err);
   }
 };
 

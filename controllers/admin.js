@@ -6,115 +6,103 @@ const encrypt = require('../modules/encrypt');
 const redis = require('../modules/redis');
 
 const join = async (req, res) => {
-  const joinAdmin = req.body;
   try {
+    const joinAdmin = req.body;
+
     const isIdDuplicate = await adminService.findAdminById(joinAdmin.id);
-    if (isIdDuplicate) {
-      return res.status(CODE.DUPLICATE).json(form.fail(MSG.ID_ALREADY_EXIST));
-    }
+    if (isIdDuplicate) return res.status(CODE.DUPLICATE).json(form.fail(MSG.ID_ALREADY_EXIST));
 
     const isNameDuplicate = await adminService.findAdminByName(joinAdmin.name);
-    if (isNameDuplicate) {
-      return res.status(CODE.DUPLICATE).json(form.fail(MSG.NAME_ALREADY_EXIST));
-    }
-  } catch (err) {
-    return res.status(CODE.INTERNAL_SERVER_ERROR).json(form.fail(MSG.INTERNAL_SERVER_ERROR));
-  }
+    if (isNameDuplicate) return res.status(CODE.DUPLICATE).json(form.fail(MSG.NAME_ALREADY_EXIST));
 
-  const isJoin = await adminService.join(joinAdmin);
-  if (isJoin === CODE.INTERNAL_SERVER_ERROR) {
+    await adminService.join(joinAdmin);
+    res.status(CODE.CREATED).json(form.success());
+  } catch (err) {
+    console.error(`=== Admin Ctrl join Error: ${err} === `);
     return res.status(CODE.INTERNAL_SERVER_ERROR).json(form.fail(MSG.INTERNAL_SERVER_ERROR));
   }
-  res.status(CODE.CREATED).json(form.success());
 };
 
 const login = async (req, res) => {
-  const reqAdmin = req.body;
-  const loginAdmin = await adminService.login(reqAdmin);
+  try {
+    const reqAdmin = req.body;
+    const loginAdmin = await adminService.login(reqAdmin);
 
-  if (typeof loginAdmin === 'number') {
-    if (loginAdmin === CODE.BAD_REQUEST) {
-      return res.status(CODE.BAD_REQUEST).json(form.fail(MSG.ID_NOT_EXIST));
-    }
-    if (loginAdmin === CODE.NOT_FOUND) {
-      return res.status(CODE.NOT_FOUND).json(form.fail(MSG.PW_MISMATCH));
-    }
-    if (loginAdmin === CODE.INTERNAL_SERVER_ERROR) {
-      return res.status(CODE.INTERNAL_SERVER_ERROR).json(form.fail(MSG.INTERNAL_SERVER_ERROR));
-    }
+    if (loginAdmin === CODE.BAD_REQUEST) return res.status(CODE.BAD_REQUEST).json(form.fail(MSG.ID_NOT_EXIST));
+
+    if (loginAdmin === CODE.NOT_FOUND) return res.status(CODE.NOT_FOUND).json(form.fail(MSG.PW_MISMATCH));
+
+    return res
+      .status(CODE.OK)
+      .cookie('accessToken', loginAdmin.token.accessToken, { httpOnly: true })
+      .cookie('refreshToken', loginAdmin.token.refreshToken, { httpOnly: true })
+      .json(form.success(loginAdmin.admin));
+  } catch (err) {
+    console.error(`=== Admin Ctrl login Error: ${err} === `);
+    return res.status(CODE.INTERNAL_SERVER_ERROR).json(form.fail(MSG.INTERNAL_SERVER_ERROR));
   }
-
-  return res
-    .status(CODE.OK)
-    .cookie('accessToken', loginAdmin.token.accessToken, { httpOnly: true })
-    .cookie('refreshToken', loginAdmin.token.refreshToken, { httpOnly: true })
-    .json(form.success(loginAdmin.admin));
 };
 
 const logout = async (req, res) => {
-  redis.del(req.cookies.idx);
-  res.clearCookie('accessToken').clearCookie('refreshToken').status(CODE.OK).json(form.success(MSG.LOGOUT_SUCCESS));
+  try {
+    redis.del(req.cookies.idx);
+    res.clearCookie('accessToken').clearCookie('refreshToken').status(CODE.OK).json(form.success(MSG.LOGOUT_SUCCESS));
+  } catch (err) {
+    console.error(`=== Admin Ctrl logout Error: ${err} === `);
+    return res.status(CODE.INTERNAL_SERVER_ERROR).json(form.fail(MSG.INTERNAL_SERVER_ERROR));
+  }
 };
 
 const updatePassword = async (req, res) => {
-  const reqAdmin = req.body;
-  if (reqAdmin.newPassword !== reqAdmin.confirmPassword) {
-    return res.status(CODE.BAD_REQUEST).json(form.fail(MSG.CONFIRM_PW_MISMATCH));
-  }
+  try {
+    const reqAdmin = req.body;
+    if (reqAdmin.newPassword !== reqAdmin.confirmPassword) {
+      return res.status(CODE.BAD_REQUEST).json(form.fail(MSG.CONFIRM_PW_MISMATCH));
+    }
 
-  const { adminIdx } = req.params;
-  const admin = await adminService.findAdminByIdx(adminIdx);
-  if (!admin) {
-    return res.status(CODE.NOT_FOUND).json(form.fail(MSG.IDX_NOT_EXIST));
-  }
-  reqAdmin.adminIdx = adminIdx;
+    const { adminIdx } = req.params;
+    const admin = await adminService.findAdminByIdx(adminIdx);
+    if (!admin) {
+      return res.status(CODE.NOT_FOUND).json(form.fail(MSG.IDX_NOT_EXIST));
+    }
 
-  const isCorrectBeforePassword = await encrypt.compare(reqAdmin.beforePassword, admin.password);
+    reqAdmin.adminIdx = adminIdx;
 
-  if (!isCorrectBeforePassword) {
-    return res.status(CODE.BAD_REQUEST).json(form.fail(MSG.PW_MISMATCH));
-  }
+    const isCorrectBeforePassword = await encrypt.compare(reqAdmin.beforePassword, admin.password);
+    if (!isCorrectBeforePassword) return res.status(CODE.BAD_REQUEST).json(form.fail(MSG.PW_MISMATCH));
 
-  const isUpdatePassword = await adminService.updatePassword(reqAdmin);
-
-  if (isUpdatePassword === CODE.INTERNAL_SERVER_ERROR) {
+    await adminService.updatePassword(reqAdmin);
+    return res.status(CODE.OK).json(form.success());
+  } catch (err) {
+    console.error(`=== Admin Ctrl updatePassword Error: ${err} === `);
     return res.status(CODE.INTERNAL_SERVER_ERROR).json(form.fail(MSG.INTERNAL_SERVER_ERROR));
   }
-
-  return res.status(CODE.OK).json(form.success());
 };
 
-const getAdminsList = async (req, res) => {
-  const adminsList = await adminService.getAdminsList();
-
-  if (adminsList === CODE.INTERNAL_SERVER_ERROR) {
+const getAdminsList = async (_, res) => {
+  try {
+    const adminsList = await adminService.getAdminsList();
+    return res.status(CODE.OK).json(form.success(adminsList));
+  } catch (err) {
+    console.error(`=== Admin Ctrl getAdminsList Error: ${err} === `);
     return res.status(CODE.INTERNAL_SERVER_ERROR).json(form.fail(MSG.INTERNAL_SERVER_ERROR));
   }
-
-  return res.status(CODE.OK).json(form.success(adminsList));
 };
 
 const deleteAdmin = async (req, res) => {
   try {
     const { idx } = req.params;
 
-    if(req.cookies.idx === idx){
-      return res.status(CODE.BAD_REQUEST).json(form.fail("본인 계정은 본인이 삭제할 수 없습니다."));
-    }
+    if (req.cookies.idx === idx)
+      return res.status(CODE.BAD_REQUEST).json(form.fail('본인 계정은 본인이 삭제할 수 없습니다.'));
 
     const isExistAdminIdx = await adminService.findAdminByIdx(idx);
-    if (!isExistAdminIdx) {
-      return res.status(CODE.NOT_FOUND).json(form.fail(MSG.IDX_NOT_EXIST));
-    }
+    if (!isExistAdminIdx) return res.status(CODE.NOT_FOUND).json(form.fail(MSG.IDX_NOT_EXIST));
 
-    const adminsList = await adminService.deleteAdmin(idx);
-
-    if (adminsList === CODE.INTERNAL_SERVER_ERROR) {
-      return res.status(CODE.INTERNAL_SERVER_ERROR).json(form.fail(MSG.INTERNAL_SERVER_ERROR));
-    }
-
+    await adminService.deleteAdmin(idx);
     return res.status(CODE.OK).json(form.success());
   } catch (err) {
+    console.error(`=== Admin Ctrl deleteAdmin Error: ${err} === `);
     return res.status(CODE.INTERNAL_SERVER_ERROR).json(form.fail(MSG.INTERNAL_SERVER_ERROR));
   }
 };
