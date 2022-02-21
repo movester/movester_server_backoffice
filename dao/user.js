@@ -11,7 +11,7 @@ const getUserInfo = async idx => {
     const [row] = await connection.query(sql);
     return row.length ? row : null;
   } catch (err) {
-    console.log(`===DB Error > ${err}===`);
+    console.error(`===DB Error > ${err}===`);
     throw new Error(err);
   } finally {
     connection.release();
@@ -28,7 +28,7 @@ const getUsersCount = async () => {
     const [row] = await connection.query(sql);
     return row.length ? row : null;
   } catch (err) {
-    console.log(`===DB Error > ${err}===`);
+    console.error(`===DB Error > ${err}===`);
     throw new Error(err);
   } finally {
     connection.release();
@@ -55,7 +55,7 @@ const getUsersListByCreateAt = async searchStart => {
     const [row] = await connection.query(sql);
     return row.length ? row : null;
   } catch (err) {
-    console.log(`===DB Error > ${err}===`);
+    console.error(`===DB Error > ${err}===`);
     throw new Error(err);
   } finally {
     connection.release();
@@ -85,7 +85,7 @@ const getUsersListByAttendPoint = async searchStart => {
 
     return row.length ? row : null;
   } catch (err) {
-    console.log(`===DB Error > ${err}===`);
+    console.error(`===DB Error > ${err}===`);
     throw new Error(err);
   } finally {
     connection.release();
@@ -104,7 +104,7 @@ const getUserByIdx = async idx => {
     const [row] = await connection.query(sql);
     return row.length ? row : null;
   } catch (err) {
-    console.log(`===DB Error > ${err}===`);
+    console.error(`===DB Error > ${err}===`);
     throw new Error(err);
   } finally {
     connection.release();
@@ -126,7 +126,7 @@ const getUserAttendPoints = async (idx, year) => {
     const [row] = await connection.query(sql);
     return row;
   } catch (err) {
-    console.log(`===DB Error > ${err}===`);
+    console.error(`===DB Error > ${err}===`);
     throw new Error(err);
   } finally {
     connection.release();
@@ -175,7 +175,7 @@ const getUserRecords = async (idx, year) => {
 
     return row;
   } catch (err) {
-    console.log(`===DB Error > ${err}===`);
+    console.error(`===DB Error > ${err}===`);
     throw new Error(err);
   } finally {
     connection.release();
@@ -204,7 +204,7 @@ const getUsersSearch = async (type, value, searchStart) => {
 
     return row;
   } catch (err) {
-    console.log(`===DB Error > ${err}===`);
+    console.error(`===DB Error > ${err}===`);
     throw new Error(err);
   } finally {
     connection.release();

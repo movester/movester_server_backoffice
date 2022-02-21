@@ -9,12 +9,12 @@ const getCreateIdx = async () => {
       connection.release();
       return row;
     } catch (err) {
-      console.log(`Query Error > ${err}`);
+      console.error(`===DB Error > ${err}===`);
       connection.release();
       return false;
     }
   } catch (err) {
-    console.log(`DB Error > ${err}`);
+    console.error(`===DB Error > ${err}===`);
     return false;
   }
 };

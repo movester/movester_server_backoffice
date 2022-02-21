@@ -109,7 +109,7 @@ const getUsersSearch = async (type, value, page) => {
 
     return { searchCnt, users };
   } catch (err) {
-    console.log('Service Error: getUsersSearch ', err);
+    console.error(`===User Service Error > ${err}===`);
     throw new Error(err);
   }
 };

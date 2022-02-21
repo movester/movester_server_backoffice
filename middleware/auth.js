@@ -61,7 +61,7 @@ const checkSuperAdmin = async (req, res, next) => {
       return res.status(CODE.UNAUTHORIZED).json(form.fail(MSG.SUPER_ADMIN_ONLY));
     }
   } catch (err) {
-    console.log('Auth Middleware Error: checkSuperAdmin ', err);
+    console.error(`===Auth Middleware Error > ${err}===`);
     return res.status(CODE.INTERNAL_SERVER_ERROR).json(form.fail(MSG.INTERNAL_SERVER_ERROR));
   }
 

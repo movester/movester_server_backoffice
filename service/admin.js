@@ -47,7 +47,7 @@ const login = async ({ id, password }) => {
       token,
     };
   } catch (err) {
-    console.log(err);
+    console.error(`===Admin Service Error > ${err}===`);
     return CODE.INTERNAL_SERVER_ERROR;
   }
 };

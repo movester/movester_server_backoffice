@@ -97,7 +97,7 @@ const getUsersSearch = async (req, res) => {
 
     return res.status(CODE.OK).json(form.success(users));
   } catch (err) {
-    console.log('Ctrl Error: getUsersSearch ', err);
+    console.log('User Ctrl Error: getUsersSearch ', err);
     return res.status(CODE.INTERNAL_SERVER_ERROR).json(form.fail(MSG.INTERNAL_SERVER_ERROR));
   }
 };
