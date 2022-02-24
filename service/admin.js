@@ -4,6 +4,19 @@ const encrypt = require('../modules/encrypt');
 const redis = require('../modules/redis');
 const CODE = require('../utils/statusCode');
 
+const join = async joinUser => {
+  try {
+    const hashPassword = await encrypt.hash(joinUser.password);
+    joinUser.password = hashPassword;
+
+    const isJoin = await adminDao.join({ joinUser });
+    return isJoin;
+  } catch (err) {
+    console.error(`=== Admin Service join Error: ${err} === `);
+    throw new Error(err);
+  }
+};
+
 const login = async ({ id, password }) => {
   try {
     const admin = await adminDao.findAdminById(id);
@@ -35,46 +48,37 @@ const login = async ({ id, password }) => {
       token,
     };
   } catch (err) {
-    console.log(err);
-    return CODE.INTERNAL_SERVER_ERROR;
-  }
-};
-
-const join = async joinUser => {
-  try {
-    const hashPassword = await encrypt.hash(joinUser.password);
-    joinUser.password = hashPassword;
-
-    const result = await adminDao.join({ joinUser });
-    return result;
-  } catch (err) {
-    return CODE.INTERNAL_SERVER_ERROR;
+    console.error(`=== Admin Service login Error: ${err} === `);
+    throw new Error(err);
   }
 };
 
 const findAdminById = async id => {
   try {
-    const result = await adminDao.findAdminById(id);
-    return result;
+    const admin = await adminDao.findAdminById(id);
+    return admin;
   } catch (err) {
+    console.error(`=== Admin Service findAdminById Error: ${err} === `);
     throw new Error(err);
   }
 };
 
 const findAdminByName = async name => {
   try {
-    const result = await adminDao.findAdminByName(name);
-    return result;
+    const admin = await adminDao.findAdminByName(name);
+    return admin;
   } catch (err) {
+    console.error(`=== Admin Service findAdminByName Error: ${err} === `);
     throw new Error(err);
   }
 };
 
 const findAdminByIdx = async idx => {
   try {
-    const result = await adminDao.findAdminByIdx(idx);
-    return result;
+    const admin = await adminDao.findAdminByIdx(idx);
+    return admin;
   } catch (err) {
+    console.error(`=== Admin Service findAdminByIdx Error: ${err} === `);
     throw new Error(err);
   }
 };
@@ -82,18 +86,41 @@ const findAdminByIdx = async idx => {
 const updatePassword = async ({ adminIdx, newPassword }) => {
   try {
     const hashPassword = await encrypt.hash(newPassword);
-    const result = await adminDao.updatePassword(adminIdx, hashPassword);
-    return result;
+    const isUpdatePassword = await adminDao.updatePassword(adminIdx, hashPassword);
+    return isUpdatePassword;
   } catch (err) {
-    return CODE.INTERNAL_SERVER_ERROR;
+    console.error(`=== Admin Service updatePassword Error: ${err} === `);
+    throw new Error(err);
+  }
+};
+
+const getAdminsList = async () => {
+  try {
+    const adminsList = await adminDao.getAdminsList();
+    return adminsList;
+  } catch (err) {
+    console.error(`=== Admin Service getAdminsList Error: ${err} === `);
+    throw new Error(err);
+  }
+};
+
+const deleteAdmin = async (idx) => {
+  try {
+    const adminsList = await adminDao.deleteAdmin(idx);
+    return adminsList;
+  } catch (err) {
+    console.error(`=== Admin Service deleteAdmin Error: ${err} === `);
+    throw new Error(err);
   }
 };
 
 module.exports = {
-  login,
   join,
+  login,
   findAdminById,
   findAdminByName,
   findAdminByIdx,
   updatePassword,
+  getAdminsList,
+  deleteAdmin
 };

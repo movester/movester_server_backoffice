@@ -1,5 +1,6 @@
 const jwt = require('../modules/jwt');
 const redis = require('../modules/redis');
+const adminService = require('../service/admin')
 const CODE = require('../utils/statusCode');
 const MSG = require('../utils/responseMessage');
 const form = require('../utils/responseForm');
@@ -53,6 +54,21 @@ const checkToken = async (req, res, next) => {
   }
 };
 
+const checkSuperAdmin = async (req, res, next) => {
+  try {
+    const admin = await adminService.findAdminByIdx(req.cookies.idx);
+    if (!admin.rank) {
+      return res.status(CODE.UNAUTHORIZED).json(form.fail(MSG.SUPER_ADMIN_ONLY));
+    }
+  } catch (err) {
+    console.error(`===Auth Middleware Error > ${err}===`);
+    return res.status(CODE.INTERNAL_SERVER_ERROR).json(form.fail(MSG.INTERNAL_SERVER_ERROR));
+  }
+
+  next();
+};
+
 module.exports = {
   checkToken,
+  checkSuperAdmin,
 };
