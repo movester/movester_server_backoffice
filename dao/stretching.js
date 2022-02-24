@@ -1,88 +1,75 @@
 const pool = require('./pool');
 
-const createStretching = async (mainPart, subPart, tool, youtubeUrl, title, contents, image, adminIdx) => {
-  let connection;
-  try {
-    connection = await pool.getConnection(async conn => conn);
 
-    const sql = `INSERT INTO stretching (main_part, sub_part, tool, youtube_url, title, contents, image, create_at, admin_idx) VALUES (${mainPart},${subPart},${tool},'${youtubeUrl}','${title}','${contents}','${image}',now(),'${adminIdx}');`;
-    const [row] = await connection.query(sql);
-    return row.length ? row : null;
+const createStretching = async ({
+  title,
+  contents,
+  mainBody,
+  subBody,
+  tool,
+  youtubeUrl,
+  image,
+  adminIdx,
+  postures,
+  effects,
+}) => {
+  let conn;
+  try {
+    conn = await pool.getConnection(async conn => conn);
+    await conn.beginTransaction();
+
+    const insertStretching = `INSERT
+                                INTO stretching (title, contents, main_body, sub_body, tool, youtube_url, image, writer)
+                              VALUES ('${title}', '${contents}', ${mainBody}, ${subBody}, ${tool}, '${youtubeUrl}', '${image}', ${adminIdx});`;
+    const [insertRow] = await conn.query(insertStretching);
+
+    const stretchingIdx = insertRow.insertId;
+
+    const getInsertPostureSql = posture => `INSERT
+                                              INTO stretching_posture (stretching_idx, posture_type)
+                                            VALUES (${stretchingIdx}, ${posture});`;
+
+    // TODO : 비동기 에러 처리
+    postures.forEach(async posture => {
+      await conn.query(getInsertPostureSql(posture));
+    });
+
+    const getInsertEffectSql = effect => `INSERT
+                                            INTO stretching_effect (stretching_idx, effect_type)
+                                          VALUES (${stretchingIdx}, ${effect});`;
+
+    // TODO : 비동기 에러 처리
+    effects.forEach(async effect => {
+      await conn.query(getInsertEffectSql(effect));
+    });
+
+    conn.commit();
+    return stretchingIdx;
   } catch (err) {
-    console.log(`===DB Error > ${err}===`);
+    console.error(`=== Stretching Dao createStretching Error: ${err} === `);
+    conn.rollback();
     throw new Error(err);
   } finally {
-    connection.release();
-  }
-};
-
-const getLastIdx = async () => {
-  let connection;
-  try {
-    connection = await pool.getConnection(async conn => conn);
-    // 추후 posture로 수정
-    const sql = `SELECT MAX(stretching_idx) AS stretchingIdx FROM stretching;`;
-    const [row] = await connection.query(sql);
-    return row[0].stretchingIdx;
-  } catch (err) {
-    console.log(`===DB Error > ${err}===`);
-    throw new Error(err);
-  } finally {
-    connection.release();
-  }
-};
-
-const createStretchingPosture = async (idx, posture) => {
-  let connection;
-  try {
-    connection = await pool.getConnection(async conn => conn);
-    // 추후 posture로 수정
-    const sql = `INSERT INTO stretching_posture (stretching_idx, tag) VALUES (${idx},${posture});`;
-    const [row] = await connection.query(sql);
-    return row.length ? row : null;
-  } catch (err) {
-    console.log(`===DB Error > ${err}===`);
-    throw new Error(err);
-  } finally {
-    connection.release();
-  }
-};
-
-const createStretchingEffect = async (idx, effect) => {
-  let connection;
-  try {
-    connection = await pool.getConnection(async conn => conn);
-    // 추후 effect로 수정
-    const sql = `INSERT INTO stretching_effect (stretching_idx, tag) VALUES (${idx},${effect});`;
-    const [row] = await connection.query(sql);
-    return row.length ? row : null;
-  } catch (err) {
-    console.log(`===DB Error > ${err}===`);
-    throw new Error(err);
-  } finally {
-    connection.release();
+    conn.release();
   }
 };
 
 const findStretchingByTitle = async title => {
-  let connection;
+  let conn;
   try {
-    connection = await pool.getConnection(async conn => conn);
-    const sql = `SELECT stretching_idx AS 'stretchingIdx', title, main_part AS mainPart, sub_part AS subPart FROM stretching WHERE title = '${title}'`;
-    const [row] = await connection.query(sql);
+    conn = await pool.getConnection(async conn => conn);
+    const sql = `SELECT stretching_idx AS 'stretchingIdx', title, main_body AS mainBody, sub_body AS subBody FROM stretching WHERE title = '${title}'`;
+    const [row] = await conn.query(sql);
     return row.length ? row[0] : null;
   } catch (err) {
-    console.log(`===DB Error > ${err}===`);
+    console.error(`=== Stretching Dao findStretchingByTitle Error: ${err} === `);
     throw new Error(err);
   } finally {
-    connection.release();
+    conn.release();
   }
 };
 
 module.exports = {
   createStretching,
-  getLastIdx,
-  createStretchingPosture,
-  createStretchingEffect,
   findStretchingByTitle,
 };

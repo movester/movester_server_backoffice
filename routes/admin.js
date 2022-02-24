@@ -7,14 +7,14 @@ const commonValidator = require('../middleware/validator/common');
 const validatorError = require('../middleware/validatorError');
 const auth = require('../middleware/auth');
 
-router.post('/join', auth.checkToken, auth.checkSuperAdmin, validator.join, validatorError.error, adminCtrl.join);
-router.post('/login', validator.login, validatorError.error, adminCtrl.login);
+router.post('/join', auth.checkToken, auth.checkSuperAdmin, validator.join, validatorError.err, adminCtrl.join);
+router.post('/login', validator.login, validatorError.err, adminCtrl.login);
 router.post('/logout', auth.checkToken, adminCtrl.logout);
 router.patch(
   '/password/:adminIdx',
   auth.checkToken,
   validator.updatePassword,
-  validatorError.error,
+  validatorError.err,
   adminCtrl.updatePassword
 );
 router.get('/', auth.checkToken, adminCtrl.getAdminsList);
@@ -23,7 +23,7 @@ router.delete(
   auth.checkToken,
   auth.checkSuperAdmin,
   commonValidator.checkIdx,
-  validatorError.error,
+  validatorError.err,
   adminCtrl.deleteAdmin
 );
 

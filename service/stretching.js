@@ -1,39 +1,21 @@
 const stretchingDao = require('../dao/stretching');
-const CODE = require('../utils/statusCode');
 
-const createStretching = async ({
-  mainPart,
-  subPart,
-  tool,
-  postures,
-  effects,
-  youtubeUrl,
-  title,
-  contents,
-  image,
-  adminIdx,
-}) => {
+const createStretching = async stretching => {
   try {
-    await stretchingDao.createStretching(mainPart, subPart, tool, youtubeUrl, title, contents, image, adminIdx);
-
-    const stretchingIdx = await stretchingDao.getLastIdx();
-
-    await Promise.all([
-      ...postures.map(posture => stretchingDao.createStretchingPosture(stretchingIdx, posture)),
-      ...effects.map(effect => stretchingDao.createStretchingEffect(stretchingIdx, effect)),
-    ]);
-
-    return { stretchingIdx };
+    const newStretchingIdx = await stretchingDao.createStretching(stretching);
+    return newStretchingIdx
   } catch (err) {
-    return CODE.INTERNAL_SERVER_ERROR;
+    console.error(`=== Stretching Service createStretching Error: ${err} === `);
+    throw new Error(err);
   }
 };
 
 const findStretchingByTitle = async title => {
   try {
-    const result = await stretchingDao.findStretchingByTitle(title);
-    return result;
+    const stretching = await stretchingDao.findStretchingByTitle(title);
+    return stretching;
   } catch (err) {
+    console.error(`=== Stretching Service findStretchingByTitle Error: ${err} === `);
     throw new Error(err);
   }
 };
