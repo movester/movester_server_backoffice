@@ -69,7 +69,29 @@ const findStretchingByTitle = async title => {
   }
 };
 
+const deleteStretching = async idx => {
+  let conn;
+
+  try {
+    conn = await pool.getConnection(async conn => conn);
+
+    const sql = `DELETE
+                   FROM stretching
+                  WHERE stretching_idx = ${idx}`;
+
+    const [row] = await conn.query(sql);
+
+    return row.affectedRows;
+  } catch (err) {
+    console.error(`=== Stretching Dao deleteStretching Error: ${err} === `);
+    throw new Error(err);
+  } finally {
+    conn.release();
+  }
+};
+
 module.exports = {
   createStretching,
   findStretchingByTitle,
+  deleteStretching
 };

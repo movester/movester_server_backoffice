@@ -20,7 +20,18 @@ const findStretchingByTitle = async title => {
   }
 };
 
+const deleteStretching = async stretchingIdx => {
+  try {
+    const isDelete = await stretchingDao.deleteStretching(stretchingIdx);
+    return isDelete;
+  } catch (err) {
+    console.error(`=== Stretching Service deleteStretching Error: ${err} === `);
+    throw new Error(err);
+  }
+};
+
 module.exports = {
   createStretching,
   findStretchingByTitle,
+  deleteStretching
 };

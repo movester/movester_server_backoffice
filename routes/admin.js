@@ -22,7 +22,7 @@ router.delete(
   '/:idx',
   auth.checkToken,
   auth.checkSuperAdmin,
-  commonValidator.checkIdx,
+  commonValidator.checkParamIdx,
   validatorError.err,
   adminCtrl.deleteAdmin
 );
