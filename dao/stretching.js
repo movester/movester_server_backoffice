@@ -1,5 +1,5 @@
 const pool = require('./pool');
-
+const { getArrayQuery } = require('../utils/sql');
 
 const createStretching = async ({
   title,
@@ -25,23 +25,17 @@ const createStretching = async ({
 
     const stretchingIdx = insertRow.insertId;
 
-    const getInsertPostureSql = posture => `INSERT
-                                              INTO stretching_posture (stretching_idx, posture_type)
-                                            VALUES (${stretchingIdx}, ${posture});`;
+    const effectSql = `INSERT
+                         INTO stretching_effect (stretching_idx, effect_type)
+                       VALUES `;
+    const insertEffects = getArrayQuery(effectSql, stretchingIdx, effects);
+    await conn.query(insertEffects);
 
-    // TODO : 비동기 에러 처리
-    postures.forEach(async posture => {
-      await conn.query(getInsertPostureSql(posture));
-    });
-
-    const getInsertEffectSql = effect => `INSERT
-                                            INTO stretching_effect (stretching_idx, effect_type)
-                                          VALUES (${stretchingIdx}, ${effect});`;
-
-    // TODO : 비동기 에러 처리
-    effects.forEach(async effect => {
-      await conn.query(getInsertEffectSql(effect));
-    });
+    const postureSql = `INSERT
+                          INTO stretching_posture (stretching_idx, posture_type)
+                        VALUES`;
+    const insertPostures = getArrayQuery(postureSql, stretchingIdx, postures);
+    await conn.query(insertPostures);
 
     conn.commit();
     return stretchingIdx;
@@ -93,5 +87,5 @@ const deleteStretching = async idx => {
 module.exports = {
   createStretching,
   findStretchingByTitle,
-  deleteStretching
+  deleteStretching,
 };
