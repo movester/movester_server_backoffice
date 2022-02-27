@@ -1,6 +1,7 @@
+// 다중 insert query 반환
 const getArrayQuery = (sql, idx, array) => {
   const getValues = array.map(v => `(${idx}, ${v})`).join(', ');
-  return sql + getValues;
+  return sql.trim() + getValues;
 };
 
 module.exports = {

@@ -27,7 +27,7 @@ const createStretching = async ({
 
     const effectSql = `INSERT
                          INTO stretching_effect (stretching_idx, effect_type)
-                       VALUES `;
+                       VALUES`;
     const insertEffects = getArrayQuery(effectSql, stretchingIdx, effects);
     await conn.query(insertEffects);
 
