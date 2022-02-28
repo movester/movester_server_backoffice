@@ -9,5 +9,6 @@ const validatorError = require('../middleware/validatorError');
 
 router.post('/', auth.checkToken, validator.createStretching, validatorError.err, stretchingCtrl.createStretching);
 router.delete('/:idx', auth.checkToken, commonValidator.checkParamIdx, validatorError.err, stretchingCtrl.deleteStretching);
+router.put('/', auth.checkToken, validator.updateStretching, validatorError.err, stretchingCtrl.updateStretching);
 
 module.exports = router;

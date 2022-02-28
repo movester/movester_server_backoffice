@@ -36,7 +36,23 @@ const deleteStretching = async (req, res) => {
   }
 };
 
+const updateStretching = async (req, res) => {
+  try {
+    const stretching = req.body;
+    stretching.adminIdx = req.cookies.idx;
+
+    const isUpdate = await stretchingService.updateStretching(stretching);
+    if (!isUpdate) return res.status(CODE.NOT_FOUND).json(form.fail(MSG.IDX_NOT_EXIST));
+
+    return res.status(CODE.OK).json(form.success());
+  } catch (err) {
+    console.error(`=== Stretching Ctrl updateStretching Error: ${err} === `);
+    return res.status(CODE.INTERNAL_SERVER_ERROR).json(form.fail(MSG.INTERNAL_SERVER_ERROR));
+  }
+};
+
 module.exports = {
   createStretching,
   deleteStretching,
+  updateStretching,
 };
