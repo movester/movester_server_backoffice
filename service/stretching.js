@@ -3,7 +3,7 @@ const stretchingDao = require('../dao/stretching');
 const createStretching = async stretching => {
   try {
     const newStretchingIdx = await stretchingDao.createStretching(stretching);
-    return newStretchingIdx
+    return newStretchingIdx;
   } catch (err) {
     console.error(`=== Stretching Service createStretching Error: ${err} === `);
     throw new Error(err);
@@ -20,6 +20,16 @@ const findStretchingByTitle = async title => {
   }
 };
 
+const findStretchingByIdx = async stretchingIdx => {
+  try {
+    const stretching = await stretchingDao.findStretchingByIdx(stretchingIdx);
+    return stretching;
+  } catch (err) {
+    console.error(`=== Stretching Service findStretchingByIdx Error: ${err} === `);
+    throw new Error(err);
+  }
+};
+
 const deleteStretching = async stretchingIdx => {
   try {
     const isDelete = await stretchingDao.deleteStretching(stretchingIdx);
@@ -30,8 +40,29 @@ const deleteStretching = async stretchingIdx => {
   }
 };
 
+const getStretching = async stretchingIdx => {
+  try {
+    const tempStretching = await stretchingDao.getDetailStretching(stretchingIdx);
+    if (!tempStretching) return tempStretching;
+
+    const effect = tempStretching.effect.map(eff => eff.effect);
+    const posture = tempStretching.posture.map(pos => pos.posture);
+
+    const stretching = { ...tempStretching.stretching };
+    stretching.effect = effect;
+    stretching.posture = posture;
+
+    return stretching;
+  } catch (err) {
+    console.error(`=== Stretching Service getStretching Error: ${err} === `);
+    throw new Error(err);
+  }
+};
+
 module.exports = {
   createStretching,
   findStretchingByTitle,
-  deleteStretching
+  findStretchingByIdx,
+  deleteStretching,
+  getStretching,
 };
