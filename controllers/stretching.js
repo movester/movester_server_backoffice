@@ -8,14 +8,14 @@ const createStretching = async (req, res) => {
     const stretching = req.body;
     stretching.adminIdx = req.cookies.idx;
 
-    const IsTitleDuplicate = await stretchingService.findStretchingByTitle(stretching.title);
-    if (IsTitleDuplicate) {
+    const isTitleDuplicate = await stretchingService.findStretchingByTitle(stretching.title);
+    if (isTitleDuplicate) {
       return res.status(CODE.DUPLICATE).json(form.fail(MSG.TITLE_ALREADY_EXIST));
     }
 
-    const newStretchingIdx = await stretchingService.createStretching(stretching);
+    const stretchingIdx = await stretchingService.createStretching(stretching);
 
-    return res.status(CODE.CREATED).json(form.success({ stretchingIdx: newStretchingIdx }));
+    return res.status(CODE.CREATED).json(form.success({ stretchingIdx }));
   } catch (err) {
     console.error(`=== Stretching Ctrl createStretching Error: ${err} === `);
     return res.status(CODE.INTERNAL_SERVER_ERROR).json(form.fail(MSG.INTERNAL_SERVER_ERROR));
