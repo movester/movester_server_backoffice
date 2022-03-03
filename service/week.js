@@ -44,8 +44,34 @@ const deleteWeek = async weekIdx => {
   }
 };
 
+const updateWeek = async weekTemp => {
+  try {
+    const week = {
+      title: weekTemp.title,
+      mon: weekTemp.week[0],
+      tue: weekTemp.week[1],
+      wed: weekTemp.week[2],
+      thu: weekTemp.week[3],
+      fri: weekTemp.week[4],
+      sat: weekTemp.week[5],
+      sun: weekTemp.week[6],
+      writer: weekTemp.adminIdx,
+      weekIdx: weekTemp.weekIdx,
+    };
+    const isUpdate = await weekDao.updateWeek(week);
+    return isUpdate;
+  } catch (err) {
+    if (String(err) === 'Error: ER_NO_REFERENCED_ROW_2') {
+      return false;
+    }
+    console.error(`=== Week Service updateWeek Error: ${err} === `);
+    throw new Error(err);
+  }
+};
+
 module.exports = {
   createWeek,
   findWeekByTitle,
   deleteWeek,
+  updateWeek,
 };

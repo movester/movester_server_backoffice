@@ -55,8 +55,30 @@ const deleteWeek = async idx => {
   }
 };
 
+const updateWeek = async ({ title, mon, tue, wed, thu, fri, sat, sun, writer, weekIdx }) => {
+  let conn;
+
+  try {
+    conn = await pool.getConnection(async conn => conn);
+
+    const sql = `UPDATE week_stretching
+                    SET title = '${title}', mon_stretching_idx = ${mon}, tue_stretching_idx = ${tue}, wed_stretching_idx = ${wed}, thu_stretching_idx = ${thu}, fri_stretching_idx = ${fri}, sat_stretching_idx = ${sat}, sun_stretching_idx = ${sun}, writer = ${writer}, create_at = now()
+                  WHERE week_stretching_idx = ${weekIdx}`;
+
+    const [row] = await conn.query(sql);
+
+    return row.affectedRows;
+  } catch (err) {
+    console.error(`=== Week Dao updateWeek Error: ${err.code} === `);
+    throw new Error(err.code);
+  } finally {
+    conn.release();
+  }
+};
+
 module.exports = {
   createWeek,
   findWeekByTitle,
   deleteWeek,
+  updateWeek,
 };

@@ -37,7 +37,28 @@ const deleteWeek = async (req, res) => {
   }
 };
 
+const updateWeek = async (req, res) => {
+  try {
+    const week = req.body;
+    week.adminIdx = req.cookies.idx;
+
+    const isTitleDuplicate = await weekService.findWeekByTitle(week.title);
+    if (isTitleDuplicate.weekIdx !== week.weekIdx) {
+      return res.status(CODE.DUPLICATE).json(form.fail(MSG.TITLE_ALREADY_EXIST));
+    }
+
+    const isUpdate = await weekService.updateWeek(week);
+    if (!isUpdate) return res.status(CODE.NOT_FOUND).json(form.fail(MSG.IDX_NOT_EXIST));
+
+    return res.status(CODE.OK).json(form.success());
+  } catch (err) {
+    console.error(`=== Week Ctrl updateWeek Error: ${err} === `);
+    return res.status(CODE.INTERNAL_SERVER_ERROR).json(form.fail(MSG.INTERNAL_SERVER_ERROR));
+  }
+};
+
 module.exports = {
   createWeek,
   deleteWeek,
+  updateWeek,
 };
