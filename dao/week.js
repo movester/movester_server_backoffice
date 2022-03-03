@@ -85,6 +85,13 @@ const getWeek = async weekIdx => {
     const [titles] = await conn.query(getUnionSql);
     week.titles = titles;
 
+    const getWriterSql = `SELECT name
+                            FROM user
+                           WHERE user_idx = ${week.writer}`;
+
+    const [writer] = await conn.query(getWriterSql);
+    week.writer = writer[0].name;
+
     conn.commit();
     return week;
   } catch (err) {
