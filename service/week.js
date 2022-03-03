@@ -34,7 +34,18 @@ const findWeekByTitle = async title => {
   }
 };
 
+const deleteWeek = async weekIdx => {
+  try {
+    const isDelete = await weekDao.deleteWeek(weekIdx);
+    return isDelete;
+  } catch (err) {
+    console.error(`=== Week Service deleteWeek Error: ${err} === `);
+    throw new Error(err);
+  }
+};
+
 module.exports = {
   createWeek,
   findWeekByTitle,
+  deleteWeek,
 };

@@ -34,7 +34,29 @@ const findWeekByTitle = async title => {
   }
 };
 
+const deleteWeek = async idx => {
+  let conn;
+
+  try {
+    conn = await pool.getConnection(async conn => conn);
+
+    const sql = `DELETE
+                   FROM week_stretching
+                  WHERE week_stretching_idx = ${idx}`;
+
+    const [row] = await conn.query(sql);
+
+    return row.affectedRows;
+  } catch (err) {
+    console.error(`=== Week Dao deleteWeek Error: ${err} === `);
+    throw new Error(err);
+  } finally {
+    conn.release();
+  }
+};
+
 module.exports = {
   createWeek,
   findWeekByTitle,
+  deleteWeek,
 };
