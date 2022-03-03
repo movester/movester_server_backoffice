@@ -52,11 +52,30 @@ const findStretchingByTitle = async title => {
   let conn;
   try {
     conn = await pool.getConnection(async conn => conn);
-    const sql = `SELECT stretching_idx AS 'stretchingIdx', title, main_body AS mainBody, sub_body AS subBody FROM stretching WHERE title = '${title}'`;
+    const sql = `SELECT stretching_idx AS 'stretchingIdx', title, main_body AS mainBody, sub_body AS subBody
+                   FROM stretching
+                  WHERE title = '${title}'`;
     const [row] = await conn.query(sql);
     return row.length ? row[0] : null;
   } catch (err) {
     console.error(`=== Stretching Dao findStretchingByTitle Error: ${err} === `);
+    throw new Error(err);
+  } finally {
+    conn.release();
+  }
+};
+
+const findStretchingByIdx = async stretchingIdx => {
+  let conn;
+  try {
+    conn = await pool.getConnection(async conn => conn);
+    const sql = `SELECT stretching_idx AS 'stretchingIdx', title, main_body AS 'mainBody', sub_body AS 'subBody'
+                   FROM stretching
+                  WHERE stretching_idx = ${stretchingIdx}`;
+    const [row] = await conn.query(sql);
+    return row.length ? row[0] : null;
+  } catch (err) {
+    console.error(`=== Stretching Dao findStretchingByIdx Error: ${err} === `);
     throw new Error(err);
   } finally {
     conn.release();
@@ -84,8 +103,46 @@ const deleteStretching = async idx => {
   }
 };
 
+const getDetailStretching = async stretchingIdx => {
+  let conn;
+  try {
+    conn = await pool.getConnection(async conn => conn);
+    await conn.beginTransaction();
+
+    const stretchingSql = `SELECT stretching_idx AS 'stretchingIdx', title, contents, main_body AS mainBody, sub_body AS subBody, tool, youtube_url, image, writer, DATE_FORMAT(create_at,'%Y.%m.%d') AS 'createAt'
+                   FROM stretching
+                  WHERE stretching_idx = ${stretchingIdx}`;
+    const [stretching] = await conn.query(stretchingSql);
+
+    if (!stretching.length) return null;
+
+    const effectSql = ` SELECT stretching_idx AS 'stretchingIdx', effect_type AS effect
+                          FROM stretching_effect
+                         WHERE stretching_idx = ${stretchingIdx}`;
+    const [effect] = await conn.query(effectSql);
+
+    const postureSql = ` SELECT stretching_idx AS 'stretchingIdx', posture_type AS posture
+                           FROM stretching_posture
+                          WHERE stretching_idx = ${stretchingIdx}`;
+    const [posture] = await conn.query(postureSql);
+
+    return {
+      stretching: stretching[0],
+      effect,
+      posture,
+    };
+  } catch (err) {
+    console.error(`=== Stretching Dao getDetailStretching Error: ${err} === `);
+    throw new Error(err);
+  } finally {
+    conn.release();
+  }
+};
+
 module.exports = {
   createStretching,
   findStretchingByTitle,
+  findStretchingByIdx,
   deleteStretching,
+  getDetailStretching,
 };
