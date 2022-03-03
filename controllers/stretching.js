@@ -45,6 +45,25 @@ const getStretching = async (req, res) => {
     return res.status(CODE.CREATED).json(form.success(stretching));
   } catch (err) {
     console.error(`=== Stretching Ctrl getStretching Error: ${err} === `);
+  }
+};
+
+const updateStretching = async (req, res) => {
+  try {
+    const stretching = req.body;
+    stretching.adminIdx = req.cookies.idx;
+
+    const isTitleDuplicate = await stretchingService.findStretchingByTitle(stretching.title);
+    if (isTitleDuplicate) {
+      return res.status(CODE.DUPLICATE).json(form.fail(MSG.TITLE_ALREADY_EXIST));
+    }
+
+    const isUpdate = await stretchingService.updateStretching(stretching);
+    if (!isUpdate) return res.status(CODE.NOT_FOUND).json(form.fail(MSG.IDX_NOT_EXIST));
+
+    return res.status(CODE.OK).json(form.success());
+  } catch (err) {
+    console.error(`=== Stretching Ctrl updateStretching Error: ${err} === `);
     return res.status(CODE.INTERNAL_SERVER_ERROR).json(form.fail(MSG.INTERNAL_SERVER_ERROR));
   }
 };
@@ -53,4 +72,5 @@ module.exports = {
   createStretching,
   deleteStretching,
   getStretching,
+  updateStretching,
 };

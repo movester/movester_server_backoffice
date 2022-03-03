@@ -42,7 +42,7 @@ const createStretching = async ({
   } catch (err) {
     console.error(`=== Stretching Dao createStretching Error: ${err} === `);
     conn.rollback();
-    throw new Error(err);
+    throw new Error(err.code);
   } finally {
     conn.release();
   }
@@ -139,10 +139,62 @@ const getDetailStretching = async stretchingIdx => {
   }
 };
 
+const updateStretching = async stretching => {
+  let conn;
+
+  try {
+    conn = await pool.getConnection(async conn => conn);
+
+    await conn.beginTransaction();
+
+    const updateStretching = `UPDATE stretching
+                                 SET title = '${stretching.title}', contents = '${stretching.contents}', main_body = ${stretching.mainBody}, sub_body = ${stretching.subBody}, tool = ${stretching.tool}, youtube_url = '${stretching.youtubeUrl}', image = '${stretching.image}', writer = ${stretching.adminIdx}
+                               WHERE stretching_idx = ${stretching.stretchingIdx}`;
+    const [updateRow] = await conn.query(updateStretching);
+
+    const isEffect = Object.keys(stretching).includes('effects');
+    if (isEffect) {
+      const deleteEffect = `DELETE
+                              FROM stretching_effect
+                             WHERE stretching_idx = ${stretching.stretchingIdx};`;
+      await conn.query(deleteEffect);
+
+      const insertEffectSql = `INSERT
+                                 INTO stretching_effect (stretching_idx, effect_type)
+                               VALUES`;
+      const insertEffects = getArrayQuery(insertEffectSql, stretching.stretchingIdx, stretching.effects);
+      await conn.query(insertEffects);
+    }
+
+    const isPosture = Object.keys(stretching).includes('postures');
+    if (isPosture) {
+      const deletePosture = `DELETE
+                              FROM stretching_posture
+                             WHERE stretching_idx = ${stretching.stretchingIdx};`;
+      await conn.query(deletePosture);
+
+      const insertPosture = `INSERT
+                               INTO stretching_posture (stretching_idx, posture_type)
+                             VALUES`;
+      const insertPostures = getArrayQuery(insertPosture, stretching.stretchingIdx, stretching.postures);
+      await conn.query(insertPostures);
+    }
+
+    conn.commit();
+    return updateRow.affectedRows;
+  } catch (err) {
+    console.error(`=== Stretching Dao updateStretching Error: ${err} === `);
+    throw new Error(err);
+  } finally {
+    conn.release();
+  }
+};
+
 module.exports = {
   createStretching,
   findStretchingByTitle,
   findStretchingByIdx,
   deleteStretching,
   getDetailStretching,
+  updateStretching,
 };

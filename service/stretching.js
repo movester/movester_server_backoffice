@@ -55,6 +55,15 @@ const getStretching = async stretchingIdx => {
     return stretching;
   } catch (err) {
     console.error(`=== Stretching Service getStretching Error: ${err} === `);
+  }
+};
+
+const updateStretching = async stretching => {
+  try {
+    const isUpdate = await stretchingDao.updateStretching(stretching);
+    return isUpdate;
+  } catch (err) {
+    console.error(`=== Stretching Service updateStretching Error: ${err} === `);
     throw new Error(err);
   }
 };
@@ -65,4 +74,5 @@ module.exports = {
   findStretchingByIdx,
   deleteStretching,
   getStretching,
+  updateStretching,
 };
