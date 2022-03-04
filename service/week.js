@@ -63,10 +63,24 @@ const updateExposeWeek = async weekIdx => {
   }
 };
 
+const cancelExposeWeek = async weekIdx => {
+  try {
+    const week = await findWeekByIdx(weekIdx);
+    if (!week.isExpose) return false;
+
+    const isCancel = await weekDao.cancelExposeWeek(weekIdx);
+    return isCancel;
+  } catch (err) {
+    console.error(`=== Week Service cancelExposeWeek Error: ${err} === `);
+    throw new Error(err);
+  }
+};
+
 module.exports = {
   createWeek,
   findWeekByTitle,
   findWeekByIdx,
   deleteWeek,
   updateExposeWeek,
+  cancelExposeWeek,
 };

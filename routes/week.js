@@ -10,5 +10,6 @@ const validatorError = require('../middleware/validatorError');
 router.post('/', auth.checkToken, validator.createWeek, validatorError.err, weekCtrl.createWeek);
 router.delete('/:idx', auth.checkToken, commonValidator.checkParamIdx, validatorError.err, weekCtrl.deleteWeek);
 router.patch('/expose', auth.checkToken, validator.checkBodyIdx, validatorError.err, weekCtrl.updateExposeWeek);
+router.delete('/expose/:idx', auth.checkToken, commonValidator.checkParamIdx, validatorError.err, weekCtrl.cancelExposeWeek);
 
 module.exports = router;

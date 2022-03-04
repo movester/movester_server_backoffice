@@ -38,7 +38,7 @@ const findWeekByIdx = async idx => {
   let conn;
   try {
     conn = await pool.getConnection(async conn => conn);
-    const sql = `SELECT week_stretching_idx AS 'weekIdx', title
+    const sql = `SELECT week_stretching_idx AS 'weekIdx', title, is_expose AS 'isExpose'
                    FROM week_stretching
                   WHERE week_stretching_idx = ${idx}`;
     const [row] = await conn.query(sql);
@@ -107,10 +107,32 @@ const updateExposeWeek = async idx => {
   }
 };
 
+const cancelExposeWeek = async idx => {
+  let conn;
+
+  try {
+    conn = await pool.getConnection(async conn => conn);
+
+    const sql = `UPDATE week_stretching
+                    SET is_expose = 0
+                  WHERE week_stretching_idx = ${idx};`;
+
+    const [row] = await conn.query(sql);
+
+    return row.affectedRows;
+  } catch (err) {
+    console.error(`=== Week Dao cancelExposeWeek Error: ${err} === `);
+    throw new Error(err);
+  } finally {
+    conn.release();
+  }
+};
+
 module.exports = {
   createWeek,
   findWeekByTitle,
   findWeekByIdx,
   deleteWeek,
   updateExposeWeek,
+  cancelExposeWeek,
 };

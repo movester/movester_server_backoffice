@@ -53,8 +53,26 @@ const updateExposeWeek = async (req, res) => {
   }
 };
 
+const cancelExposeWeek = async (req, res) => {
+  try {
+    const weekIdx = req.params.idx;
+
+    const isValidWeekIdx = await weekService.findWeekByIdx(weekIdx);
+    if (!isValidWeekIdx) return res.status(CODE.NOT_FOUND).json(form.fail(MSG.IDX_NOT_EXIST));
+
+    const isCancel = await weekService.cancelExposeWeek(weekIdx);
+    if (!isCancel) return res.status(CODE.NOT_FOUND).json(form.fail("현재 노출중인 일주일 스트레칭이 아닙니다."));
+
+    return res.status(CODE.OK).json(form.success());
+  } catch (err) {
+    console.error(`=== Week Ctrl cancelExposeWeek Error: ${err} === `);
+    return res.status(CODE.INTERNAL_SERVER_ERROR).json(form.fail(MSG.INTERNAL_SERVER_ERROR));
+  }
+};
+
 module.exports = {
   createWeek,
   deleteWeek,
   updateExposeWeek,
+  cancelExposeWeek
 };
