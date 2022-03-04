@@ -55,8 +55,30 @@ const deleteWeek = async idx => {
   }
 };
 
+const getWeeks = async () => {
+  let conn;
+
+  try {
+    conn = await pool.getConnection(async conn => conn);
+
+    const sql = `SELECT week_stretching_idx AS 'weekIdx', title, is_expose AS 'isExpose', DATE_FORMAT(create_at,'%Y.%m.%d') AS 'createAt'
+                   FROM week_stretching
+               ORDER BY title ASC;`;
+
+    const [row] = await conn.query(sql);
+
+    return row;
+  } catch (err) {
+    console.error(`=== Week Dao getWeeks Error: ${err} === `);
+    throw new Error(err);
+  } finally {
+    conn.release();
+  }
+};
+
 module.exports = {
   createWeek,
   findWeekByTitle,
   deleteWeek,
+  getWeeks,
 };

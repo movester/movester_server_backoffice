@@ -37,7 +37,18 @@ const deleteWeek = async (req, res) => {
   }
 };
 
+const getWeeks = async (req, res) => {
+  try {
+    const weeks = await weekService.getWeeks();
+    return res.status(CODE.OK).json(form.success(weeks));
+  } catch (err) {
+    console.error(`=== Week Ctrl getWeeks Error: ${err} === `);
+    return res.status(CODE.INTERNAL_SERVER_ERROR).json(form.fail(MSG.INTERNAL_SERVER_ERROR));
+  }
+};
+
 module.exports = {
   createWeek,
   deleteWeek,
+  getWeeks,
 };
