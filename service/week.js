@@ -34,6 +34,16 @@ const findWeekByTitle = async title => {
   }
 };
 
+const findWeekByIdx = async idx => {
+  try {
+    const week = await weekDao.findWeekByIdx(idx);
+    return week;
+  } catch (err) {
+    console.error(`=== Week Service findWeekByIdx Error: ${err} === `);
+    throw new Error(err);
+  }
+};
+
 const deleteWeek = async weekIdx => {
   try {
     const isDelete = await weekDao.deleteWeek(weekIdx);
@@ -44,8 +54,19 @@ const deleteWeek = async weekIdx => {
   }
 };
 
+const updateExposeWeek = async weekIdx => {
+  try {
+    await weekDao.updateExposeWeek(weekIdx);
+  } catch (err) {
+    console.error(`=== Week Service updateExposeWeek Error: ${err} === `);
+    throw new Error(err);
+  }
+};
+
 module.exports = {
   createWeek,
   findWeekByTitle,
+  findWeekByIdx,
   deleteWeek,
+  updateExposeWeek,
 };

@@ -34,6 +34,23 @@ const findWeekByTitle = async title => {
   }
 };
 
+const findWeekByIdx = async idx => {
+  let conn;
+  try {
+    conn = await pool.getConnection(async conn => conn);
+    const sql = `SELECT week_stretching_idx AS 'weekIdx', title
+                   FROM week_stretching
+                  WHERE week_stretching_idx = ${idx}`;
+    const [row] = await conn.query(sql);
+    return row.length ? row[0] : null;
+  } catch (err) {
+    console.error(`=== Week Dao findWeekByIdx Error: ${err} === `);
+    throw new Error(err);
+  } finally {
+    conn.release();
+  }
+};
+
 const deleteWeek = async idx => {
   let conn;
 
@@ -55,8 +72,45 @@ const deleteWeek = async idx => {
   }
 };
 
+const updateExposeWeek = async idx => {
+  let conn;
+
+  try {
+    conn = await pool.getConnection(async conn => conn);
+    await conn.beginTransaction();
+
+    const getExposedSql = `SELECT week_stretching_idx AS 'exposedWeekIdx'
+                             FROM week_stretching
+                            WHERE is_expose = 1;`;
+
+    const [exposed] = await conn.query(getExposedSql);
+
+    if (exposed.length) {
+      const { exposedWeekIdx } = exposed[0];
+      const unExposeSql = `UPDATE week_stretching
+                              SET is_expose = 0
+                            WHERE week_stretching_idx = ${exposedWeekIdx};`;
+      await conn.query(unExposeSql);
+    }
+
+    const exposeSql = `UPDATE week_stretching
+                          SET is_expose = 1
+                        WHERE week_stretching_idx = ${idx};`;
+    await conn.query(exposeSql);
+
+    conn.commit();
+  } catch (err) {
+    console.error(`=== Week Dao updateExposeWeek Error: ${err} === `);
+    throw new Error(err);
+  } finally {
+    conn.release();
+  }
+};
+
 module.exports = {
   createWeek,
   findWeekByTitle,
+  findWeekByIdx,
   deleteWeek,
+  updateExposeWeek,
 };
