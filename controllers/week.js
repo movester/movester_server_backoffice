@@ -37,7 +37,22 @@ const deleteWeek = async (req, res) => {
   }
 };
 
+const getExposeWeek = async (req, res) => {
+  try {
+    const weekIdx = req.params.idx;
+
+    const week = await weekService.getExposeWeek(weekIdx);
+    if (!week) return res.status(CODE.NOT_FOUND).json(form.fail("노출중인 일주일 스트레칭이 없습니다."));
+
+    return res.status(CODE.OK).json(form.success(week));
+  } catch (err) {
+    console.error(`=== Week Ctrl getExposeWeek Error: ${err} === `);
+    return res.status(CODE.INTERNAL_SERVER_ERROR).json(form.fail(MSG.INTERNAL_SERVER_ERROR));
+  }
+};
+
 module.exports = {
   createWeek,
   deleteWeek,
+  getExposeWeek
 };
