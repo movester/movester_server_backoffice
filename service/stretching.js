@@ -79,20 +79,17 @@ const getStretchings = async search => {
 
     const stretchings = await stretchingDao.getStretchings(managedSearch);
 
-    // TODO: 난이도 추가
     const managedStretchings = stretchings.map(stretching => {
-      stretching.effects = stretching.effects ? stretching.effects.split(' ') : null;
-      stretching.postures = stretching.postures ? stretching.postures.split(' ') : null;
       if (stretching.effects) {
-        stretching.effects = stretching.effects.map(effect => +effect);
+        stretching.effects = stretching.effects.split(' ').map(v => +v);
       }
       if (stretching.postures) {
-        stretching.postures = stretching.postures.map(posture => +posture);
+        stretching.postures = stretching.postures.split(' ').map(v => +v);
       }
       return stretching;
     });
 
-    return stretchings;
+    return managedStretchings;
   } catch (err) {
     console.error(`=== Stretching Service getStretchings Error: ${err} === `);
     throw new Error(err);
