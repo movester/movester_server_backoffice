@@ -68,9 +68,22 @@ const updateStretching = async (req, res) => {
   }
 };
 
+const getStretchings = async (req, res) => {
+  try {
+    const stretching = req.query;
+    const strechings = await stretchingService.getStretchings(stretching);
+
+    return res.status(CODE.OK).json(form.success(strechings));
+  } catch (err) {
+    console.error(`=== Stretching Ctrl getStretchings Error: ${err} === `);
+    return res.status(CODE.INTERNAL_SERVER_ERROR).json(form.fail(MSG.INTERNAL_SERVER_ERROR));
+  }
+};
+
 module.exports = {
   createStretching,
   deleteStretching,
   getStretching,
   updateStretching,
+  getStretchings,
 };

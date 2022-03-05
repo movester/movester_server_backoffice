@@ -68,6 +68,37 @@ const updateStretching = async stretching => {
   }
 };
 
+const getStretchings = async stretchingTemp => {
+  try {
+    const stretching = Object.keys(stretchingTemp).reduce((acc, key) => {
+      acc[key] = stretchingTemp[key] || "''";
+      return acc;
+    }, {});
+
+    if (stretchingTemp.title) stretching.title = `'${stretchingTemp.title}'`;
+
+    // TODO: 난이도 추가
+    const strechingsTemp = await stretchingDao.getStretchings(stretching);
+
+    const strechings = strechingsTemp.map(stretching => {
+      stretching.effects = stretching.effects ? stretching.effects.split(' ') : null;
+      stretching.postures = stretching.postures ? stretching.postures.split(' ') : null;
+      if (stretching.effects) {
+        stretching.effects = stretching.effects.map(effect => +effect);
+      }
+      if (stretching.postures) {
+        stretching.postures = stretching.postures.map(posture => +posture);
+      }
+
+      return stretching;
+    });
+    return strechings;
+  } catch (err) {
+    console.error(`=== Stretching Service getStretchings Error: ${err} === `);
+    throw new Error(err);
+  }
+};
+
 module.exports = {
   createStretching,
   findStretchingByTitle,
@@ -75,4 +106,5 @@ module.exports = {
   deleteStretching,
   getStretching,
   updateStretching,
+  getStretchings,
 };

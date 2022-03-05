@@ -190,6 +190,54 @@ const updateStretching = async stretching => {
   }
 };
 
+const getStretchings = async ({ title, mainCategory, subCategory, posture, effect, tool }) => {
+  let conn;
+
+  try {
+    conn = await pool.getConnection(async conn => conn);
+
+    const sql = `SELECT stretching_idx AS 'stretchingIdx'
+                      , title
+                      , main_body AS 'mainBody'
+                      , sub_body AS 'subBody'
+                      , (SELECT group_concat(effect_type SEPARATOR ' ')
+                           FROM movester_db.stretching_effect AS b
+	                    	  WHERE a.stretching_idx = b.stretching_idx
+	                     GROUP BY b.stretching_idx
+	                       ) AS 'effects'
+	                    , (SELECT group_concat(posture_type SEPARATOR ' ')
+	                      	 FROM movester_db.stretching_posture AS c
+	                      	WHERE a.stretching_idx = c.stretching_idx
+	                     GROUP BY c.stretching_idx
+	                       ) AS 'postures'
+                   FROM stretching a
+                  WHERE a.title LIKE CONCAT('%',${title},'%')
+                    AND a.main_body LIKE CONCAT('%',${mainCategory},'%')
+                    AND a.sub_body LIKE CONCAT('%',${subCategory},'%')
+                    AND IFNULL(a.tool,'') LIKE CONCAT('%',${tool},'%')
+                    AND IFNULL((SELECT group_concat(effect_type SEPARATOR ' ')
+                                  FROM stretching_effect AS b
+                                 WHERE a.stretching_idx = b.stretching_idx
+                              GROUP BY b.stretching_idx
+                        ), '') LIKE CONCAT('%', ${effect},'%')
+                    AND IFNULL((SELECT group_concat(posture_type SEPARATOR ' ')
+                                  FROM stretching_posture AS c
+                                 WHERE a.stretching_idx = c.stretching_idx
+                              GROUP BY c.stretching_idx
+                        ), '') LIKE CONCAT('%',${posture},'%')
+                    ORDER BY a.stretching_idx DESC;`;
+
+    const [row] = await conn.query(sql);
+
+    return row;
+  } catch (err) {
+    console.error(`=== Stretching Dao getStretchings Error: ${err} === `);
+    throw new Error(err);
+  } finally {
+    conn.release();
+  }
+};
+
 module.exports = {
   createStretching,
   findStretchingByTitle,
@@ -197,4 +245,5 @@ module.exports = {
   deleteStretching,
   getDetailStretching,
   updateStretching,
+  getStretchings,
 };
