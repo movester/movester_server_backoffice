@@ -25,17 +25,21 @@ const createStretching = async ({
 
     const stretchingIdx = insertRow.insertId;
 
-    const effectSql = `INSERT
-                         INTO stretching_effect (stretching_idx, effect_type)
-                       VALUES`;
-    const insertEffects = getArrayQuery(effectSql, stretchingIdx, effects);
-    await conn.query(insertEffects);
+    if (effects.length) {
+      const effectSql = `INSERT
+                           INTO stretching_effect (stretching_idx, effect_type)
+                         VALUES`;
+      const insertEffects = getArrayQuery(effectSql, stretchingIdx, effects);
+      await conn.query(insertEffects);
+    }
 
-    const postureSql = `INSERT
-                          INTO stretching_posture (stretching_idx, posture_type)
-                        VALUES`;
-    const insertPostures = getArrayQuery(postureSql, stretchingIdx, postures);
-    await conn.query(insertPostures);
+    if (postures.length) {
+      const postureSql = `INSERT
+                            INTO stretching_posture (stretching_idx, posture_type)
+                          VALUES`;
+      const insertPostures = getArrayQuery(postureSql, stretchingIdx, postures);
+      await conn.query(insertPostures);
+    }
 
     conn.commit();
     return stretchingIdx;
