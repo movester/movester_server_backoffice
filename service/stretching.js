@@ -92,10 +92,7 @@ const getStretchings = async search => {
       return stretching;
     });
 
-    return {
-      searchCnt: managedStretchings.length,
-      stretchings,
-    };
+    return stretchings;
   } catch (err) {
     console.error(`=== Stretching Service getStretchings Error: ${err} === `);
     throw new Error(err);
