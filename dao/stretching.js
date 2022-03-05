@@ -214,6 +214,10 @@ const getStretchings = async ({ title, mainCategory, subCategory, posture, effec
 	                      	WHERE a.stretching_idx = c.stretching_idx
 	                     GROUP BY c.stretching_idx
 	                       ) AS 'postures'
+                      , (SELECT AVG(difficulty)
+                           FROM stretching_difficulty d
+                          WHERE a.stretching_idx = d.stretching_idx
+                        ) AS 'difficulty'
                    FROM stretching a
                   WHERE a.title LIKE CONCAT('%',${title},'%')
                     AND a.main_body LIKE CONCAT('%',${mainCategory},'%')

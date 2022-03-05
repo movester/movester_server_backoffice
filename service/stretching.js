@@ -86,6 +86,10 @@ const getStretchings = async search => {
       if (stretching.postures) {
         stretching.postures = stretching.postures.split(' ').map(v => +v);
       }
+
+      stretching.difficulty = stretching.difficulty ?? 0;
+      stretching.difficulty = +Number(stretching.difficulty).toFixed(2);
+
       return stretching;
     });
 
