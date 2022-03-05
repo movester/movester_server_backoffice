@@ -208,12 +208,12 @@ const getStretchings = async ({ title, mainCategory, subCategory, posture, effec
                            FROM movester_db.stretching_effect AS b
 	                    	  WHERE a.stretching_idx = b.stretching_idx
 	                     GROUP BY b.stretching_idx
-	                       ) AS 'effects'
+	                       ) AS 'effect'
 	                    , (SELECT group_concat(posture_type SEPARATOR ' ')
 	                      	 FROM movester_db.stretching_posture AS c
 	                      	WHERE a.stretching_idx = c.stretching_idx
 	                     GROUP BY c.stretching_idx
-	                       ) AS 'postures'
+	                       ) AS 'posture'
                       , (SELECT AVG(difficulty)
                            FROM stretching_difficulty d
                           WHERE a.stretching_idx = d.stretching_idx

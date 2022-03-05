@@ -80,11 +80,11 @@ const getStretchings = async search => {
     const stretchings = await stretchingDao.getStretchings(managedSearch);
 
     const managedStretchings = stretchings.map(stretching => {
-      if (stretching.effects) {
-        stretching.effects = stretching.effects.split(' ').map(v => +v);
+      if (stretching.effect) {
+        stretching.effect = stretching.effect.split(' ').map(v => +v);
       }
-      if (stretching.postures) {
-        stretching.postures = stretching.postures.split(' ').map(v => +v);
+      if (stretching.posture) {
+        stretching.posture = stretching.posture.split(' ').map(v => +v);
       }
 
       stretching.difficulty = stretching.difficulty ?? 0;
