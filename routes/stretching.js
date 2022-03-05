@@ -11,6 +11,6 @@ router.post('/', auth.checkToken, validator.createStretching, validatorError.err
 router.delete('/:idx', auth.checkToken, commonValidator.checkParamIdx, validatorError.err, stretchingCtrl.deleteStretching);
 router.get('/:idx', auth.checkToken, commonValidator.checkParamIdx, validatorError.err, stretchingCtrl.getStretching);
 router.put('/', auth.checkToken, validator.updateStretching, validatorError.err, stretchingCtrl.updateStretching);
-router.get('/', auth.checkToken, stretchingCtrl.getStretchings);
+router.get('/', auth.checkToken, validator.getStretchings, validatorError.err, stretchingCtrl.getStretchings);
 
 module.exports = router;

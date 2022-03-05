@@ -68,19 +68,19 @@ const updateStretching = async stretching => {
   }
 };
 
-const getStretchings = async stretchingTemp => {
+const getStretchings = async search => {
   try {
-    const stretching = Object.keys(stretchingTemp).reduce((acc, key) => {
-      acc[key] = stretchingTemp[key] || "''";
+    const managedSearch = Object.keys(search).reduce((acc, key) => {
+      acc[key] = search[key] || "''";
       return acc;
     }, {});
 
-    if (stretchingTemp.title) stretching.title = `'${stretchingTemp.title}'`;
+    if (search.title) managedSearch.title = `'${search.title}'`;
+
+    const stretchings = await stretchingDao.getStretchings(managedSearch);
 
     // TODO: 난이도 추가
-    const strechingsTemp = await stretchingDao.getStretchings(stretching);
-
-    const strechings = strechingsTemp.map(stretching => {
+    const managedStretchings = stretchings.map(stretching => {
       stretching.effects = stretching.effects ? stretching.effects.split(' ') : null;
       stretching.postures = stretching.postures ? stretching.postures.split(' ') : null;
       if (stretching.effects) {
@@ -89,10 +89,13 @@ const getStretchings = async stretchingTemp => {
       if (stretching.postures) {
         stretching.postures = stretching.postures.map(posture => +posture);
       }
-
       return stretching;
     });
-    return strechings;
+
+    return {
+      searchCnt: managedStretchings.length,
+      stretchings,
+    };
   } catch (err) {
     console.error(`=== Stretching Service getStretchings Error: ${err} === `);
     throw new Error(err);

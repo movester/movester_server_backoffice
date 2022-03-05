@@ -1,4 +1,4 @@
-const { body } = require('express-validator');
+const { body, query } = require('express-validator');
 
 const createStretching = [
   body('title')
@@ -64,7 +64,17 @@ const updateStretching = [
   body('image').exists().withMessage('image을(를) 입력해주세요.'),
 ];
 
+const getStretchings = [
+  query('title', 'title을(를) 입력해주세요.').exists(),
+  query('mainCategory', 'mainCategory(를) 입력해주세요.').exists().toInt(),
+  query('subCategory', 'subCategory(를) 입력해주세요.').exists().toInt(),
+  query('posture', 'posture(를) 입력해주세요.').exists().toInt(),
+  query('effect', 'effect(를) 입력해주세요.').exists().toInt(),
+  query('tool', 'tool(를) 입력해주세요.').exists().toInt(),
+];
+
 module.exports = {
   createStretching,
   updateStretching,
+  getStretchings,
 };

@@ -70,8 +70,8 @@ const updateStretching = async (req, res) => {
 
 const getStretchings = async (req, res) => {
   try {
-    const stretching = req.query;
-    const strechings = await stretchingService.getStretchings(stretching);
+    const search = req.query;
+    const strechings = await stretchingService.getStretchings(search);
 
     return res.status(CODE.OK).json(form.success(strechings));
   } catch (err) {
