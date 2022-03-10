@@ -2,7 +2,6 @@ const jwt = require('../modules/jwt');
 const adminDao = require('../dao/admin');
 const encrypt = require('../modules/encrypt');
 const redis = require('../modules/redis');
-const CODE = require('../utils/statusCode');
 
 const join = async joinUser => {
   try {
@@ -21,14 +20,10 @@ const login = async ({ id, password }) => {
   try {
     const admin = await adminDao.findAdminById(id);
 
-    if (!admin) {
-      return CODE.BAD_REQUEST;
-    }
-
     const isCorrectPassword = await encrypt.compare(password, admin.password);
 
     if (!isCorrectPassword) {
-      return CODE.NOT_FOUND;
+      return false;
     }
 
     const token = {
@@ -104,7 +99,7 @@ const getAdminsList = async () => {
   }
 };
 
-const deleteAdmin = async (idx) => {
+const deleteAdmin = async idx => {
   try {
     const adminsList = await adminDao.deleteAdmin(idx);
     return adminsList;
@@ -122,5 +117,5 @@ module.exports = {
   findAdminByIdx,
   updatePassword,
   getAdminsList,
-  deleteAdmin
+  deleteAdmin,
 };

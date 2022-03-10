@@ -26,11 +26,13 @@ const join = async (req, res) => {
 const login = async (req, res) => {
   try {
     const reqAdmin = req.body;
+    const isAdminValid = await adminService.findAdminById(reqAdmin.id);
+
+    if (!isAdminValid) return res.status(CODE.BAD_REQUEST).json(form.fail(MSG.ID_NOT_EXIST));
+    if (isAdminValid.deleteAt) return res.status(CODE.BAD_REQUEST).json(form.fail('탈퇴한 관리자 계정입니다.'));
+
     const loginAdmin = await adminService.login(reqAdmin);
-
-    if (loginAdmin === CODE.BAD_REQUEST) return res.status(CODE.BAD_REQUEST).json(form.fail(MSG.ID_NOT_EXIST));
-
-    if (loginAdmin === CODE.NOT_FOUND) return res.status(CODE.NOT_FOUND).json(form.fail(MSG.PW_MISMATCH));
+    if (!loginAdmin) return res.status(CODE.NOT_FOUND).json(form.fail(MSG.PW_MISMATCH));
 
     return res
       .status(CODE.OK)
