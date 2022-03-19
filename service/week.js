@@ -65,6 +65,26 @@ const updateWeek = async weekTemp => {
       return false;
     }
     console.error(`=== Week Service updateWeek Error: ${err} === `);
+  }
+};
+
+const getWeek = async weekIdx => {
+  try {
+    const weekTemp = await weekDao.getWeek(weekIdx);
+    if (!weekTemp) return null;
+
+    const week = {
+      weekIdx: weekTemp.weekIdx,
+      title: weekTemp.title,
+      week: weekTemp.titles.map(v => v.title),
+      writer: weekTemp.writer,
+      createAt: weekTemp.createAt,
+      isExpose: weekTemp.isExpose,
+    };
+
+    return week;
+  } catch (err) {
+    console.error(`=== Week Service getWeek Error: ${err} === `);
     throw new Error(err);
   }
 };
@@ -74,4 +94,5 @@ module.exports = {
   findWeekByTitle,
   deleteWeek,
   updateWeek,
+  getWeek,
 };

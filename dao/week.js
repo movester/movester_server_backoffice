@@ -76,9 +76,50 @@ const updateWeek = async ({ title, mon, tue, wed, thu, fri, sat, sun, writer, we
   }
 };
 
+const getWeek = async weekIdx => {
+  let conn;
+
+  try {
+    conn = await pool.getConnection(async conn => conn);
+
+    await conn.beginTransaction();
+
+    const getWeekSql = `SELECT week_stretching_idx AS 'weekIdx', title, writer, DATE_FORMAT(create_at,'%Y.%m.%d') AS 'createAt', is_expose AS 'isExpose', mon_stretching_idx AS 'monIdx', tue_stretching_idx AS 'tueIdx', wed_stretching_idx AS 'wedIdx', thu_stretching_idx AS 'thuIdx', fri_stretching_idx AS 'friIdx', sat_stretching_idx AS 'satIdx', sun_stretching_idx AS 'sunIdx'
+                          FROM week_stretching
+                         WHERE week_stretching_idx = ${weekIdx}`;
+
+    const [row] = await conn.query(getWeekSql);
+    if (!row.length) return null;
+
+    const week = row[0];
+    const weekIdxs = [week.tueIdx, week.wedIdx, week.thuIdx, week.friIdx, week.satIdx, week.sunIdx];
+
+    const getStretchingTitleSql = idx => `(SELECT title
+                                             FROM stretching
+                                            WHERE stretching_idx = ${idx})`;
+
+    const getUnionSql = weekIdxs.reduce(
+      (acc, dayIdx) => `${acc} UNION ALL ${getStretchingTitleSql(dayIdx)}`,
+      getStretchingTitleSql(week.monIdx)
+    );
+
+    const [titles] = await conn.query(getUnionSql);
+    week.titles = titles;
+
+    conn.commit();
+    return week;
+  } catch (err) {
+    console.error(`=== Week Dao getWeek Error: ${err} === `);
+    throw new Error(err);
+  } finally {
+    conn.release();
+  }
+};
+
 module.exports = {
   createWeek,
   findWeekByTitle,
   deleteWeek,
   updateWeek,
+  getWeek,
 };
