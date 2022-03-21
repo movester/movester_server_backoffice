@@ -28,7 +28,10 @@ const updateWeek = [
     .custom(v => v.every(e => e > 0)),
 ];
 
+const checkBodyIdx = [body('weekIdx').isInt().withMessage('idx 는 숫자로만 이루어져야 합니다.').toInt()];
+
 module.exports = {
   createWeek,
   updateWeek,
+  checkBodyIdx
 };

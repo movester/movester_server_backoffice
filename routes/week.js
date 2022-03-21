@@ -11,5 +11,7 @@ router.post('/', auth.checkToken, validator.createWeek, validatorError.err, week
 router.delete('/:idx', auth.checkToken, commonValidator.checkParamIdx, validatorError.err, weekCtrl.deleteWeek);
 router.put('/', auth.checkToken, validator.updateWeek, validatorError.err, weekCtrl.updateWeek);
 router.get('/:idx', auth.checkToken, commonValidator.checkParamIdx, validatorError.err, weekCtrl.getWeek);
+router.patch('/expose', auth.checkToken, validator.checkBodyIdx, validatorError.err, weekCtrl.updateExposeWeek);
+router.delete('/expose/:idx', auth.checkToken, commonValidator.checkParamIdx, validatorError.err, weekCtrl.cancelExposeWeek);
 
 module.exports = router;
