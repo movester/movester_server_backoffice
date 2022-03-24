@@ -43,7 +43,7 @@ const updateWeek = async (req, res) => {
     week.adminIdx = req.cookies.idx;
 
     const isTitleDuplicate = await weekService.findWeekByTitle(week.title);
-    if (isTitleDuplicate.weekIdx !== week.weekIdx) {
+    if (isTitleDuplicate && isTitleDuplicate.weekIdx !== week.weekIdx) {
       return res.status(CODE.DUPLICATE).json(form.fail(MSG.TITLE_ALREADY_EXIST));
     }
 
@@ -104,6 +104,19 @@ const cancelExposeWeek = async (req, res) => {
   }
 };
 
+const getExposeWeek = async (req, res) => {
+  try {
+    const weekIdx = req.params.idx;
+
+    const week = await weekService.getExposeWeek(weekIdx);
+
+    return res.status(CODE.OK).json(form.success(week));
+  } catch (err) {
+    console.error(`=== Week Ctrl getExposeWeek Error: ${err} === `);
+    return res.status(CODE.INTERNAL_SERVER_ERROR).json(form.fail(MSG.INTERNAL_SERVER_ERROR));
+  }
+};
+
 module.exports = {
   createWeek,
   deleteWeek,
@@ -111,4 +124,5 @@ module.exports = {
   getWeek,
   updateExposeWeek,
   cancelExposeWeek,
+  getExposeWeek,
 };

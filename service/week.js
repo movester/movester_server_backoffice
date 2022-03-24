@@ -121,6 +121,16 @@ const cancelExposeWeek = async weekIdx => {
   }
 };
 
+const getExposeWeek = async () => {
+  try {
+    const week = await weekDao.getExposeWeek();
+    return week;
+  } catch (err) {
+    console.error(`=== Week Service getExposeWeek Error: ${err} === `);
+    throw new Error(err);
+  }
+};
+
 module.exports = {
   createWeek,
   findWeekByTitle,
@@ -130,4 +140,5 @@ module.exports = {
   getWeek,
   updateExposeWeek,
   cancelExposeWeek,
+  getExposeWeek,
 };

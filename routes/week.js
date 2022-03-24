@@ -13,5 +13,6 @@ router.put('/', auth.checkToken, validator.updateWeek, validatorError.err, weekC
 router.get('/:idx', auth.checkToken, commonValidator.checkParamIdx, validatorError.err, weekCtrl.getWeek);
 router.patch('/expose', auth.checkToken, validator.checkBodyIdx, validatorError.err, weekCtrl.updateExposeWeek);
 router.delete('/expose/:idx', auth.checkToken, commonValidator.checkParamIdx, validatorError.err, weekCtrl.cancelExposeWeek);
+router.get('/expose/stretchings', auth.checkToken, weekCtrl.getExposeWeek);
 
 module.exports = router;
