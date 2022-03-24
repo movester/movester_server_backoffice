@@ -1,5 +1,15 @@
 const weekDao = require('../dao/week');
 
+const getWeeks = async () => {
+  try {
+    const weeks = await weekDao.getWeeks();
+    return weeks;
+  } catch (err) {
+    console.error(`=== Week Service getWeeks Error: ${err} === `);
+    throw new Error(err);
+  }
+};
+
 const createWeek = async weekTemp => {
   try {
     const week = {
@@ -132,6 +142,7 @@ const getExposeWeek = async () => {
 };
 
 module.exports = {
+  getWeeks,
   createWeek,
   findWeekByTitle,
   findWeekByIdx,

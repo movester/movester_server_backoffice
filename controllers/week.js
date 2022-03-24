@@ -3,6 +3,16 @@ const CODE = require('../utils/statusCode');
 const MSG = require('../utils/responseMessage');
 const form = require('../utils/responseForm');
 
+const getWeeks = async (req, res) => {
+  try {
+    const weeks = await weekService.getWeeks();
+    return res.status(CODE.OK).json(form.success(weeks));
+  } catch (err) {
+    console.error(`=== Week Ctrl getWeeks Error: ${err} === `);
+    return res.status(CODE.INTERNAL_SERVER_ERROR).json(form.fail(MSG.INTERNAL_SERVER_ERROR));
+  }
+};
+
 const createWeek = async (req, res) => {
   try {
     const week = req.body;
@@ -118,6 +128,7 @@ const getExposeWeek = async (req, res) => {
 };
 
 module.exports = {
+  getWeeks,
   createWeek,
   deleteWeek,
   updateWeek,

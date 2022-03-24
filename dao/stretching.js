@@ -110,8 +110,8 @@ const getDetailStretching = async stretchingIdx => {
     await conn.beginTransaction();
 
     const stretchingSql = `SELECT stretching_idx AS 'stretchingIdx', title, contents, main_body AS mainBody, sub_body AS subBody, tool, youtube_url, image, writer, DATE_FORMAT(create_at,'%Y.%m.%d') AS 'createAt'
-                   FROM stretching
-                  WHERE stretching_idx = ${stretchingIdx}`;
+                             FROM stretching
+                            WHERE stretching_idx = ${stretchingIdx}`;
     const [stretching] = await conn.query(stretchingSql);
 
     if (!stretching.length) return null;
@@ -169,8 +169,8 @@ const updateStretching = async stretching => {
     const isPosture = Object.keys(stretching).includes('postures');
     if (isPosture) {
       const deletePosture = `DELETE
-                              FROM stretching_posture
-                             WHERE stretching_idx = ${stretching.stretchingIdx};`;
+                               FROM stretching_posture
+                              WHERE stretching_idx = ${stretching.stretchingIdx};`;
       await conn.query(deletePosture);
 
       const insertPosture = `INSERT
