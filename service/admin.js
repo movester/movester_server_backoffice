@@ -20,8 +20,8 @@ const join = async joinUser => {
 const login = async ({ id, password }) => {
   try {
     const admin = await adminDao.findAdminById(id);
-
-    if (!admin) {
+ 
+    if (!admin || admin.deleteAt) {
       return CODE.BAD_REQUEST;
     }
 
