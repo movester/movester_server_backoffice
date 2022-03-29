@@ -1,4 +1,5 @@
 const pool = require('./pool');
+const { getInsertWeekDayStretchingSql } = require('../utils/sql');
 
 const getWeeks = async () => {
   let conn;
@@ -39,16 +40,8 @@ const createWeek = async ({ title, week, adminIdx }) => {
 
     const weekStretchingIdx = insertRow.insertId;
 
-    const getInsertWeekDayStretchingSql = (weekStretchingIdx, weekArr) => {
-      const insertSql = `INSERT
-                           INTO week_day_stretching (week_stretching_idx, week_day, stretching_idx)
-                         VALUES`;
-      const getValues = weekArr.map((v, i) => `(${weekStretchingIdx}, ${i}, ${v})`).join(', ');
-      return insertSql.trim() + getValues;
-    };
-
-    const insertweekDayStretching = getInsertWeekDayStretchingSql(weekStretchingIdx, week);
-    await conn.query(insertweekDayStretching);
+    const insertWeekDayStretching = getInsertWeekDayStretchingSql(weekStretchingIdx, week);
+    await conn.query(insertWeekDayStretching);
 
     conn.commit();
     return weekStretchingIdx;
@@ -119,30 +112,32 @@ const deleteWeek = async idx => {
   }
 };
 
-const updateWeek = async ({ title, mon, tue, wed, thu, fri, sat, sun, adminIdx, weekIdx }) => {
+const updateWeek = async ({ weekIdx, title, week, adminIdx }) => {
   let conn;
 
   try {
     conn = await pool.getConnection(async conn => conn);
+    await conn.beginTransaction();
 
-    const sql = `UPDATE week_stretching
-                    SET title = '${title}'
-                      , mon_stretching_idx = ${mon}
-                      , tue_stretching_idx = ${tue}
-                      , wed_stretching_idx = ${wed}
-                      , thu_stretching_idx = ${thu}
-                      , fri_stretching_idx = ${fri}
-                      , sat_stretching_idx = ${sat}
-                      , sun_stretching_idx = ${sun}
-                      , admin_idx = ${adminIdx}
-                      , create_at = CURRENT_TIMESTAMP()
-                  WHERE week_stretching_idx = ${weekIdx}`;
+    const updateWeekStretching = `UPDATE week_stretching
+                                     SET title = '${title}'
+                                       , admin_idx = ${adminIdx}
+                                   WHERE week_stretching_idx = ${weekIdx}`;
+    await conn.query(updateWeekStretching);
 
-    const [row] = await conn.query(sql);
+    const deleteweekDayStretching = `DELETE
+                                      FROM week_day_stretching
+                                      WHERE week_stretching_idx = ${weekIdx}`;
+    await conn.query(deleteweekDayStretching);
 
-    return row.affectedRows;
+    const insertWeekDayStretching = getInsertWeekDayStretchingSql(weekIdx, week);
+    await conn.query(insertWeekDayStretching);
+
+    conn.commit();
+    return true;
   } catch (err) {
-    console.error(`=== Week Dao updateWeek Error: ${err.code} === `);
+    console.error(`=== Week Dao updateWeek Error: ${err} === `);
+    conn.rollback();
     throw new Error(err.code);
   } finally {
     conn.release();
