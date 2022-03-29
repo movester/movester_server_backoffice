@@ -25,17 +25,36 @@ const getWeeks = async () => {
   }
 };
 
-const createWeek = async ({ title, mon, tue, wed, thu, fri, sat, sun, adminIdx }) => {
+const createWeek = async ({ title, week, adminIdx }) => {
   let conn;
+
   try {
     conn = await pool.getConnection(async conn => conn);
-    const sql = `INSERT
-                   INTO week_stretching (title, mon_stretching_idx, tue_stretching_idx, wed_stretching_idx, thu_stretching_idx, fri_stretching_idx, sat_stretching_idx, sun_stretching_idx, admin_idx)
-                 VALUES ('${title}', ${mon}, ${tue}, ${wed}, ${thu}, ${fri}, ${sat}, ${sun}, ${adminIdx});`;
-    const [row] = await conn.query(sql);
-    return row.insertId;
+    await conn.beginTransaction();
+
+    const insertWeekStretching = `INSERT
+                                    INTO week_stretching (title,  admin_idx)
+                                  VALUES ('${title}', ${adminIdx});`;
+    const [insertRow] = await conn.query(insertWeekStretching);
+
+    const weekStretchingIdx = insertRow.insertId;
+
+    const getInsertWeekDayStretchingSql = (weekStretchingIdx, weekArr) => {
+      const insertSql = `INSERT
+                           INTO week_day_stretching (week_stretching_idx, week_day, stretching_idx)
+                         VALUES`;
+      const getValues = weekArr.map((v, i) => `(${weekStretchingIdx}, ${i}, ${v})`).join(', ');
+      return insertSql.trim() + getValues;
+    };
+
+    const insertweekDayStretching = getInsertWeekDayStretchingSql(weekStretchingIdx, week);
+    await conn.query(insertweekDayStretching);
+
+    conn.commit();
+    return weekStretchingIdx;
   } catch (err) {
-    console.error(`=== Week Dao createWeek Error: ${err.code} === `);
+    console.error(`=== Week Dao createWeek Error: ${err} === `);
+    conn.rollback();
     throw new Error(err.code);
   } finally {
     conn.release();

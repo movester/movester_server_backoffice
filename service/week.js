@@ -10,19 +10,8 @@ const getWeeks = async () => {
   }
 };
 
-const createWeek = async weekTemp => {
+const createWeek = async week => {
   try {
-    const week = {
-      title: weekTemp.title,
-      mon: weekTemp.week[0],
-      tue: weekTemp.week[1],
-      wed: weekTemp.week[2],
-      thu: weekTemp.week[3],
-      fri: weekTemp.week[4],
-      sat: weekTemp.week[5],
-      sun: weekTemp.week[6],
-      adminIdx: weekTemp.adminIdx,
-    };
     const newWeekIdx = await weekDao.createWeek(week);
     return newWeekIdx;
   } catch (err) {
