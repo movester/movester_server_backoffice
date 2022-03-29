@@ -67,18 +67,8 @@ const updateWeek = async week => {
 
 const getWeek = async weekIdx => {
   try {
-    const weekTemp = await weekDao.getWeek(weekIdx);
-    if (!weekTemp) return null;
-
-    const week = {
-      weekIdx: weekTemp.weekIdx,
-      title: weekTemp.title,
-      week: weekTemp.titles.map(v => v.title),
-      adminIdx: weekTemp.adminIdx,
-      createAt: weekTemp.createAt,
-      isExpose: weekTemp.isExpose,
-    };
-
+    const week = await weekDao.getWeek(weekIdx);
+    if (!week) return null;
     return week;
   } catch (err) {
     console.error(`=== Week Service getWeek Error: ${err} === `);
