@@ -68,6 +68,38 @@ const updateStretching = async stretching => {
   }
 };
 
+const getStretchings = async search => {
+  try {
+    const managedSearch = Object.keys(search).reduce((acc, key) => {
+      acc[key] = search[key] || "''";
+      return acc;
+    }, {});
+
+    if (search.title) managedSearch.title = `'${search.title}'`;
+
+    const stretchings = await stretchingDao.getStretchings(managedSearch);
+
+    const managedStretchings = stretchings.map(stretching => {
+      if (stretching.effect) {
+        stretching.effect = stretching.effect.split(' ').map(v => +v);
+      }
+      if (stretching.posture) {
+        stretching.posture = stretching.posture.split(' ').map(v => +v);
+      }
+
+      stretching.difficulty = stretching.difficulty ?? 0;
+      stretching.difficulty = +Number(stretching.difficulty).toFixed(2);
+
+      return stretching;
+    });
+
+    return managedStretchings;
+  } catch (err) {
+    console.error(`=== Stretching Service getStretchings Error: ${err} === `);
+    throw new Error(err);
+  }
+};
+
 module.exports = {
   createStretching,
   findStretchingByTitle,
@@ -75,4 +107,5 @@ module.exports = {
   deleteStretching,
   getStretching,
   updateStretching,
+  getStretchings,
 };

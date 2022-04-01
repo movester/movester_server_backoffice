@@ -8,7 +8,7 @@ const responseMessage = {
 
   POST_CREATE_SUCCESS: '글 등록 성공',
   POST_LIST_SUCCESS: '글 목록 조회 성공',
-  POST_DETAIL_SUCCESS: '글 상세 조회 성공',
+  POST_DETAIL_SUCCESS: '글 상세조회 성공',
   POST_UPDATE_SUCCESS: '글 수정 성공',
   POST_DELETE_SUCCESS: '글 삭제 성공',
 
