@@ -19,7 +19,7 @@ const createStretching = async ({
     await conn.beginTransaction();
 
     const insertStretching = `INSERT
-                                INTO stretching (title, contents, main_body, sub_body, tool, youtube_url, image, writer)
+                                INTO stretching (title, contents, main_body, sub_body, tool, youtube_url, image, admin_idx AS 'adminIdx')
                               VALUES ('${title}', '${contents}', ${mainBody}, ${subBody}, ${tool}, '${youtubeUrl}', '${image}', ${adminIdx});`;
     const [insertRow] = await conn.query(insertStretching);
 
@@ -113,25 +113,38 @@ const getDetailStretching = async stretchingIdx => {
     conn = await pool.getConnection(async conn => conn);
     await conn.beginTransaction();
 
-    const stretchingSql = `SELECT stretching_idx AS 'stretchingIdx', title, contents, main_body AS mainBody, sub_body AS subBody, tool, youtube_url, image, writer, DATE_FORMAT(create_at,'%Y.%m.%d') AS 'createAt'
-                             FROM stretching
+    const stretchingSql = `SELECT a.stretching_idx AS 'stretchingIdx'
+                                , a.title
+                                , a.contents
+                                , a.main_body AS mainBody
+                                , a.sub_body AS subBody
+                                , a.tool
+                                , a.youtube_url
+                                , a.image
+                                , a.admin_idx AS 'adminIdx'
+                                , DATE_FORMAT(a.create_at,'%Y.%m.%d') AS 'createAt'
+                                , (SELECT AVG(b.difficulty)
+                                     FROM stretching_difficulty b
+                                    WHERE a.stretching_idx = b.stretching_idx
+                                  ) AS 'difficulty'
+                             FROM stretching a
                             WHERE stretching_idx = ${stretchingIdx}`;
     const [stretching] = await conn.query(stretchingSql);
 
     if (!stretching.length) return null;
 
-    const effectSql = ` SELECT stretching_idx AS 'stretchingIdx', effect_type AS effect
+    const effectSql = ` SELECT effect_type AS effect
                           FROM stretching_effect
                          WHERE stretching_idx = ${stretchingIdx}`;
     const [effect] = await conn.query(effectSql);
 
-    const postureSql = ` SELECT stretching_idx AS 'stretchingIdx', posture_type AS posture
+    const postureSql = ` SELECT posture_type AS posture
                            FROM stretching_posture
                           WHERE stretching_idx = ${stretchingIdx}`;
     const [posture] = await conn.query(postureSql);
 
     return {
-      stretching: stretching[0],
+      ...stretching[0],
       effect,
       posture,
     };
@@ -152,7 +165,7 @@ const updateStretching = async stretching => {
     await conn.beginTransaction();
 
     const updateStretching = `UPDATE stretching
-                                 SET title = '${stretching.title}', contents = '${stretching.contents}', main_body = ${stretching.mainBody}, sub_body = ${stretching.subBody}, tool = ${stretching.tool}, youtube_url = '${stretching.youtubeUrl}', image = '${stretching.image}', writer = ${stretching.adminIdx}
+                                 SET title = '${stretching.title}', contents = '${stretching.contents}', main_body = ${stretching.mainBody}, sub_body = ${stretching.subBody}, tool = ${stretching.tool}, youtube_url = '${stretching.youtubeUrl}', image = '${stretching.image}', admin_idx AS 'adminIdx' = ${stretching.adminIdx}
                                WHERE stretching_idx = ${stretching.stretchingIdx}`;
     const [updateRow] = await conn.query(updateStretching);
 

@@ -42,17 +42,17 @@ const deleteStretching = async stretchingIdx => {
 
 const getStretching = async stretchingIdx => {
   try {
-    const tempStretching = await stretchingDao.getDetailStretching(stretchingIdx);
-    if (!tempStretching) return tempStretching;
+    const stretching = await stretchingDao.getDetailStretching(stretchingIdx);
+    if (!stretching) return stretching;
 
-    const effect = tempStretching.effect.map(eff => eff.effect);
-    const posture = tempStretching.posture.map(pos => pos.posture);
+    const effect = stretching.effect.map(eff => eff.effect);
+    const posture = stretching.posture.map(pos => pos.posture);
 
-    const stretching = { ...tempStretching.stretching };
-    stretching.effect = effect;
-    stretching.posture = posture;
+    stretching.difficulty = stretching.difficulty ?? 0;
+    stretching.difficulty = +Number(stretching.difficulty).toFixed(2);
 
-    return stretching;
+    const managedStretching = { ...stretching, effect, posture };
+    return managedStretching;
   } catch (err) {
     console.error(`=== Stretching Service getStretching Error: ${err} === `);
   }
