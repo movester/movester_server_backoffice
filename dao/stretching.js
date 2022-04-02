@@ -56,7 +56,10 @@ const findStretchingByTitle = async title => {
   let conn;
   try {
     conn = await pool.getConnection(async conn => conn);
-    const sql = `SELECT stretching_idx AS 'stretchingIdx', title, main_body AS mainBody, sub_body AS subBody
+    const sql = `SELECT stretching_idx AS 'stretchingIdx'
+                      , title
+                      , main_body AS mainBody
+                      , sub_body AS subBody
                    FROM stretching
                   WHERE title = '${title}'`;
     const [row] = await conn.query(sql);
@@ -73,7 +76,10 @@ const findStretchingByIdx = async stretchingIdx => {
   let conn;
   try {
     conn = await pool.getConnection(async conn => conn);
-    const sql = `SELECT stretching_idx AS 'stretchingIdx', title, main_body AS 'mainBody', sub_body AS 'subBody'
+    const sql = `SELECT stretching_idx AS 'stretchingIdx'
+                      , title
+                      , main_body AS 'mainBody'
+                      , sub_body AS 'subBody'
                    FROM stretching
                   WHERE stretching_idx = ${stretchingIdx}`;
     const [row] = await conn.query(sql);
@@ -165,7 +171,14 @@ const updateStretching = async stretching => {
     await conn.beginTransaction();
 
     const updateStretching = `UPDATE stretching
-                                 SET title = '${stretching.title}', contents = '${stretching.contents}', main_body = ${stretching.mainBody}, sub_body = ${stretching.subBody}, tool = ${stretching.tool}, youtube_url = '${stretching.youtubeUrl}', image = '${stretching.image}', admin_idx AS 'adminIdx' = ${stretching.adminIdx}
+                                 SET title = '${stretching.title}'
+                                   , contents = '${stretching.contents}'
+                                   , main_body = ${stretching.mainBody}
+                                   , sub_body = ${stretching.subBody}
+                                   , tool = ${stretching.tool}
+                                   , youtube_url = '${stretching.youtubeUrl}'
+                                   , image = '${stretching.image}'
+                                   , admin_idx AS 'adminIdx' = ${stretching.adminIdx}
                                WHERE stretching_idx = ${stretching.stretchingIdx}`;
     const [updateRow] = await conn.query(updateStretching);
 
