@@ -5,7 +5,13 @@ const getUserInfo = async idx => {
   try {
     conn = await pool.getConnection(async conn => conn);
 
-    const sql = `SELECT user_idx AS 'userIdx', email, name, kakao_id AS 'kakaoId', is_email_auth AS 'isEmailAuth', DATE_FORMAT(create_at,'%Y.%m.%d') AS 'createAt'
+    const sql = `SELECT user_idx AS 'userIdx'
+                      , email
+                      , name
+                      , kakao_id AS 'kakaoId'
+                      , is_email_auth AS 'isEmailAuth'
+                      , DATE_FORMAT(create_at,'%Y.%m.%d') AS 'createAt'
+                      , DATE_FORMAT(delete_at,'%Y.%m.%d') AS 'deleteAt'
                    FROM user
                   WHERE user_idx = ${idx}`;
     const [row] = await conn.query(sql);
@@ -24,7 +30,8 @@ const getUsersCount = async () => {
     conn = await pool.getConnection(async conn => conn);
 
     const sql = `SELECT COUNT(*) AS count
-                   FROM user`;
+                   FROM user
+                  WHERE delete_at IS NULL`;
     const [row] = await conn.query(sql);
     return row.length ? row : null;
   } catch (err) {
@@ -40,7 +47,10 @@ const getUsersListByCreateAt = async searchStart => {
   try {
     conn = await pool.getConnection(async conn => conn);
 
-    const sql = `SELECT user_idx AS 'userIdx', email, name, DATE_FORMAT(create_at,'%Y.%m.%d') AS 'createAt'
+    const sql = `SELECT user_idx AS 'userIdx'
+                      , email
+                      , name
+                      , DATE_FORMAT(create_at,'%Y.%m.%d') AS 'createAt'
                       , (SELECT COUNT(*)
                                   FROM attend_point
                                  WHERE user_idx = user.user_idx
@@ -49,6 +59,7 @@ const getUsersListByCreateAt = async searchStart => {
                               GROUP BY user_idx, attend_year, attend_month
                         ) AS 'attendPoint'
                   FROM user
+                 WHERE delete_at IS NULL
                  ORDER BY create_at DESC
                  LIMIT ${searchStart},10`;
 
@@ -68,7 +79,10 @@ const getUsersListByAttendPoint = async searchStart => {
     conn = await pool.getConnection(async conn => conn);
 
     const sql = `SELECT *
-                   FROM (SELECT user_idx AS 'userIdx', email, name,  DATE_FORMAT(create_at,'%Y.%m.%d') AS 'createAt'
+                   FROM (SELECT user_idx AS 'userIdx'
+                              , email
+                              , name
+                              , DATE_FORMAT(create_at,'%Y.%m.%d') AS 'createAt'
                            , (SELECT COUNT(*)
                                        FROM attend_point
                                       WHERE user_idx = user.user_idx
@@ -77,6 +91,7 @@ const getUsersListByAttendPoint = async searchStart => {
                                    GROUP BY user_idx, attend_year, attend_month
                               ) AS attendPoint
                           FROM user
+                         WHERE delete_at IS NULL
                         ) userAttendPoint
               ORDER BY attendPoint DESC
                  LIMIT ${searchStart},10;`;
@@ -97,7 +112,8 @@ const getUserByIdx = async idx => {
   try {
     conn = await pool.getConnection(async conn => conn);
 
-    const sql = `SELECT user_idx AS userIdx, email
+    const sql = `SELECT user_idx AS userIdx
+                      , email
                    FROM user
                   WHERE user_idx = ${idx}`;
 
@@ -116,7 +132,8 @@ const getUserAttendPoints = async (idx, year) => {
   try {
     conn = await pool.getConnection(async conn => conn);
 
-    const sql = `SELECT attend_month AS month, COUNT(*) * 10 AS attendPoint
+    const sql = `SELECT attend_month AS month
+                      , COUNT(*) * 10 AS attendPoint
                    FROM attend_point
                   WHERE user_idx = ${idx}
                     AND attend_year = ${year}
@@ -139,7 +156,7 @@ const getUserRecords = async (idx, year) => {
     conn = await pool.getConnection(async conn => conn);
 
     const sql = `SELECT record_month AS month
-                   ,
+                      ,
                      (SELECT record
                         FROM user_record
                        WHERE record_type = 1
@@ -188,7 +205,10 @@ const getUsersSearch = async (type, value) => {
   try {
     conn = await pool.getConnection(async conn => conn);
 
-    const sql = `SELECT user_idx AS 'userIdx', email, name, DATE_FORMAT(create_at,'%Y.%m.%d') AS 'createAt'
+    const sql = `SELECT user_idx AS 'userIdx'
+                      , email
+                      , name
+                      , DATE_FORMAT(create_at,'%Y.%m.%d') AS 'createAt'
                         , (SELECT COUNT(*)
                              FROM attend_point
                             WHERE user_idx = user.user_idx
