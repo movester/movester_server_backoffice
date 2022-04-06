@@ -19,7 +19,11 @@ const createStretching = async ({
     await conn.beginTransaction();
 
     const insertStretching = `INSERT
+<<<<<<< HEAD
                                 INTO stretching (title, contents, main_body, sub_body, tool, youtube_url, image, admin_idx AS 'adminIdx')
+=======
+                                INTO stretching (title, contents, main_body, sub_body, tool, youtube_url, image, admin_idx)
+>>>>>>> origin/fix/82_작성자_스키마_변경_대응
                               VALUES ('${title}', '${contents}', ${mainBody}, ${subBody}, ${tool}, '${youtubeUrl}', '${image}', ${adminIdx});`;
     const [insertRow] = await conn.query(insertStretching);
 
@@ -119,6 +123,7 @@ const getDetailStretching = async stretchingIdx => {
     conn = await pool.getConnection(async conn => conn);
     await conn.beginTransaction();
 
+<<<<<<< HEAD
     const stretchingSql = `SELECT a.stretching_idx AS 'stretchingIdx'
                                 , a.title
                                 , a.contents
@@ -134,17 +139,40 @@ const getDetailStretching = async stretchingIdx => {
                                     WHERE a.stretching_idx = b.stretching_idx
                                   ) AS 'difficulty'
                              FROM stretching a
+=======
+    const stretchingSql = `SELECT stretching_idx AS 'stretchingIdx'
+                                , title
+                                , contents
+                                , main_body AS mainBody
+                                , sub_body AS subBody
+                                , tool
+                                , youtube_url
+                                , image
+                                , admin_idx AS adminIdx
+                                , DATE_FORMAT(create_at,'%Y.%m.%d') AS 'createAt'
+                             FROM stretching
+>>>>>>> origin/fix/82_작성자_스키마_변경_대응
                             WHERE stretching_idx = ${stretchingIdx}`;
     const [stretching] = await conn.query(stretchingSql);
 
     if (!stretching.length) return null;
 
+<<<<<<< HEAD
     const effectSql = ` SELECT effect_type AS effect
+=======
+    const effectSql = ` SELECT stretching_idx AS 'stretchingIdx'
+                             , effect_type AS effect
+>>>>>>> origin/fix/82_작성자_스키마_변경_대응
                           FROM stretching_effect
                          WHERE stretching_idx = ${stretchingIdx}`;
     const [effect] = await conn.query(effectSql);
 
+<<<<<<< HEAD
     const postureSql = ` SELECT posture_type AS posture
+=======
+    const postureSql = ` SELECT stretching_idx AS 'stretchingIdx'
+                              , posture_type AS posture
+>>>>>>> origin/fix/82_작성자_스키마_변경_대응
                            FROM stretching_posture
                           WHERE stretching_idx = ${stretchingIdx}`;
     const [posture] = await conn.query(postureSql);
@@ -178,7 +206,11 @@ const updateStretching = async stretching => {
                                    , tool = ${stretching.tool}
                                    , youtube_url = '${stretching.youtubeUrl}'
                                    , image = '${stretching.image}'
+<<<<<<< HEAD
                                    , admin_idx AS 'adminIdx' = ${stretching.adminIdx}
+=======
+                                   , admin_idx = ${stretching.adminIdx}
+>>>>>>> origin/fix/82_작성자_스키마_변경_대응
                                WHERE stretching_idx = ${stretching.stretchingIdx}`;
     const [updateRow] = await conn.query(updateStretching);
 

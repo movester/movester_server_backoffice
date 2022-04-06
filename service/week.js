@@ -21,7 +21,7 @@ const createWeek = async weekTemp => {
       fri: weekTemp.week[4],
       sat: weekTemp.week[5],
       sun: weekTemp.week[6],
-      writer: weekTemp.adminIdx,
+      adminIdx: weekTemp.adminIdx,
     };
     const newWeekIdx = await weekDao.createWeek(week);
     return newWeekIdx;
@@ -75,7 +75,7 @@ const updateWeek = async weekTemp => {
       fri: weekTemp.week[4],
       sat: weekTemp.week[5],
       sun: weekTemp.week[6],
-      writer: weekTemp.adminIdx,
+      adminIdx: weekTemp.adminIdx,
       weekIdx: weekTemp.weekIdx,
     };
     const isUpdate = await weekDao.updateWeek(week);
@@ -97,7 +97,7 @@ const getWeek = async weekIdx => {
       weekIdx: weekTemp.weekIdx,
       title: weekTemp.title,
       week: weekTemp.titles.map(v => v.title),
-      writer: weekTemp.writer,
+      adminIdx: weekTemp.adminIdx,
       createAt: weekTemp.createAt,
       isExpose: weekTemp.isExpose,
     };
