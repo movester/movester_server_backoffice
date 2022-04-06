@@ -5,7 +5,8 @@ const join = async ({ joinUser }) => {
   try {
     conn = await pool.getConnection(async conn => conn);
 
-    const sql = `INSERT INTO admin (id, password, name, admin_type, create_at)
+    const sql = `INSERT
+                   INTO admin (id, password, name, admin_type, create_at)
                  VALUES ('${joinUser.id}', '${joinUser.password}', '${joinUser.name}', ${joinUser.rank}, now())`;
 
     const [row] = await conn.query(sql);
@@ -23,7 +24,12 @@ const findAdminById = async id => {
   try {
     conn = await pool.getConnection(async conn => conn);
 
-    const sql = `SELECT admin_idx AS 'adminIdx', id, password, name, admin_type AS 'rank'
+    const sql = `SELECT admin_idx AS 'adminIdx'
+                      , id
+                      , password
+                      , name
+                      , admin_type AS 'rank'
+                      , DATE_FORMAT(delete_at,'%Y.%m.%d') AS 'deleteAt'
                    FROM admin WHERE id = '${id}'`;
 
     const [row] = await conn.query(sql);
@@ -41,7 +47,12 @@ const findAdminByName = async name => {
   try {
     conn = await pool.getConnection(async conn => conn);
 
-    const sql = `SELECT admin_idx AS 'adminIdx', id, password, name, admin_type AS 'rank'
+    const sql = `SELECT admin_idx AS 'adminIdx'
+                      , id
+                      , password
+                      , name
+                      , admin_type AS 'rank'
+                      , DATE_FORMAT(delete_at,'%Y.%m.%d') AS 'deleteAt'
                    FROM admin
                   WHERE name = '${name}'`;
 
@@ -61,7 +72,12 @@ const findAdminByIdx = async idx => {
   try {
     conn = await pool.getConnection(async conn => conn);
 
-    const sql = `SELECT admin_idx AS 'adminIdx', id, password, name, admin_type AS 'rank'
+    const sql = `SELECT admin_idx AS 'adminIdx'
+                      , id
+                      , password
+                      , name
+                      , admin_type AS 'rank'
+                      , DATE_FORMAT(delete_at,'%Y.%m.%d') AS 'deleteAt'
                   FROM admin
                  WHERE admin_idx = ${idx}`;
 
@@ -100,7 +116,12 @@ const getAdminsList = async () => {
   try {
     conn = await pool.getConnection(async conn => conn);
 
-    const sql = `SELECT admin_idx AS 'adminIdx', id, name, admin_type AS 'rank', DATE_FORMAT(create_at,'%Y.%m.%d') AS 'createAt'
+    const sql = `SELECT admin_idx AS 'adminIdx'
+                      , id
+                      , name
+                      , admin_type AS 'rank'
+                      , DATE_FORMAT(create_at,'%Y.%m.%d') AS 'createAt'
+                      , DATE_FORMAT(delete_at,'%Y.%m.%d') AS 'deleteAt'
                    FROM admin
                   ORDER BY create_at desc`;
 
@@ -120,8 +141,8 @@ const deleteAdmin = async idx => {
   try {
     conn = await pool.getConnection(async conn => conn);
 
-    const sql = `DELETE
-                   FROM admin
+    const sql = `UPDATE admin
+                    SET delete_at = CURRENT_TIMESTAMP()
                   WHERE admin_idx = ${idx}`;
 
     const [row] = await conn.query(sql);
