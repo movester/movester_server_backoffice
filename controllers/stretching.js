@@ -52,9 +52,9 @@ const updateStretching = async (req, res) => {
   try {
     const stretching = req.body;
     stretching.adminIdx = req.cookies.idx;
-
     const isTitleDuplicate = await stretchingService.findStretchingByTitle(stretching.title);
-    if (isTitleDuplicate.stretchingIdx !== stretching.stretchingIdx) {
+
+    if (isTitleDuplicate && isTitleDuplicate?.stretchingIdx !== stretching.stretchingIdx) {
       return res.status(CODE.DUPLICATE).json(form.fail(MSG.TITLE_ALREADY_EXIST));
     }
 
