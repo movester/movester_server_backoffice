@@ -25,6 +25,5 @@ app.use(
 );
 
 app.use('/api', router);
-app.use('/uploads', express.static('uploads'));
 
 module.exports = app;

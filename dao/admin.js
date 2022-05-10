@@ -123,6 +123,7 @@ const getAdminsList = async () => {
                       , DATE_FORMAT(create_at,'%Y.%m.%d') AS 'createAt'
                       , DATE_FORMAT(delete_at,'%Y.%m.%d') AS 'deleteAt'
                    FROM admin
+                  WHERE delete_at IS NULL
                   ORDER BY create_at desc`;
 
     const [row] = await conn.query(sql);
