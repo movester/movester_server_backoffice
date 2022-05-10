@@ -153,12 +153,12 @@ const getWeek = async weekIdx => {
     await conn.beginTransaction();
 
     const getWeekStretchingSql = `SELECT week_stretching_idx AS 'weekIdx'
-                             , title
-                             , admin_idx AS 'adminIdx'
-                             , DATE_FORMAT(create_at,'%Y.%m.%d') AS 'createAt'
-                             , is_expose AS 'isExpose'
-                          FROM week_stretching
-                         WHERE week_stretching_idx = ${weekIdx}`;
+                                       , title
+                                       , admin_idx AS 'adminIdx'
+                                       , DATE_FORMAT(create_at,'%Y.%m.%d') AS 'createAt'
+                                       , is_expose AS 'isExpose'
+                                    FROM week_stretching
+                                   WHERE week_stretching_idx = ${weekIdx}`;
 
     const [tempWeekStretching] = await conn.query(getWeekStretchingSql);
     if (!tempWeekStretching.length) return null;
@@ -171,7 +171,7 @@ const getWeek = async weekIdx => {
                                        FROM week_day_stretching as A
                                   LEFT JOIN stretching as B
                                          ON A.stretching_idx = B.stretching_idx
-                                      WHERE A.week_stretching_idx = 27
+                                      WHERE A.week_stretching_idx = ${weekIdx}
                                    ORDER BY week_day`;
 
     const [weekDayStretching] = await conn.query(getWeekDayStretchingSql);
