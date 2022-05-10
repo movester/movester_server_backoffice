@@ -171,7 +171,7 @@ const getWeek = async weekIdx => {
                                        FROM week_day_stretching as A
                                   LEFT JOIN stretching as B
                                          ON A.stretching_idx = B.stretching_idx
-                                      WHERE A.week_stretching_idx = 27
+                                      WHERE A.week_stretching_idx = ${weekIdx}
                                    ORDER BY week_day`;
 
     const [weekDayStretching] = await conn.query(getWeekDayStretchingSql);
