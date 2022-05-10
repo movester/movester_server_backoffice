@@ -4,8 +4,8 @@ const createStretching = [
   body('title')
     .exists()
     .withMessage('title을(를) 입력해주세요.')
-    .isLength({ min: 5, max: 50 })
-    .withMessage('title은 최소 5글자부터 최대 50글자까지 가능합니다.'),
+    .isLength({ min: 2, max: 20 })
+    .withMessage('title은 최소 2글자부터 최대 20글자까지 가능합니다.'),
   body('contents').exists().withMessage('contents을(를) 입력해주세요.'),
   body('mainBody')
     .exists()
