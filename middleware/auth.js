@@ -68,7 +68,22 @@ const checkSuperAdmin = async (req, res, next) => {
   next();
 };
 
+const checkReadOnlyAdmin = async (req, res, next) => {
+  try {
+    const admin = await adminService.findAdminByIdx(req.cookies.idx);
+    if (admin.rank===2) {
+      return res.status(CODE.UNAUTHORIZED).json(form.fail(MSG.UNAUTHORIZED));
+    }
+  } catch (err) {
+    console.error(`===Auth Middleware Error > ${err}===`);
+    return res.status(CODE.INTERNAL_SERVER_ERROR).json(form.fail(MSG.INTERNAL_SERVER_ERROR));
+  }
+
+  next();
+};
+
 module.exports = {
   checkToken,
   checkSuperAdmin,
+  checkReadOnlyAdmin
 };

@@ -8,12 +8,47 @@ const commonValidator = require('../middleware/validator/common');
 const validatorError = require('../middleware/validatorError');
 
 router.get('/', auth.checkToken, weekCtrl.getWeeks);
-router.post('/', auth.checkToken, validator.createWeek, validatorError.err, weekCtrl.createWeek);
-router.delete('/:idx', auth.checkToken, commonValidator.checkParamIdx, validatorError.err, weekCtrl.deleteWeek);
-router.put('/', auth.checkToken, validator.updateWeek, validatorError.err, weekCtrl.updateWeek);
+router.post(
+  '/',
+  auth.checkToken,
+  auth.checkReadOnlyAdmin,
+  validator.createWeek,
+  validatorError.err,
+  weekCtrl.createWeek
+);
+router.delete(
+  '/:idx',
+  auth.checkToken,
+  auth.checkReadOnlyAdmin,
+  commonValidator.checkParamIdx,
+  validatorError.err,
+  weekCtrl.deleteWeek
+);
+router.put(
+  '/',
+  auth.checkToken,
+  auth.checkReadOnlyAdmin,
+  validator.updateWeek,
+  validatorError.err,
+  weekCtrl.updateWeek
+);
 router.get('/:idx', auth.checkToken, commonValidator.checkParamIdx, validatorError.err, weekCtrl.getWeek);
-router.patch('/expose', auth.checkToken, validator.checkBodyIdx, validatorError.err, weekCtrl.updateExposeWeek);
-router.delete('/expose/:idx', auth.checkToken, commonValidator.checkParamIdx, validatorError.err, weekCtrl.cancelExposeWeek);
+router.patch(
+  '/expose',
+  auth.checkToken,
+  auth.checkReadOnlyAdmin,
+  validator.checkBodyIdx,
+  validatorError.err,
+  weekCtrl.updateExposeWeek
+);
+router.delete(
+  '/expose/:idx',
+  auth.checkToken,
+  auth.checkReadOnlyAdmin,
+  commonValidator.checkParamIdx,
+  validatorError.err,
+  weekCtrl.cancelExposeWeek
+);
 router.get('/expose/stretchings', auth.checkToken, weekCtrl.getExposeWeek);
 
 module.exports = router;

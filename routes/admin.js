@@ -7,12 +7,21 @@ const commonValidator = require('../middleware/validator/common');
 const validatorError = require('../middleware/validatorError');
 const auth = require('../middleware/auth');
 
-router.post('/join', auth.checkToken, auth.checkSuperAdmin, validator.join, validatorError.err, adminCtrl.join);
+router.post(
+  '/join',
+  auth.checkToken,
+  auth.checkSuperAdmin,
+  auth.checkReadOnlyAdmin,
+  validator.join,
+  validatorError.err,
+  adminCtrl.join
+);
 router.post('/login', validator.login, validatorError.err, adminCtrl.login);
 router.post('/logout', auth.checkToken, adminCtrl.logout);
 router.patch(
   '/password/:adminIdx',
   auth.checkToken,
+  auth.checkReadOnlyAdmin,
   validator.updatePassword,
   validatorError.err,
   adminCtrl.updatePassword
