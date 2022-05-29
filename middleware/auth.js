@@ -35,6 +35,7 @@ const checkToken = async (req, res, next) => {
 
     res.cookie('accessToken', newAccessToken);
     req.cookies.accessToken = newAccessToken;
+    req.cookies.userIdx = refreshToken.idx;
 
     next();
   } else if (refreshToken === TOKEN_EXPIRED) {
@@ -45,6 +46,7 @@ const checkToken = async (req, res, next) => {
     redis.set(accessToken.idx, newRefreshToken);
     res.cookie('refreshToken', newRefreshToken);
     req.cookies.refreshToken = newRefreshToken;
+    req.cookies.userIdx = accessToken.idx;
 
     next();
   } else {
